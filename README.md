@@ -8,7 +8,147 @@ Reproducible local inference and quantitative-development environment for an M1 
 - `qwen35-4b-1m`: experimental literal 1.01M context reader.
 - `qwen38-27b-focused`: best-effort Qwen3.8 engineering profile at short context; its standard Q4 package exceeds physical memory.
 
-## First run
+## Recommended setup
+
+Use `qwen35-9b-daily` for routine quantitative research, coding, architecture, and backtest review. It offers the best quality that is practical on this 16 GB Mac. Use `qwen35-4b-1m` for lower memory pressure and staged long-context experiments. Keep `qwen38-27b-focused` archived on `TickArchive`; its weights exceed this machine's physical memory before runtime and KV-cache overhead, so the launcher blocks it unless `AI_ALLOW_UNSAFE_MODEL=1` is deliberately set.
+
+The model server and coding agent run as separate processes. The server reads weights from `TickArchive`, loads them into unified memory, and exposes a localhost API. Aider, Claude Code integration, or a Python application connects to that API. Model storage remains external; source repositories and the reproducible workstation configuration remain in Git.
+
+## How to use the workstation: steps 1–7
+
+### 1. Connect and verify TickArchive
+
+Attach the drive before starting inference, then verify the storage layout and toolchain:
+
+```bash
+ls /Volumes/TickArchive/ai-workstation
+cd /Users/mdnasim/epatnerlab/local-ai-workstation
+make doctor
+```
+
+The external directory should contain `models`, `manifests`, `benchmarks`, `indexes`, `prompt-cache`, `research`, and `tmp`.
+
+### 2. Start the local model server
+
+For daily work, run this in terminal 1 and leave it open:
+
+```bash
+cd /Users/mdnasim/epatnerlab/local-ai-workstation
+make serve-daily
+```
+
+This serves `qwen3.5:9b-q4_K_M` at `http://127.0.0.1:11434`. The first load is storage-bound and will be slow on the temporary USB connection; steady-state generation runs from unified memory. Stop the server with `Ctrl+C`.
+
+For a lighter session or long-context experiment, use:
+
+```bash
+make serve-long
+```
+
+### 3. Launch a coding agent
+
+Open terminal 2, enter the source repository the agent should work on, and start Aider:
+
+```bash
+cd /path/to/your/quant-project
+/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh aider qwen35-9b-daily
+```
+
+Useful Aider commands include `/add FILE`, `/read-only FILE`, `/run pytest`, `/diff`, `/undo`, `/commit`, and `/exit`. Keep market data and credentials outside prompts and Git. Review every proposed change, especially execution, timestamp, and portfolio-accounting logic.
+
+To try the Claude Code interface against the same local model:
+
+```bash
+cd /path/to/your/quant-project
+/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh claude qwen35-9b-daily
+```
+
+### 4. Chat with the model directly
+
+With the server running, open another terminal:
+
+```bash
+OLLAMA_HOST=http://127.0.0.1:11434 \
+OLLAMA_MODELS=/Volumes/TickArchive/ai-workstation/models/ollama \
+ollama run qwen3.5:9b-q4_K_M
+```
+
+Use `/bye` to leave the chat. Substitute `qwen3.5:4b-q4_K_M` when lower memory use is more important than model quality.
+
+### 5. Connect a Python application
+
+Ollama provides an OpenAI-compatible localhost endpoint. Add the client to a project with `uv add openai`, then use:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="http://127.0.0.1:11434/v1", api_key="ollama")
+response = client.chat.completions.create(
+    model="qwen3.5:9b-q4_K_M",
+    messages=[
+        {
+            "role": "system",
+            "content": (
+                "Act as a quantitative-finance research reviewer. Check for "
+                "leakage, overfitting, survivorship bias, invalid timestamps, "
+                "and unrealistic execution assumptions."
+            ),
+        },
+        {"role": "user", "content": "Review this backtest methodology."},
+    ],
+    temperature=0.1,
+)
+print(response.choices[0].message.content)
+```
+
+The service binds to localhost by default and has no authentication. Do not expose port `11434` to a public or untrusted network.
+
+### 6. Validate long context progressively
+
+Display the prescribed ladder:
+
+```bash
+cd /Users/mdnasim/epatnerlab/local-ai-workstation
+make context-ladder
+```
+
+Start at 128K rather than jumping to one million tokens:
+
+```bash
+./scripts/serve.sh qwen35-4b-1m 131072
+```
+
+In a second terminal, run a retrieval probe:
+
+```bash
+cd /Users/mdnasim/epatnerlab/local-ai-workstation
+python3 benchmarks/context_probe.py \
+  --base-url http://127.0.0.1:11434 \
+  --model qwen3.5:4b-q4_K_M \
+  --context 131072 \
+  --tokens 100000
+```
+
+Only advance after checking retrieval accuracy, memory pressure, swap use, prompt-processing time, and generation latency at `131072`, `262144`, `524288`, `786432`, and `1010000`. The model's native metadata declares 262K; larger windows are experimental extrapolation and a literal 1M KV cache may not fit comfortably in 16 GB. Retrieval and selective file loading are generally preferable for large codebases.
+
+### 7. Preserve and recover the workstation
+
+After changing installed models, update the committed manifests:
+
+```bash
+cd /Users/mdnasim/epatnerlab/local-ai-workstation
+make lock-models
+```
+
+After committing changes, refresh the offline Git bundle:
+
+```bash
+make bundle
+```
+
+The bundle is stored at `/Volumes/TickArchive/ai-workstation/manifests/local-ai-workstation.bundle`. The private upstream protects the configuration if the Mac and external drive are both lost. Model weights are excluded from Git and can be downloaded again from the pinned names and manifests. See [disaster recovery](docs/RECOVERY.md) for the restoration procedure.
+
+## Initial installation
 
 ```bash
 cp .env.example .env
@@ -19,21 +159,7 @@ cp .env.example .env
 ./scripts/model-pull.sh qwen35-9b-daily
 ```
 
-Large downloads are intentionally explicit. Do not pull Qwen3.8 until the smaller profiles and storage path are validated.
-
-Start a profile:
-
-```bash
-./scripts/serve.sh qwen35-9b-daily
-```
-
-In another terminal, start a coding agent in the repository you want to edit:
-
-```bash
-/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh aider qwen35-9b-daily
-```
-
-The 27B profile is archived for a future machine with at least 32 GB unified memory. The launcher blocks it on this 16 GB Mac unless an explicit unsafe override is set.
+Large downloads are intentionally explicit. Validate the smaller profiles and storage path before archiving Qwen3.8.
 
 For a pinned GGUF and full llama.cpp controls:
 
@@ -42,9 +168,7 @@ GGUF_PATH="/Volumes/TickArchive/ai-workstation/models/gguf/model.gguf" \
   ./scripts/serve.sh qwen35-4b-1m 131072
 ```
 
-Increase the long-context profile only after each prior level passes retrieval, memory, swap, and latency checks. See [disaster recovery](docs/RECOVERY.md) and [Thunderbolt migration](docs/THUNDERBOLT_MIGRATION.md).
-
-After model changes, run `make lock-models`. After committing, run `make bundle` to place a restorable Git bundle on TickArchive. For loss of both devices, push this repository to a private remote; model weights are reproducible downloads and are deliberately excluded from Git.
+When the replacement cable arrives, follow [Thunderbolt migration](docs/THUNDERBOLT_MIGRATION.md) and benchmark the negotiated connection before changing model profiles.
 
 ## Security
 
