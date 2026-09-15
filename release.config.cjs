@@ -1,4 +1,5 @@
 module.exports = {
+  repositoryUrl: "https://github.com/nasimubd/local-ai-workstation.git",
   branches: ["main"],
   tagFormat: "v${version}",
   plugins: [
