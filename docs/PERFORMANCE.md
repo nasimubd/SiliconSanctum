@@ -1,6 +1,6 @@
 # Performance results
 
-Measurements on the M1 Pro 16 GB Mac, with model files on `/Volumes/TickArchive`.
+Measurements on the M1 Pro 16 GB Mac, with model files under `AI_ROOT`.
 
 | Backend/profile | Context | Cold activation | First TTFT | Cached TTFT | Decode |
 |---|---:|---:|---:|---:|---:|
