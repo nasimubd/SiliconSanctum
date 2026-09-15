@@ -8,7 +8,7 @@ if [[ -f "$repo_dir/.env" ]]; then
   set +a
 fi
 
-: "${AI_VOLUME:=/Volumes/TickArchive}"
+: "${AI_VOLUME:=/Volumes/AI-NVME}"
 : "${AI_ROOT:=$AI_VOLUME/ai-workstation}"
 : "${AI_HOST:=127.0.0.1}"
 : "${AI_PORT:=8080}"
