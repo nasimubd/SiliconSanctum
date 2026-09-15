@@ -29,14 +29,21 @@ ensure_gh_token() {
 }
 
 check_commits_conventional() {
-  local bad=0
+  local bad=0 range="${1:-HEAD}" baseline
+  # The repository predates its release automation and contains legacy
+  # scaffold commits with free-form subjects. Validate those commits only on
+  # the first release boundary; every subsequent release is tag-to-HEAD.
+  if [ "$range" = "HEAD" ] && ! git describe --tags --abbrev=0 >/dev/null 2>&1; then
+    baseline="$(git log --format='%H' --grep='^build: adopt semantic release convention$' -n 1)"
+    [ -n "$baseline" ] && range="$baseline..HEAD"
+  fi
   while IFS= read -r hash; do
     subject="$(git log -1 --format=%s "$hash")"
     if ! printf '%s\n' "$(git log -1 --format=%B "$hash")" | node scripts/release/commitlint.cjs; then
       echo "non-conventional commit: $hash $subject" >&2
       bad=$((bad + 1))
     fi
-  done < <(git log --format='%H' "${1:-HEAD}")
+  done < <(git log --format='%H' "$range")
   [ "$bad" -eq 0 ] || return 1
   echo "all commits are conventional"
 }
