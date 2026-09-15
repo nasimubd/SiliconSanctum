@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Validate release prerequisites."
+set -euo pipefail
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/scripts/release/lib.sh"
+check_clean_tree
+check_on_main
+ensure_gh_token
+check_commits_conventional HEAD
+make validate

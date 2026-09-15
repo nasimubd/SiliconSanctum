@@ -133,6 +133,24 @@ benchmark evidence for behavior changes, and keep pull requests focused. Do
 not commit credentials, proprietary market data, model weights, or generated
 runtime artifacts.
 
+## Releasing
+
+Releases follow the same `mise` + semantic-release convention used by the
+quantitative research projects in this organization. Run from a clean `main`
+checkout with GitHub authentication available:
+
+```bash
+mise run release:drift       # inspect version, tags, and unreleased commits
+mise run release:dry         # preview the next release; no changes made
+mise run release:full        # preflight, changelog/version, tag, GitHub Release
+```
+
+`release:preflight` requires a clean tree, `main`, Conventional Commits, and a
+passing validation suite. semantic-release derives the version from commit
+types, updates `VERSION` and `CHANGELOG.md`, creates a `vX.Y.Z` tag, and publishes
+the GitHub Release. See `release.config.cjs` and `mise-tasks/release/` for the
+reproducible implementation.
+
 ## Technology credits
 
 This project integrates [Ollama](https://github.com/ollama/ollama),
@@ -148,3 +166,15 @@ of their respective owners.
 ## License
 
 Licensed under the [MIT License](LICENSE).
+
+Related quantitative research: [msys-alpha-forage](https://github.com/epatnerlab/msys-alpha-forage).
+
+## Citation
+
+```bibtex
+@software{opendeviationbar-py,
+  title = {opendeviationbar-py: High-performance open deviation bar construction for quantitative trading},
+  author = {Terry Li},
+  url = {https://github.com/terrylica/opendeviationbar-py}
+}
+```

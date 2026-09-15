@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Show release version, tags, and unreleased commits."
+set -euo pipefail
+echo "Current version: $(cat VERSION)"
+echo "Latest tag: $(git describe --tags --abbrev=0 2>/dev/null || echo none)"
+git log --oneline "$(git describe --tags --abbrev=0 2>/dev/null || echo HEAD~0)..HEAD" 2>/dev/null || true
