@@ -1,202 +1,150 @@
 # Local AI Workstation
 
-Reproducible local inference and quantitative-development environment for an M1 Pro Mac with 16 GB unified memory and the external `TickArchive` volume.
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Conventional Commits](https://img.shields.io/badge/commits-Conventional%20Commits-fe5196.svg)](https://www.conventionalcommits.org/)
+[![macOS](https://img.shields.io/badge/platform-macOS-000000.svg?logo=apple)](https://www.apple.com/macos/)
+[![Ollama](https://img.shields.io/badge/runtime-Ollama-000000.svg)](https://ollama.com/)
+[![llama.cpp](https://img.shields.io/badge/runtime-llama.cpp-4285f4.svg)](https://github.com/ggml-org/llama.cpp)
+[![MLX](https://img.shields.io/badge/runtime-MLX-555555.svg)](https://github.com/ml-explore/mlx)
+[![Kaggle](https://img.shields.io/badge/burst%20compute-Kaggle-20beff.svg?logo=kaggle)](https://www.kaggle.com/)
 
-## Profiles
+Reproducible local inference and quantitative-development tooling for Apple
+Silicon Macs with model storage on an external NVMe volume. It combines
+Ollama, llama.cpp, MLX, Claude Code, Aider, and checkpointed Kaggle workers for
+coding, research review, and backtest experimentation.
 
-- `qwen35-4b-chat`: fast direct chat at 8K context.
-- `qwen35-4b-coding`: default coding/agent profile at 32K context.
-- `qwen35-9b-daily`: higher-quality focused coding at 32K startup context.
-- `qwen35-4b-1m`: experimental literal 1.01M context reader.
-- `qwen38-27b-focused`: best-effort Qwen3.8 engineering profile at short context; its standard Q4 package exceeds physical memory.
+> **Important:** This is research infrastructure, not trading advice. Never
+> connect it to live order execution without independent controls and human
+> authorization.
 
-## Recommended setup
+## Quick start
 
-Use `qwen35-4b-coding` for routine work on this 16 GB Mac; switch to `qwen35-9b-daily` only for focused quality passes. Use `qwen35-4b-1m` for staged long-context experiments. Keep `qwen38-27b-focused` archived on `TickArchive`; its weights exceed physical memory before runtime and KV-cache overhead, so the launcher blocks it unless `AI_ALLOW_UNSAFE_MODEL=1` is deliberately set.
+### Requirements
 
-The model server and coding agent run as separate processes. The server reads weights from `TickArchive`, loads them into unified memory, and exposes a localhost API. Aider, Claude Code integration, or a Python application connects to that API. Model storage remains external; source repositories and the reproducible workstation configuration remain in Git.
+- Apple Silicon macOS (the tested machine is an M1 Pro with 16 GB unified memory)
+- Homebrew and an external volume mounted at `/Volumes/TickArchive`
+- A source repository for your quantitative project
+- Optional: a Kaggle account for burst jobs and Claude Code for the agent UI
 
-## How to use the workstation: steps 1–7
-
-### 1. Connect and verify TickArchive
-
-Attach the drive before starting inference, then verify the storage layout and toolchain:
+### Install
 
 ```bash
-ls /Volumes/TickArchive/ai-workstation
+git clone https://github.com/nasimubd/local-ai-workstation.git
+cd local-ai-workstation
+cp .env.example .env
+./scripts/bootstrap.sh
 local-ai doctor
 ```
 
-The external directory should contain `models`, `manifests`, `benchmarks`, `indexes`, `prompt-cache`, `research`, and `tmp`.
+If the command is not found in an existing terminal, open a new terminal or
+run `export PATH="$HOME/.local/bin:$PATH"`.
 
-### 2. Start the local model server
-
-For daily work, run:
-
-```bash
-local-ai serve daily
-```
-
-This starts or reuses a persistent Ollama LaunchAgent, unloads any previous model, and explicitly loads `qwen3.5:4b-q4_K_M` at `http://127.0.0.1:11434`. The first load is storage-bound; subsequent requests reuse the resident model and prompt cache.
-
-For a lighter session or long-context experiment, use:
+### Start local inference
 
 ```bash
-local-ai serve long
-```
-
-`serve` is idempotent: changing profiles reuses the daemon instead of trying to bind a second process to port `11434`. The 4B profile starts at a safer 128K context; request larger levels explicitly through the context ladder. Inspect or stop a managed server with:
-
-```bash
+local-ai serve daily       # Qwen3.5 4B, 32K context: default coding mode
 local-ai status
-local-ai stop
 ```
 
-If `status` reports an external process, stop it in its original terminal with `Ctrl+C`; `local-ai` will not kill a process it does not own.
+The managed Ollama LaunchAgent stays on localhost, keeps one model resident,
+and stores weights/cache/benchmarks on `TickArchive`. The first model load is
+storage-bound; later requests reuse memory and the prompt cache.
 
-### 3. Launch a coding agent
+## Claude Code workflow
 
-Open terminal 2, enter the source repository the agent should work on, and start Aider:
+Claude Code runs on the Mac and uses Ollama's Anthropic-compatible local API;
+Qwen performs inference, while Claude Code supplies the terminal/tool harness.
+Your repository, tests, backtests, and Git history remain local.
 
 ```bash
 cd /path/to/your/quant-project
-/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh aider qwen35-4b-coding
+local-ai agent claude qwen35-4b-coding
 ```
 
-Useful Aider commands include `/add FILE`, `/read-only FILE`, `/run pytest`, `/diff`, `/undo`, `/commit`, and `/exit`. Keep market data and credentials outside prompts and Git. Review every proposed change, especially execution, timestamp, and portfolio-accounting logic.
-
-To try the Claude Code interface against the same local model:
+For a long-context audit, start progressively at 524K:
 
 ```bash
-cd /path/to/your/quant-project
-/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh claude qwen35-4b-coding
+local-ai agent claude qwen35-4b-1m 524288
 ```
 
-For a literal long-context Claude Code session, pass the context explicitly.
-Start at 524288 and advance to 1010000 only after the retrieval and memory
-probes pass:
+Advance to `786432` and `1010000` only after retrieval accuracy, tool calls,
+memory pressure, and swap usage pass validation. Qwen3.5's native context is
+262K; larger values are extrapolation experiments. Use long context for
+repository-wide review, then switch back to 32K/128K for iterative edits.
+
+## Quantitative research and backtesting
+
+Ask the agent to inspect code, propose a diff, run tests, and execute a
+deterministic backtest. Require it to record the Git commit, data manifest,
+random seed, parameters, and output path. Keep raw market data and credentials
+outside prompts and Git. Review every change involving timestamps, execution,
+portfolio accounting, and leakage.
+
+```text
+Run the backtest with the pinned dataset and seed. Check for look-ahead,
+survivorship, timestamp, and train/test leakage. Write metrics and the run
+manifest to /Volumes/TickArchive/ai-workstation/benchmarks. Do not place orders.
+```
+
+## Kaggle burst compute
+
+Kaggle is a separate, quota-bounded batch worker—not a live extension of the
+Claude Code process. Configure `kaggle/job.json`, authenticate, and submit:
 
 ```bash
-cd /path/to/your/quant-project
-/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh claude qwen35-4b-1m 524288
+kaggle auth login
+make kaggle-submit
+kaggle kernels status <your-kaggle-username>/quant-long-context-worker
+make kaggle-output
 ```
 
-Claude Code remains the local tool harness while Qwen performs inference via
-Ollama's Anthropic-compatible Messages API. Qwen3.5's native limit is 262K;
-524K and 1M are extrapolation experiments. Keep long sessions read-only until
-retrieval accuracy and tool-call reliability are established.
+The worker embeds its manifest, enforces a deadline, and writes checkpoints.
+Upload only approved code/data/model artifacts. Kaggle's T4×2 allocation is two
+16 GB GPUs; use a tensor-parallel CUDA runtime for large models. Start long
+context jobs at 524K and checkpoint each shard. Do not operate multiple accounts
+to pool quota; follow [Kaggle's Terms](https://www.kaggle.com/terms).
 
-### 4. Chat with the model directly
+See [Kaggle operations](docs/KAGGLE.md) and [performance results](docs/PERFORMANCE.md).
 
-With the server running, open another terminal:
+## Profiles and commands
 
-```bash
-OLLAMA_HOST=http://127.0.0.1:11434 \
-OLLAMA_MODELS=/Volumes/TickArchive/ai-workstation/models/ollama \
-ollama run qwen3.5:9b-q4_K_M
-```
+| Command | Profile | Use |
+|---|---|---|
+| `local-ai serve chat` | Qwen3.5 4B / 8K | Fast conversation |
+| `local-ai serve daily` | Qwen3.5 4B / 32K | Default coding and agents |
+| `local-ai serve quality` | Qwen3.5 9B / 32K | Focused quality pass |
+| `local-ai serve long 524288` | Qwen3.5 4B | Experimental long context |
+| `local-ai serve qwen38` | Qwen3.8 27B | Guarded, memory-heavy experiment |
 
-Use `/bye` to leave the chat. Substitute `qwen3.5:4b-q4_K_M` when lower memory use is more important than model quality.
+Useful commands: `local-ai doctor`, `local-ai validate`, `local-ai benchmark`,
+`local-ai context-ladder`, `local-ai lock-models`, and `local-ai bundle`.
 
-### 5. Connect a Python application
+## Reproducibility and recovery
 
-Ollama provides an OpenAI-compatible localhost endpoint. Add the client to a project with `uv add openai`, then use:
+Configuration, scripts, manifests, and documentation are versioned in Git.
+Model weights are deliberately excluded. Run `local-ai lock-models` after model
+changes and `local-ai bundle` to refresh the offline recovery bundle on
+`TickArchive`. See [recovery](docs/RECOVERY.md) and [Thunderbolt migration](docs/THUNDERBOLT_MIGRATION.md).
 
-```python
-from openai import OpenAI
+## Contributing
 
-client = OpenAI(base_url="http://127.0.0.1:11434/v1", api_key="ollama")
-response = client.chat.completions.create(
-    model="qwen3.5:9b-q4_K_M",
-    messages=[
-        {
-            "role": "system",
-            "content": (
-                "Act as a quantitative-finance research reviewer. Check for "
-                "leakage, overfitting, survivorship bias, invalid timestamps, "
-                "and unrealistic execution assumptions."
-            ),
-        },
-        {"role": "user", "content": "Review this backtest methodology."},
-    ],
-    temperature=0.1,
-)
-print(response.choices[0].message.content)
-```
+Use [Conventional Commits](https://www.conventionalcommits.org/), add tests or
+benchmark evidence for behavior changes, and keep pull requests focused. Do
+not commit credentials, proprietary market data, model weights, or generated
+runtime artifacts.
 
-The service binds to localhost by default and has no authentication. Do not expose port `11434` to a public or untrusted network.
+## Technology credits
 
-### 6. Validate long context progressively
+This project integrates [Ollama](https://github.com/ollama/ollama),
+[llama.cpp](https://github.com/ggml-org/llama.cpp),
+[MLX](https://github.com/ml-explore/mlx),
+[MLX-LM](https://github.com/ml-explore/mlx-lm),
+[Aider](https://github.com/Aider-AI/aider),
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code),
+[Kaggle](https://www.kaggle.com/), and
+[Shields.io](https://shields.io/). Their names and marks remain the property
+of their respective owners.
 
-Display the prescribed ladder:
+## License
 
-```bash
-local-ai context-ladder
-```
-
-Start at 128K rather than jumping to one million tokens:
-
-```bash
-local-ai serve long 131072
-```
-
-In a second terminal, run a retrieval probe:
-
-```bash
-cd /Users/mdnasim/epatnerlab/local-ai-workstation
-python3 benchmarks/context_probe.py \
-  --base-url http://127.0.0.1:11434 \
-  --model qwen3.5:4b-q4_K_M \
-  --context 131072 \
-  --tokens 100000
-```
-
-Only advance after checking retrieval accuracy, memory pressure, swap use, prompt-processing time, and generation latency at `131072`, `262144`, `524288`, `786432`, and `1010000`. The model's native metadata declares 262K; larger windows are experimental extrapolation and a literal 1M KV cache may not fit comfortably in 16 GB. Retrieval and selective file loading are generally preferable for large codebases.
-
-### 7. Preserve and recover the workstation
-
-After changing installed models, update the committed manifests:
-
-```bash
-local-ai lock-models
-```
-
-After committing changes, refresh the offline Git bundle:
-
-```bash
-local-ai bundle
-```
-
-The bundle is stored at `/Volumes/TickArchive/ai-workstation/manifests/local-ai-workstation.bundle`. The private upstream protects the configuration if the Mac and external drive are both lost. Model weights are excluded from Git and can be downloaded again from the pinned names and manifests. See [disaster recovery](docs/RECOVERY.md) for the restoration procedure.
-
-## Initial installation
-
-```bash
-cp .env.example .env
-./scripts/bootstrap.sh
-./scripts/doctor.sh
-./scripts/storage-benchmark.sh 4
-./scripts/model-pull.sh qwen35-4b-1m
-./scripts/model-pull.sh qwen35-9b-daily
-```
-
-Large downloads are intentionally explicit. Validate the smaller profiles and storage path before archiving Qwen3.8.
-
-Bootstrap installs `local-ai` under `~/.local/bin`, allowing workstation commands to run from any directory. Make targets remain available when the current directory is this repository; `make` does not discover this project's Makefile from the home directory.
-
-Bootstrap also installs the Kaggle CLI. If a terminal opened before bootstrap
-does not see it, open a new terminal or run `export PATH="$HOME/.local/bin:$PATH"`
-before `kaggle auth login`.
-
-For a pinned GGUF and full llama.cpp controls:
-
-```bash
-GGUF_PATH="/Volumes/TickArchive/ai-workstation/models/gguf/model.gguf" \
-  ./scripts/serve.sh qwen35-4b-1m 131072
-```
-
-When the replacement cable arrives, follow [Thunderbolt migration](docs/THUNDERBOLT_MIGRATION.md) and benchmark the negotiated connection before changing model profiles.
-
-## Security
-
-Servers bind to localhost by default. Never put exchange secrets in prompts, model directories, indexes, or agent configuration. Keep production trading disabled and require human authorization for every live-order action. Treat unofficial uncensored weights and model templates as untrusted code/data until independently evaluated.
+Licensed under the [MIT License](LICENSE).
