@@ -1,6 +1,6 @@
 SHELL := /bin/zsh
 
-.PHONY: doctor storage-init storage-benchmark bootstrap validate snapshot lock-models bundle serve-daily serve-long serve-qwen38 context-ladder aider
+.PHONY: doctor storage-init storage-benchmark bootstrap install-cli validate snapshot lock-models bundle serve-daily serve-long serve-qwen38 context-ladder aider
 
 doctor:
 	./scripts/doctor.sh
@@ -13,6 +13,9 @@ storage-benchmark:
 
 bootstrap:
 	./scripts/bootstrap.sh
+
+install-cli:
+	./scripts/install-cli.sh
 
 validate:
 	./scripts/validate.sh

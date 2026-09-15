@@ -22,8 +22,7 @@ Attach the drive before starting inference, then verify the storage layout and t
 
 ```bash
 ls /Volumes/TickArchive/ai-workstation
-cd /Users/mdnasim/epatnerlab/local-ai-workstation
-make doctor
+local-ai doctor
 ```
 
 The external directory should contain `models`, `manifests`, `benchmarks`, `indexes`, `prompt-cache`, `research`, and `tmp`.
@@ -33,8 +32,7 @@ The external directory should contain `models`, `manifests`, `benchmarks`, `inde
 For daily work, run this in terminal 1 and leave it open:
 
 ```bash
-cd /Users/mdnasim/epatnerlab/local-ai-workstation
-make serve-daily
+local-ai serve daily
 ```
 
 This serves `qwen3.5:9b-q4_K_M` at `http://127.0.0.1:11434`. The first load is storage-bound and will be slow on the temporary USB connection; steady-state generation runs from unified memory. Stop the server with `Ctrl+C`.
@@ -42,7 +40,7 @@ This serves `qwen3.5:9b-q4_K_M` at `http://127.0.0.1:11434`. The first load is s
 For a lighter session or long-context experiment, use:
 
 ```bash
-make serve-long
+local-ai serve long
 ```
 
 ### 3. Launch a coding agent
@@ -108,14 +106,13 @@ The service binds to localhost by default and has no authentication. Do not expo
 Display the prescribed ladder:
 
 ```bash
-cd /Users/mdnasim/epatnerlab/local-ai-workstation
-make context-ladder
+local-ai context-ladder
 ```
 
 Start at 128K rather than jumping to one million tokens:
 
 ```bash
-./scripts/serve.sh qwen35-4b-1m 131072
+local-ai serve long 131072
 ```
 
 In a second terminal, run a retrieval probe:
@@ -136,14 +133,13 @@ Only advance after checking retrieval accuracy, memory pressure, swap use, promp
 After changing installed models, update the committed manifests:
 
 ```bash
-cd /Users/mdnasim/epatnerlab/local-ai-workstation
-make lock-models
+local-ai lock-models
 ```
 
 After committing changes, refresh the offline Git bundle:
 
 ```bash
-make bundle
+local-ai bundle
 ```
 
 The bundle is stored at `/Volumes/TickArchive/ai-workstation/manifests/local-ai-workstation.bundle`. The private upstream protects the configuration if the Mac and external drive are both lost. Model weights are excluded from Git and can be downloaded again from the pinned names and manifests. See [disaster recovery](docs/RECOVERY.md) for the restoration procedure.
@@ -160,6 +156,8 @@ cp .env.example .env
 ```
 
 Large downloads are intentionally explicit. Validate the smaller profiles and storage path before archiving Qwen3.8.
+
+Bootstrap installs `local-ai` under `~/.local/bin`, allowing workstation commands to run from any directory. Make targets remain available when the current directory is this repository; `make` does not discover this project's Makefile from the home directory.
 
 For a pinned GGUF and full llama.cpp controls:
 
