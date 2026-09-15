@@ -4,13 +4,15 @@ Reproducible local inference and quantitative-development environment for an M1 
 
 ## Profiles
 
-- `qwen35-9b-daily`: daily quantitative coding, 128K target context.
+- `qwen35-4b-chat`: fast direct chat at 8K context.
+- `qwen35-4b-coding`: default coding/agent profile at 32K context.
+- `qwen35-9b-daily`: higher-quality focused coding at 32K startup context.
 - `qwen35-4b-1m`: experimental literal 1.01M context reader.
 - `qwen38-27b-focused`: best-effort Qwen3.8 engineering profile at short context; its standard Q4 package exceeds physical memory.
 
 ## Recommended setup
 
-Use `qwen35-9b-daily` for routine quantitative research, coding, architecture, and backtest review. It offers the best quality that is practical on this 16 GB Mac. Use `qwen35-4b-1m` for lower memory pressure and staged long-context experiments. Keep `qwen38-27b-focused` archived on `TickArchive`; its weights exceed this machine's physical memory before runtime and KV-cache overhead, so the launcher blocks it unless `AI_ALLOW_UNSAFE_MODEL=1` is deliberately set.
+Use `qwen35-4b-coding` for routine work on this 16 GB Mac; switch to `qwen35-9b-daily` only for focused quality passes. Use `qwen35-4b-1m` for staged long-context experiments. Keep `qwen38-27b-focused` archived on `TickArchive`; its weights exceed physical memory before runtime and KV-cache overhead, so the launcher blocks it unless `AI_ALLOW_UNSAFE_MODEL=1` is deliberately set.
 
 The model server and coding agent run as separate processes. The server reads weights from `TickArchive`, loads them into unified memory, and exposes a localhost API. Aider, Claude Code integration, or a Python application connects to that API. Model storage remains external; source repositories and the reproducible workstation configuration remain in Git.
 
@@ -29,13 +31,13 @@ The external directory should contain `models`, `manifests`, `benchmarks`, `inde
 
 ### 2. Start the local model server
 
-For daily work, run this in terminal 1 and leave it open:
+For daily work, run:
 
 ```bash
 local-ai serve daily
 ```
 
-This starts or reuses the single Ollama daemon, unloads any previous model, and explicitly loads `qwen3.5:9b-q4_K_M` at `http://127.0.0.1:11434`. The first load is storage-bound and will be slow on the temporary USB connection; steady-state generation runs from unified memory.
+This starts or reuses a persistent Ollama LaunchAgent, unloads any previous model, and explicitly loads `qwen3.5:4b-q4_K_M` at `http://127.0.0.1:11434`. The first load is storage-bound; subsequent requests reuse the resident model and prompt cache.
 
 For a lighter session or long-context experiment, use:
 

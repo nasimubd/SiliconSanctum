@@ -1,5 +1,6 @@
 #!/bin/zsh
 set -euo pipefail
+zmodload zsh/datetime
 source "${0:A:h}/lib.sh"
 require_volume
 

@@ -11,13 +11,16 @@ usage() {
   print -- ""
   print -- "Commands:"
   print -- "  doctor                         Verify tools, hardware, and TickArchive"
-  print -- "  serve daily [CONTEXT]          Start the recommended 9B profile"
+  print -- "  serve chat [CONTEXT]           Start the 4B/8K low-latency profile"
+  print -- "  serve daily [CONTEXT]          Start the 4B/32K coding profile"
+  print -- "  serve quality [CONTEXT]        Start the 9B/32K focused profile"
   print -- "  serve long [CONTEXT]           Start the 4B long-context profile"
   print -- "  serve qwen38 [CONTEXT]         Start the guarded 27B profile"
   print -- "  serve PROFILE [CONTEXT]        Start an exact profile name"
   print -- "  status                          Show the server and loaded model"
   print -- "  stop                            Stop a server managed by local-ai"
-  print -- "  agent [aider|claude] [PROFILE] Start a coding agent in the current repo"
+  print -- "  agent [aider|claude] [PROFILE] Start a coding agent; defaults to 4B/32K"
+  print -- "  benchmark PROFILE [CONTEXT]    Measure latency, throughput, and memory"
   print -- "  context-ladder [PROFILE]       Display progressive context test levels"
   print -- "  storage-benchmark [SIZE_GIB]   Benchmark the external model drive"
   print -- "  validate                       Validate workstation configuration"
@@ -31,7 +34,9 @@ usage() {
 
 resolve_profile() {
   case "${1:-daily}" in
-    daily) print -- "qwen35-9b-daily" ;;
+    chat) print -- "qwen35-4b-chat" ;;
+    daily|coding) print -- "qwen35-4b-coding" ;;
+    quality) print -- "qwen35-9b-daily" ;;
     long) print -- "qwen35-4b-1m" ;;
     qwen38) print -- "qwen38-27b-focused" ;;
     *) print -- "$1" ;;
@@ -57,6 +62,7 @@ case "$command_name" in
     print -- "storage=$AI_ROOT"
     print -- "ollama_api=http://$AI_HOST:$AI_OLLAMA_PORT"
     print -- "llama_cpp_api=http://$AI_HOST:$AI_PORT"
+    print -- "mlx_api=http://$AI_HOST:$AI_MLX_PORT"
     ;;
   serve)
     profile="$(resolve_profile "${1:-daily}")"
@@ -64,7 +70,7 @@ case "$command_name" in
     exec "$repo_dir/scripts/server-manager.sh" start "$profile" "$@"
     ;;
   serve-daily)
-    exec "$repo_dir/scripts/server-manager.sh" start qwen35-9b-daily "$@"
+    exec "$repo_dir/scripts/server-manager.sh" start qwen35-4b-coding "$@"
     ;;
   serve-long)
     exec "$repo_dir/scripts/server-manager.sh" start qwen35-4b-1m "$@"
@@ -76,7 +82,10 @@ case "$command_name" in
     exec "$repo_dir/scripts/server-manager.sh" "$command_name"
     ;;
   agent)
-    exec "$repo_dir/scripts/agent.sh" "${1:-aider}" "${2:-qwen35-9b-daily}"
+    exec "$repo_dir/scripts/agent.sh" "${1:-aider}" "${2:-qwen35-4b-coding}"
+    ;;
+  benchmark)
+    exec "$repo_dir/scripts/performance-benchmark.sh" "${1:-qwen35-4b-chat}" "${2:-}"
     ;;
   context-ladder)
     exec "$repo_dir/scripts/context-ladder.sh" "${1:-qwen35-4b-1m}"
