@@ -3,7 +3,7 @@ set -euo pipefail
 source "${0:A:h}/lib.sh"
 need jq
 jq -e '.profiles | length >= 3' "$models_file" >/dev/null
-for script in "$repo_dir"/scripts/*.sh; do
+for script in "$repo_dir"/scripts/*.sh "$repo_dir"/bin/local-ai; do
   zsh -o NO_BG_NICE -n < "$script"
 done
 python3 -m py_compile "$repo_dir/benchmarks/context_probe.py"

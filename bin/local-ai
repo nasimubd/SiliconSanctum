@@ -1,0 +1,87 @@
+#!/bin/zsh
+set -euo pipefail
+
+repo_dir="${0:A:h:h}"
+source "$repo_dir/scripts/lib.sh"
+
+usage() {
+  print -- "Local AI workstation"
+  print -- ""
+  print -- "Usage: local-ai COMMAND [ARGUMENTS]"
+  print -- ""
+  print -- "Commands:"
+  print -- "  doctor                         Verify tools, hardware, and TickArchive"
+  print -- "  serve daily [CONTEXT]          Start the recommended 9B profile"
+  print -- "  serve long [CONTEXT]           Start the 4B long-context profile"
+  print -- "  serve qwen38 [CONTEXT]         Start the guarded 27B profile"
+  print -- "  serve PROFILE [CONTEXT]        Start an exact profile name"
+  print -- "  agent [aider|claude] [PROFILE] Start a coding agent in the current repo"
+  print -- "  context-ladder [PROFILE]       Display progressive context test levels"
+  print -- "  storage-benchmark [SIZE_GIB]   Benchmark the external model drive"
+  print -- "  validate                       Validate workstation configuration"
+  print -- "  snapshot                       Capture local tool versions"
+  print -- "  lock-models                    Copy model manifests into Git locks"
+  print -- "  bundle                         Refresh the offline recovery bundle"
+  print -- "  paths                          Show configuration and storage paths"
+  print -- ""
+  print -- "Compatibility aliases: serve-daily, serve-long, serve-qwen38"
+}
+
+resolve_profile() {
+  case "${1:-daily}" in
+    daily) print -- "qwen35-9b-daily" ;;
+    long) print -- "qwen35-4b-1m" ;;
+    qwen38) print -- "qwen38-27b-focused" ;;
+    *) print -- "$1" ;;
+  esac
+}
+
+command_name="${1:-help}"
+shift $(( $# > 0 ? 1 : 0 ))
+
+case "$command_name" in
+  help|-h|--help)
+    usage
+    ;;
+  doctor|validate|snapshot|lock-models)
+    exec "$repo_dir/scripts/${command_name}.sh" "$@"
+    ;;
+  bundle)
+    exec "$repo_dir/scripts/recovery-bundle.sh" "$@"
+    ;;
+  paths)
+    print -- "repository=$repo_dir"
+    print -- "volume=$AI_VOLUME"
+    print -- "storage=$AI_ROOT"
+    print -- "ollama_api=http://$AI_HOST:$AI_OLLAMA_PORT"
+    print -- "llama_cpp_api=http://$AI_HOST:$AI_PORT"
+    ;;
+  serve)
+    profile="$(resolve_profile "${1:-daily}")"
+    (( $# > 0 )) && shift
+    exec "$repo_dir/scripts/serve.sh" "$profile" "$@"
+    ;;
+  serve-daily)
+    exec "$repo_dir/scripts/serve.sh" qwen35-9b-daily "$@"
+    ;;
+  serve-long)
+    exec "$repo_dir/scripts/serve.sh" qwen35-4b-1m "$@"
+    ;;
+  serve-qwen38)
+    exec "$repo_dir/scripts/serve.sh" qwen38-27b-focused "$@"
+    ;;
+  agent)
+    exec "$repo_dir/scripts/agent.sh" "${1:-aider}" "${2:-qwen35-9b-daily}"
+    ;;
+  context-ladder)
+    exec "$repo_dir/scripts/context-ladder.sh" "${1:-qwen35-4b-1m}"
+    ;;
+  storage-benchmark)
+    exec "$repo_dir/scripts/storage-benchmark.sh" "${1:-4}"
+    ;;
+  *)
+    print -u2 -- "error: unknown command '$command_name'"
+    usage >&2
+    exit 2
+    ;;
+esac

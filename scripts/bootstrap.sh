@@ -10,6 +10,7 @@ if [[ ! -f "$repo_dir/.env" ]]; then
 fi
 
 "$repo_dir/scripts/storage-init.sh"
+"$repo_dir/scripts/install-cli.sh"
 
 if command -v uv >/dev/null 2>&1; then
   # Aider's current voice dependency still imports audioop, removed in Python 3.13.
@@ -17,4 +18,4 @@ if command -v uv >/dev/null 2>&1; then
   uv tool install --upgrade huggingface-hub
 fi
 
-print -- "Bootstrap complete. Run: make doctor"
+print -- "Bootstrap complete. Run from any directory: local-ai doctor"
