@@ -31,9 +31,10 @@ ensure_gh_token() {
 check_commits_conventional() {
   local bad=0 range="${1:-HEAD}" baseline
   # The repository predates its release automation and contains legacy
-  # scaffold commits with free-form subjects. Validate those commits only on
-  # the first release boundary; every subsequent release is tag-to-HEAD.
-  if [ "$range" = "HEAD" ] && ! git describe --tags --abbrev=0 >/dev/null 2>&1; then
+  # scaffold commits with free-form subjects. Keep the explicit convention
+  # boundary for every release preflight; released commits remain validated by
+  # semantic-release's tag-to-HEAD analysis.
+  if [ "$range" = "HEAD" ]; then
     baseline="$(git log --format='%H' --grep='^build: adopt semantic release convention$' -n 1)"
     [ -n "$baseline" ] && range="$baseline..HEAD"
   fi
