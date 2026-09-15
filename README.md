@@ -35,13 +35,22 @@ For daily work, run this in terminal 1 and leave it open:
 local-ai serve daily
 ```
 
-This serves `qwen3.5:9b-q4_K_M` at `http://127.0.0.1:11434`. The first load is storage-bound and will be slow on the temporary USB connection; steady-state generation runs from unified memory. Stop the server with `Ctrl+C`.
+This starts or reuses the single Ollama daemon, unloads any previous model, and explicitly loads `qwen3.5:9b-q4_K_M` at `http://127.0.0.1:11434`. The first load is storage-bound and will be slow on the temporary USB connection; steady-state generation runs from unified memory.
 
 For a lighter session or long-context experiment, use:
 
 ```bash
 local-ai serve long
 ```
+
+`serve` is idempotent: changing profiles reuses the daemon instead of trying to bind a second process to port `11434`. The 4B profile starts at a safer 128K context; request larger levels explicitly through the context ladder. Inspect or stop a managed server with:
+
+```bash
+local-ai status
+local-ai stop
+```
+
+If `status` reports an external process, stop it in its original terminal with `Ctrl+C`; `local-ai` will not kill a process it does not own.
 
 ### 3. Launch a coding agent
 

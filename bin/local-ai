@@ -15,6 +15,8 @@ usage() {
   print -- "  serve long [CONTEXT]           Start the 4B long-context profile"
   print -- "  serve qwen38 [CONTEXT]         Start the guarded 27B profile"
   print -- "  serve PROFILE [CONTEXT]        Start an exact profile name"
+  print -- "  status                          Show the server and loaded model"
+  print -- "  stop                            Stop a server managed by local-ai"
   print -- "  agent [aider|claude] [PROFILE] Start a coding agent in the current repo"
   print -- "  context-ladder [PROFILE]       Display progressive context test levels"
   print -- "  storage-benchmark [SIZE_GIB]   Benchmark the external model drive"
@@ -59,16 +61,19 @@ case "$command_name" in
   serve)
     profile="$(resolve_profile "${1:-daily}")"
     (( $# > 0 )) && shift
-    exec "$repo_dir/scripts/serve.sh" "$profile" "$@"
+    exec "$repo_dir/scripts/server-manager.sh" start "$profile" "$@"
     ;;
   serve-daily)
-    exec "$repo_dir/scripts/serve.sh" qwen35-9b-daily "$@"
+    exec "$repo_dir/scripts/server-manager.sh" start qwen35-9b-daily "$@"
     ;;
   serve-long)
-    exec "$repo_dir/scripts/serve.sh" qwen35-4b-1m "$@"
+    exec "$repo_dir/scripts/server-manager.sh" start qwen35-4b-1m "$@"
     ;;
   serve-qwen38)
-    exec "$repo_dir/scripts/serve.sh" qwen38-27b-focused "$@"
+    exec "$repo_dir/scripts/server-manager.sh" start qwen38-27b-focused "$@"
+    ;;
+  status|stop)
+    exec "$repo_dir/scripts/server-manager.sh" "$command_name"
     ;;
   agent)
     exec "$repo_dir/scripts/agent.sh" "${1:-aider}" "${2:-qwen35-9b-daily}"

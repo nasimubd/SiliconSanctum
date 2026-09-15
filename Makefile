@@ -30,13 +30,13 @@ bundle:
 	./scripts/recovery-bundle.sh
 
 serve-daily:
-	./scripts/serve.sh qwen35-9b-daily
+	./scripts/server-manager.sh start qwen35-9b-daily
 
 serve-long:
-	./scripts/serve.sh qwen35-4b-1m
+	./scripts/server-manager.sh start qwen35-4b-1m
 
 serve-qwen38:
-	./scripts/serve.sh qwen38-27b-focused
+	./scripts/server-manager.sh start qwen38-27b-focused
 
 context-ladder:
 	./scripts/context-ladder.sh qwen35-4b-1m
