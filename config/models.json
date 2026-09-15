@@ -1,0 +1,42 @@
+{
+  "profiles": {
+    "qwen35-4b-1m": {
+      "purpose": "Experimental literal-million-token text reader",
+      "ollama_model": "qwen3.5:4b-q4_K_M",
+      "context": 1010000,
+      "context_ladder": [131072, 262144, 524288, 786432, 1010000],
+      "cache_type_k": "q4_0",
+      "cache_type_v": "q4_0",
+      "gpu_layers": "auto",
+      "flash_attention": true,
+      "vision": false,
+      "parallel": 1
+    },
+    "qwen35-9b-daily": {
+      "purpose": "Daily quantitative coding and review",
+      "ollama_model": "qwen3.5:9b-q4_K_M",
+      "context": 131072,
+      "context_ladder": [32768, 65536, 131072, 262144],
+      "cache_type_k": "q4_0",
+      "cache_type_v": "q4_0",
+      "gpu_layers": "auto",
+      "flash_attention": true,
+      "vision": false,
+      "parallel": 1
+    },
+    "qwen38-27b-focused": {
+      "purpose": "Best-effort focused quantitative engineering; not a 1M profile",
+      "ollama_model": "qwen3.8:27b-q4_K_M",
+      "context": 16384,
+      "context_ladder": [8192, 16384, 32768],
+      "cache_type_k": "q4_0",
+      "cache_type_v": "q4_0",
+      "gpu_layers": "auto",
+      "flash_attention": true,
+      "vision": false,
+      "parallel": 1,
+      "minimum_ram_gib": 32,
+      "warning": "The 18 GB Q4 package exceeds physical RAM; expect swap and poor interactivity. Prefer a verified IQ3 GGUF when available."
+    }
+  }
+}

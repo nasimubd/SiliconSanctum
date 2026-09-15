@@ -1,0 +1,7 @@
+brew "cmake"
+brew "git-lfs"
+brew "jq"
+brew "llama.cpp"
+brew "ollama"
+brew "shellcheck"
+brew "uv"

@@ -1,0 +1,9 @@
+architect: true
+auto-accept-architect: false
+model: ollama/qwen3.5:9b-q4_K_M
+editor-model: ollama/qwen3.5:9b-q4_K_M
+editor-edit-format: editor-diff
+weak-model: ollama/qwen3.5:4b-q4_K_M
+test-cmd: uv run pytest
+auto-test: true
+show-model-warnings: true
