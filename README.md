@@ -22,7 +22,7 @@ coding, research review, and backtest experimentation.
 ### Requirements
 
 - Apple Silicon macOS (the tested machine is an M1 Pro with 16 GB unified memory)
-- Homebrew and an external volume mounted at `/Volumes/TickArchive`
+- Homebrew and an external volume mounted under `/Volumes`
 - A source repository for your quantitative project
 - Optional: a Kaggle account for burst jobs and Claude Code for the agent UI
 
@@ -32,6 +32,7 @@ coding, research review, and backtest experimentation.
 git clone https://github.com/nasimubd/local-ai-workstation.git
 cd local-ai-workstation
 cp .env.example .env
+# Edit .env: replace YOUR_NVME_NAME with the exact name shown by `ls /Volumes`.
 ./scripts/bootstrap.sh
 local-ai doctor
 ```
@@ -105,6 +106,15 @@ context jobs at 524K and checkpoint each shard. Do not operate multiple accounts
 to pool quota; follow [Kaggle's Terms](https://www.kaggle.com/terms).
 
 See [Kaggle operations](docs/KAGGLE.md) and [performance results](docs/PERFORMANCE.md).
+
+## Open-source safety
+
+Keep `.env`, credentials, raw market data, model weights, logs, and generated
+benchmark outputs outside Git. `AI_VOLUME` is the mounted volume and `AI_ROOT`
+is its workstation-data directory; both are local placeholders, not public
+paths. Run `./scripts/security-scan.sh` before every push and follow the
+[security policy](SECURITY.md), [third-party notices](THIRD_PARTY_NOTICES.md),
+and [public-release checklist](docs/PUBLICATION_CHECKLIST.md).
 
 ## Profiles and commands
 
