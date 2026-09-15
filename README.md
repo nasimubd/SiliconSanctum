@@ -184,6 +184,10 @@ Large downloads are intentionally explicit. Validate the smaller profiles and st
 
 Bootstrap installs `local-ai` under `~/.local/bin`, allowing workstation commands to run from any directory. Make targets remain available when the current directory is this repository; `make` does not discover this project's Makefile from the home directory.
 
+Bootstrap also installs the Kaggle CLI. If a terminal opened before bootstrap
+does not see it, open a new terminal or run `export PATH="$HOME/.local/bin:$PATH"`
+before `kaggle auth login`.
+
 For a pinned GGUF and full llama.cpp controls:
 
 ```bash

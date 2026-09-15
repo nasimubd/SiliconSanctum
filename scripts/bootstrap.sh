@@ -17,6 +17,7 @@ if command -v uv >/dev/null 2>&1; then
   uv tool install --upgrade --python 3.12 aider-chat
   uv tool install --upgrade huggingface-hub
   uv tool install --upgrade --python 3.12 mlx-lm
+  uv tool install --upgrade --python 3.12 kaggle
 fi
 
 print -- "Bootstrap complete. Run from any directory: local-ai doctor"
