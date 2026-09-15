@@ -1,6 +1,6 @@
 SHELL := /bin/zsh
 
-.PHONY: doctor storage-init storage-benchmark bootstrap install-cli validate snapshot lock-models bundle serve-daily serve-long serve-qwen38 context-ladder aider
+.PHONY: doctor storage-init storage-benchmark bootstrap install-cli validate snapshot lock-models bundle serve-daily serve-long serve-qwen38 context-ladder aider kaggle-submit kaggle-output
 
 doctor:
 	./scripts/doctor.sh
@@ -43,3 +43,9 @@ context-ladder:
 
 aider:
 	./scripts/agent.sh aider qwen35-9b-daily
+
+kaggle-submit:
+	./scripts/kaggle-submit.sh
+
+kaggle-output:
+	./scripts/kaggle-output.sh
