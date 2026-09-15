@@ -167,14 +167,12 @@ of their respective owners.
 
 Licensed under the [MIT License](LICENSE).
 
-Related quantitative research: [msys-alpha-forage](https://github.com/epatnerlab/msys-alpha-forage).
-
 ## Citation
 
 ```bibtex
-@software{opendeviationbar-py,
-  title = {opendeviationbar-py: High-performance open deviation bar construction for quantitative trading},
-  author = {Terry Li},
-  url = {https://github.com/terrylica/opendeviationbar-py}
+@software{local-ai-workstation,
+  title = {local-ai-workstation: Reproducible local inference and quantitative-development workstation},
+  author = {MD NASIM},
+  url = {https://github.com/nasimubd/local-ai-workstation}
 }
 ```
