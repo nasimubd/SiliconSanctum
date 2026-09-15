@@ -48,7 +48,7 @@ local-ai status
 ```
 
 The managed Ollama LaunchAgent stays on localhost, keeps one model resident,
-and stores weights/cache/benchmarks on `TickArchive`. The first model load is
+and stores weights/cache/benchmarks under `AI_ROOT`. The first model load is
 storage-bound; later requests reuse memory and the prompt cache.
 
 ## Claude Code workflow
@@ -84,7 +84,7 @@ portfolio accounting, and leakage.
 ```text
 Run the backtest with the pinned dataset and seed. Check for look-ahead,
 survivorship, timestamp, and train/test leakage. Write metrics and the run
-manifest to /Volumes/TickArchive/ai-workstation/benchmarks. Do not place orders.
+manifest to `$AI_ROOT/benchmarks`. Do not place orders.
 ```
 
 ## Kaggle burst compute
@@ -134,7 +134,7 @@ Useful commands: `local-ai doctor`, `local-ai validate`, `local-ai benchmark`,
 Configuration, scripts, manifests, and documentation are versioned in Git.
 Model weights are deliberately excluded. Run `local-ai lock-models` after model
 changes and `local-ai bundle` to refresh the offline recovery bundle on
-`TickArchive`. See [recovery](docs/RECOVERY.md) and [Thunderbolt migration](docs/THUNDERBOLT_MIGRATION.md).
+`AI_ROOT`. See [recovery](docs/RECOVERY.md) and [Thunderbolt migration](docs/THUNDERBOLT_MIGRATION.md).
 
 ## Contributing
 

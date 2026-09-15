@@ -1,9 +1,9 @@
 # Disaster recovery
 
-If the working copy is lost but TickArchive survives:
+If the working copy is lost but the configured AI volume survives:
 
 ```bash
-git clone /Volumes/TickArchive/ai-workstation/manifests/local-ai-workstation.bundle local-ai-workstation
+git clone "$AI_ROOT/manifests/local-ai-workstation.bundle" local-ai-workstation
 cd local-ai-workstation
 ./scripts/bootstrap.sh
 ```
@@ -19,4 +19,4 @@ Then restore model weights from the pinned names in `config/models.json` using `
 7. Run `./scripts/validate.sh`, then execute the context ladder from 128K upward.
 8. Configure the coding agent to use the local API and restore only the MCP/tool permissions it requires.
 
-Back up this Git repository separately from `TickArchive`. Model weights are replaceable; the repository, model manifests, experiment manifests, indexes, and irreplaceable market data are the important backup set.
+Back up this Git repository separately from `$AI_ROOT`. Model weights are replaceable; the repository, model manifests, experiment manifests, indexes, and irreplaceable market data are the important backup set.
