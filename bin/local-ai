@@ -23,6 +23,8 @@ usage() {
   print -- "  benchmark PROFILE [CONTEXT]    Measure latency, throughput, and memory"
   print -- "  context-ladder [PROFILE]       Display progressive context test levels"
   print -- "  storage-benchmark [SIZE_GIB]   Benchmark the external model drive"
+  print -- "  kaggle-submit                  Submit the reproducible burst worker"
+  print -- "  kaggle-output [SLUG]           Download worker artifacts"
   print -- "  validate                       Validate workstation configuration"
   print -- "  snapshot                       Capture local tool versions"
   print -- "  lock-models                    Copy model manifests into Git locks"
@@ -92,6 +94,12 @@ case "$command_name" in
     ;;
   storage-benchmark)
     exec "$repo_dir/scripts/storage-benchmark.sh" "${1:-4}"
+    ;;
+  kaggle-submit)
+    exec "$repo_dir/scripts/kaggle-submit.sh" "$@"
+    ;;
+  kaggle-output)
+    exec "$repo_dir/scripts/kaggle-output.sh" "$@"
     ;;
   *)
     print -u2 -- "error: unknown command '$command_name'"

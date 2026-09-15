@@ -1,0 +1,10 @@
+{
+  "kernel_slug": "nasimubd/quant-long-context-worker",
+  "dataset_ref": "nasimubd/ai-workstation-models",
+  "model": "qwen35-4b-1m",
+  "context": 524288,
+  "max_runtime_seconds": 39600,
+  "daily_gpu_seconds": 14400,
+  "weekly_gpu_seconds": 108000,
+  "command": ["python", "-m", "backtest.run", "--config", "configs/research.yaml"]
+}
