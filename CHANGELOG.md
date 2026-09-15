@@ -1,3 +1,12 @@
+## [1.0.1](https://github.com/nasimubd/local-ai-workstation/compare/v1.0.0...v1.0.1) (2026-09-15)
+
+
+### Bug Fixes
+
+* parameterize workstation paths ([#14](https://github.com/nasimubd/local-ai-workstation/issues/14)) ([ca9b950](https://github.com/nasimubd/local-ai-workstation/commit/ca9b950315a7785bdd73385743978aae256bf637))
+* preserve release commit boundary ([#21](https://github.com/nasimubd/local-ai-workstation/issues/21)) ([2690b0a](https://github.com/nasimubd/local-ai-workstation/commit/2690b0a29cb3559907edbf6b94d7babe7075f2ac))
+* remove machine-specific paths ([#20](https://github.com/nasimubd/local-ai-workstation/issues/20)) ([21c96c8](https://github.com/nasimubd/local-ai-workstation/commit/21c96c88da196d6d78dcfae282f0a833c5bdd1d2))
+
 # 1.0.0 (2026-09-15)
 
 
