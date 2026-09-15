@@ -15,7 +15,7 @@ jobs. It is not an interactive replacement for the local Ollama service.
 4. Monitor and retrieve results:
 
 ```bash
-kaggle kernels status nasimubd/quant-long-context-worker
+kaggle kernels status <your-kaggle-username>/quant-long-context-worker
 ./scripts/kaggle-output.sh
 ```
 
