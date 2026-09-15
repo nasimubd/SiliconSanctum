@@ -14,7 +14,9 @@ mkdir -p "$repo_dir/.state"
   done
 } > "$repo_dir/.state/versions.txt"
 
-brew bundle dump --file "$repo_dir/.state/Brewfile.lock" --force
+if ! brew bundle dump --file "$repo_dir/.state/Brewfile.lock" --force; then
+  print -u2 -- "warning: Homebrew could not dump the full installed dependency graph; the committed Brewfile remains authoritative"
+fi
 if command -v ollama >/dev/null 2>&1; then
   OLLAMA_MODELS="$AI_ROOT/models/ollama" ollama list > "$repo_dir/.state/ollama-models.txt" 2>/dev/null || true
 fi
