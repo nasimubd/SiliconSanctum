@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Verify release tree and remote are synchronized."
+set -euo pipefail
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/scripts/release/lib.sh"
+check_clean_tree
+echo "release postflight passed"

@@ -1,0 +1,14 @@
+[tools]
+node = "22"
+uv = "latest"
+
+[tasks]
+"release:drift" = "mise-tasks/release/drift"
+"release:dry" = "mise-tasks/release/dry"
+"release:full" = "mise-tasks/release/full"
+"release:preflight" = "mise-tasks/release/preflight"
+"release:version" = "mise-tasks/release/version"
+"release:postflight" = "mise-tasks/release/postflight"
+
+[env]
+PYTHONPATH = "."

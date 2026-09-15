@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Preview semantic-release without changes."
+set -euo pipefail
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/scripts/release/lib.sh"
+ensure_gh_token
+npx semantic-release --no-ci --dry-run --extends ./release.config.cjs
