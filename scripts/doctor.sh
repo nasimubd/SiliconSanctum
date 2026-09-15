@@ -3,7 +3,7 @@ set -euo pipefail
 source "${0:A:h}/lib.sh"
 
 failures=0
-for tool in git jq uv cmake ollama llama-server; do
+for tool in git jq uv cmake ollama llama-server kaggle; do
   if command -v "$tool" >/dev/null 2>&1; then
     print -- "ok      $tool: $(command -v "$tool")"
   else

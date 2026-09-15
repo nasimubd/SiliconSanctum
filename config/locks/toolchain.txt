@@ -7,4 +7,5 @@ ollama=0.34.0
 shellcheck=0.11.0
 uv=0.12.13
 huggingface-cli=1.31.0
+kaggle=2.2.4 (uv tool, Python 3.12)
 aider=0.86.2 (Python 3.12 tool environment)
