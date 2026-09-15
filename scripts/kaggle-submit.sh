@@ -13,6 +13,14 @@ jq --arg slug "$slug" '.kernel_slug=$slug' "$tmp_dir/job.json" > "$tmp_dir/job.j
 mv "$tmp_dir/job.json.tmp" "$tmp_dir/job.json"
 jq --arg id "$slug" '.id=$id' "$tmp_dir/kernel-metadata.json" > "$tmp_dir/kernel-metadata.json.tmp"
 mv "$tmp_dir/kernel-metadata.json.tmp" "$tmp_dir/kernel-metadata.json"
+python3 - "$tmp_dir" <<'PY'
+import json, pathlib, sys
+directory = pathlib.Path(sys.argv[1])
+job = json.loads((directory / "job.json").read_text())
+kernel = (directory / "kernel.py").read_text()
+kernel = kernel.replace("JOB_PAYLOAD = None", "JOB_PAYLOAD = " + repr(job), 1)
+(directory / "kernel.py").write_text(kernel)
+PY
 print -- "Submitting Kaggle job from $tmp_dir"
 kaggle kernels push -p "$tmp_dir"
 print -- "Monitor: kaggle kernels status $slug"
