@@ -30,7 +30,7 @@ bundle:
 	./scripts/recovery-bundle.sh
 
 serve-daily:
-	./scripts/server-manager.sh start qwen35-9b-daily
+	./scripts/server-manager.sh start qwen35-4b-coding
 
 serve-long:
 	./scripts/server-manager.sh start qwen35-4b-1m

@@ -1,5 +1,31 @@
 {
   "profiles": {
+    "qwen35-4b-chat": {
+      "purpose": "Fast direct chat and small focused tasks",
+      "ollama_model": "qwen3.5:4b-q4_K_M",
+      "context": 8192,
+      "startup_context": 8192,
+      "context_ladder": [4096, 8192, 16384],
+      "cache_type_k": "q4_0",
+      "cache_type_v": "q4_0",
+      "gpu_layers": "auto",
+      "flash_attention": true,
+      "vision": false,
+      "parallel": 1
+    },
+    "qwen35-4b-coding": {
+      "purpose": "Default local coding-agent profile for a 16 GB Mac",
+      "ollama_model": "qwen3.5:4b-q4_K_M",
+      "context": 32768,
+      "startup_context": 32768,
+      "context_ladder": [16384, 32768, 65536],
+      "cache_type_k": "q4_0",
+      "cache_type_v": "q4_0",
+      "gpu_layers": "auto",
+      "flash_attention": true,
+      "vision": false,
+      "parallel": 1
+    },
     "qwen35-4b-1m": {
       "purpose": "Experimental literal-million-token text reader",
       "ollama_model": "qwen3.5:4b-q4_K_M",
@@ -14,10 +40,10 @@
       "parallel": 1
     },
     "qwen35-9b-daily": {
-      "purpose": "Daily quantitative coding and review",
+      "purpose": "Higher-quality focused coding with constrained context",
       "ollama_model": "qwen3.5:9b-q4_K_M",
       "context": 131072,
-      "startup_context": 131072,
+      "startup_context": 32768,
       "context_ladder": [32768, 65536, 131072, 262144],
       "cache_type_k": "q4_0",
       "cache_type_v": "q4_0",

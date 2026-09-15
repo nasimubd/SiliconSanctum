@@ -5,12 +5,12 @@ source "${0:A:h}/lib.sh"
 need curl
 need jq
 need ollama
+need launchctl
 require_volume
 
 action="${1:-status}"
 endpoint="http://${AI_HOST}:${AI_OLLAMA_PORT}"
 state_dir="$AI_ROOT/tmp"
-pid_file="$state_dir/ollama-server.pid"
 profile_file="$state_dir/active-profile.json"
 log_file="$state_dir/ollama-server.log"
 lock_dir="$state_dir/profile-switch.lock"
@@ -21,9 +21,8 @@ server_ready() {
 }
 
 managed_pid() {
-  [[ -s "$pid_file" ]] || return 1
-  local pid
-  pid="$(<"$pid_file")"
+  local pid service_target="gui/$(id -u)/com.nasim.local-ai.ollama"
+  pid="$(launchctl print "$service_target" 2>/dev/null | awk '/pid =/ {print $3; exit}')"
   [[ "$pid" == <-> ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
   [[ "$(ps -p "$pid" -o command= 2>/dev/null)" == *"ollama serve"* ]] || return 1
@@ -36,16 +35,8 @@ start_server() {
     return
   fi
 
-  rm -f "$pid_file"
   print -- "Starting managed Ollama server at $endpoint."
-  OLLAMA_HOST="$endpoint" \
-  OLLAMA_MODELS="$AI_ROOT/models/ollama" \
-  OLLAMA_FLASH_ATTENTION=1 \
-  OLLAMA_KV_CACHE_TYPE=q4_0 \
-  OLLAMA_NUM_PARALLEL=1 \
-  nohup ollama serve > "$log_file" 2>&1 < /dev/null &!
-  server_pid=$!
-  print -- "$server_pid" > "$pid_file"
+  "$repo_dir/scripts/install-service.sh" start
 
   for _ in {1..60}; do
     server_ready && return
@@ -80,14 +71,22 @@ load_profile() {
   trap 'rmdir "$lock_dir" 2>/dev/null || true' EXIT
 
   start_server
-  if ! curl -fsS "$endpoint/api/tags" | jq -e --arg model "$model" '.models[]?.name == $model' >/dev/null; then
+  model_available=0
+  for _ in {1..60}; do
+    if curl -fsS "$endpoint/api/tags" | jq -e --arg model "$model" 'if type == "object" then any((.models // [])[]; .name == $model) else false end' >/dev/null; then
+      model_available=1
+      break
+    fi
+    sleep 0.25
+  done
+  if (( ! model_available )); then
     die "$model is unavailable to the running server. Stop the external Ollama process, then retry so the managed server can use $AI_ROOT/models/ollama."
   fi
 
   if [[ -s "$profile_file" ]] &&
      jq -e --arg profile "$profile" --arg model "$model" --argjson context "$context" \
        '.profile == $profile and .model == $model and .context == $context' "$profile_file" >/dev/null &&
-     curl -fsS "$endpoint/api/ps" | jq -e --arg model "$model" '.models[]?.name == $model' >/dev/null; then
+     curl -fsS "$endpoint/api/ps" | jq -e --arg model "$model" 'if type == "object" then any((.models // [])[]; .name == $model) else false end' >/dev/null; then
     print -- "Already ready: $model at $endpoint (context $context)."
     return
   fi
@@ -131,17 +130,13 @@ show_status() {
 stop_server() {
   local pid
   if pid="$(managed_pid 2>/dev/null)"; then
-    kill "$pid"
-    for _ in {1..50}; do
-      kill -0 "$pid" 2>/dev/null || break
-      sleep 0.1
-    done
-    rm -f "$pid_file" "$profile_file"
+    "$repo_dir/scripts/install-service.sh" stop
+    rm -f "$profile_file"
     print -- "Stopped managed Ollama server (PID $pid)."
   elif server_ready; then
     die "Ollama is running but was not started by local-ai. Stop it with Ctrl+C in its original terminal, or quit its owning application."
   else
-    rm -f "$pid_file" "$profile_file"
+    rm -f "$profile_file"
     print -- "Ollama server is already stopped."
   fi
 }

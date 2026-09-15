@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.nasim.local-ai.ollama</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>exec /opt/homebrew/bin/ollama serve</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key><string>/Users/mdnasim</string>
+    <key>PATH</key><string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>OLLAMA_CONTEXT_LENGTH</key><string>32768</string>
+    <key>OLLAMA_FLASH_ATTENTION</key><string>1</string>
+    <key>OLLAMA_HOST</key><string>http://127.0.0.1:11434</string>
+    <key>OLLAMA_KEEP_ALIVE</key><string>-1</string>
+    <key>OLLAMA_KV_CACHE_TYPE</key><string>q4_0</string>
+    <key>OLLAMA_LOAD_TIMEOUT</key><string>30m</string>
+    <key>OLLAMA_MAX_LOADED_MODELS</key><string>1</string>
+    <key>OLLAMA_MODELS</key><string>/Volumes/TickArchive/ai-workstation/models/ollama</string>
+    <key>OLLAMA_NUM_PARALLEL</key><string>1</string>
+  </dict>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ProcessType</key>
+  <string>Interactive</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardErrorPath</key>
+  <string>/Users/mdnasim/Library/Logs/local-ai/ollama-server.error.log</string>
+  <key>StandardOutPath</key>
+  <string>/Users/mdnasim/Library/Logs/local-ai/ollama-server.log</string>
+  <key>ThrottleInterval</key>
+  <integer>5</integer>
+</dict>
+</plist>

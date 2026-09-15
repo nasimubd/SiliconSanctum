@@ -4,14 +4,17 @@ source "${0:A:h}/lib.sh"
 need jq
 
 agent="${1:-aider}"
-profile="${2:-qwen35-9b-daily}"
+profile="${2:-qwen35-4b-coding}"
 model="$(profile_value "$profile" ollama_model)"
+
+"$repo_dir/scripts/server-manager.sh" start "$profile"
 
 case "$agent" in
   aider)
     need aider
     export OLLAMA_API_BASE="http://${AI_HOST}:${AI_OLLAMA_PORT}"
-    exec aider --model "ollama_chat/$model" --config "$repo_dir/config/aider.conf.yml"
+    exec aider --model "ollama_chat/$model" --editor-model "ollama_chat/$model" \
+      --weak-model "ollama_chat/$model" --config "$repo_dir/config/aider.conf.yml"
     ;;
   claude)
     need ollama

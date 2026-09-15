@@ -13,6 +13,8 @@ fi
 : "${AI_HOST:=127.0.0.1}"
 : "${AI_PORT:=8080}"
 : "${AI_OLLAMA_PORT:=11434}"
+: "${AI_MLX_PORT:=8081}"
+: "${AI_DEFAULT_CONTEXT:=32768}"
 : "${AI_THREADS:=6}"
 : "${AI_PARALLEL:=1}"
 

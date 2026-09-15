@@ -16,6 +16,7 @@ if command -v uv >/dev/null 2>&1; then
   # Aider's current voice dependency still imports audioop, removed in Python 3.13.
   uv tool install --upgrade --python 3.12 aider-chat
   uv tool install --upgrade huggingface-hub
+  uv tool install --upgrade --python 3.12 mlx-lm
 fi
 
 print -- "Bootstrap complete. Run from any directory: local-ai doctor"
