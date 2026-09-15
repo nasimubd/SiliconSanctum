@@ -1,6 +1,6 @@
 {
-  "kernel_slug": "nasimubd/quant-long-context-worker",
-  "dataset_ref": "nasimubd/ai-workstation-models",
+  "kernel_slug": "quant-long-context-worker",
+  "dataset_ref": "",
   "model": "qwen35-4b-1m",
   "context": 524288,
   "max_runtime_seconds": 39600,

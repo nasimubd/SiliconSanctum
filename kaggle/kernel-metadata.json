@@ -1,5 +1,5 @@
 {
-  "id": "nasimubd/quant-long-context-worker",
+  "id": "quant-long-context-worker",
   "title": "Quant long-context worker",
   "code_file": "kernel.py",
   "language": "python",
@@ -7,5 +7,5 @@
   "is_private": true,
   "enable_gpu": true,
   "enable_internet": true,
-  "dataset_sources": ["nasimubd/ai-workstation-models"]
+  "dataset_sources": []
 }
