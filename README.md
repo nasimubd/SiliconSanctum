@@ -60,7 +60,7 @@ Open terminal 2, enter the source repository the agent should work on, and start
 
 ```bash
 cd /path/to/your/quant-project
-/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh aider qwen35-9b-daily
+/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh aider qwen35-4b-coding
 ```
 
 Useful Aider commands include `/add FILE`, `/read-only FILE`, `/run pytest`, `/diff`, `/undo`, `/commit`, and `/exit`. Keep market data and credentials outside prompts and Git. Review every proposed change, especially execution, timestamp, and portfolio-accounting logic.
@@ -69,8 +69,22 @@ To try the Claude Code interface against the same local model:
 
 ```bash
 cd /path/to/your/quant-project
-/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh claude qwen35-9b-daily
+/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh claude qwen35-4b-coding
 ```
+
+For a literal long-context Claude Code session, pass the context explicitly.
+Start at 524288 and advance to 1010000 only after the retrieval and memory
+probes pass:
+
+```bash
+cd /path/to/your/quant-project
+/Users/mdnasim/epatnerlab/local-ai-workstation/scripts/agent.sh claude qwen35-4b-1m 524288
+```
+
+Claude Code remains the local tool harness while Qwen performs inference via
+Ollama's Anthropic-compatible Messages API. Qwen3.5's native limit is 262K;
+524K and 1M are extrapolation experiments. Keep long sessions read-only until
+retrieval accuracy and tool-call reliability are established.
 
 ### 4. Chat with the model directly
 
