@@ -1,3 +1,11 @@
+# [1.1.0](https://github.com/nasimubd/local-ai-workstation/compare/v1.0.1...v1.1.0) (2026-09-16)
+
+
+### Features
+
+* add one-command alpha-forge fallback ([#23](https://github.com/nasimubd/local-ai-workstation/issues/23)) ([5517923](https://github.com/nasimubd/local-ai-workstation/commit/55179236c0fcac6d236c866a5e0d0c8ff78953c9))
+* automate TickArchive migration checks ([#22](https://github.com/nasimubd/local-ai-workstation/issues/22)) ([b58486d](https://github.com/nasimubd/local-ai-workstation/commit/b58486d8762f7c85494fb2f442174423921429ca))
+
 ## [1.0.1](https://github.com/nasimubd/local-ai-workstation/compare/v1.0.0...v1.0.1) (2026-09-15)
 
 
