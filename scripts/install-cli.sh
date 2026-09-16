@@ -8,6 +8,9 @@ command_path="$bin_dir/local-ai"
 
 mkdir -p "$bin_dir"
 ln -sfn "$repo_dir/bin/local-ai" "$command_path"
+for alias in backtest plot; do
+  ln -sfn "$repo_dir/bin/local-ai" "$bin_dir/$alias"
+done
 
 if [[ ":$PATH:" != *":$bin_dir:"* ]]; then
   print -u2 -- "warning: $bin_dir is not currently on PATH"
@@ -18,4 +21,4 @@ if [[ ":$PATH:" != *":$bin_dir:"* ]]; then
 fi
 
 "$command_path" paths
-print -- "Installed $command_path"
+print -- "Installed $command_path plus backtest and plot"

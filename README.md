@@ -107,6 +107,41 @@ to pool quota; follow [Kaggle's Terms](https://www.kaggle.com/terms).
 
 See [Kaggle operations](docs/KAGGLE.md) and [performance results](docs/PERFORMANCE.md).
 
+### Local alpha-forge fallback
+
+The TickArchive-aware hot path for `msys-alpha-forage` is registered as a
+local backtesting project. It runs only discovery-split research jobs that the
+repository already designates as Mac-local; it does not ingest live data,
+access lockbox data, or execute orders. Every run records its Git SHA, exact
+command, data roots, exit status, and output log under
+`$AI_ROOT/benchmarks/backtests`.
+
+```bash
+local-ai backtest list
+local-ai backtest run alpha-forge fade-comparison --dry-run
+local-ai stop
+local-ai backtest run alpha-forge fade-sweep
+```
+
+Set `AI_ALPHA_FORGE_DIR` only when the checkout is not the sibling
+`../msys-alpha-forage` directory. A resident inference model blocks a backtest
+on this 16 GB machine to avoid memory pressure and swap.
+
+### One-command project workflow
+
+Run `./scripts/install-cli.sh` once. It installs `backtest` and `plot` into
+`~/.local/bin`; after that, change into a project directory:
+
+```bash
+backtest    # list registered jobs
+plot        # run the alpha-forge plotting job and record its manifest
+```
+
+For alpha-forge, run `backtest run alpha-forge fade-comparison` or
+`backtest run alpha-forge fade-sweep`. Backtests are strict by default; plots
+permit a dirty checkout but record that fact in the manifest. Neither command
+executes live orders.
+
 ## Open-source safety
 
 Keep `.env`, credentials, raw market data, model weights, logs, and generated

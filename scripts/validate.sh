@@ -3,6 +3,7 @@ set -euo pipefail
 source "${0:A:h}/lib.sh"
 need jq
 jq -e '.profiles | length >= 3' "$models_file" >/dev/null
+jq -e '.projects["alpha-forge"].jobs | length >= 1' "$repo_dir/config/backtests.json" >/dev/null
 for script in "$repo_dir"/scripts/*.sh "$repo_dir"/bin/local-ai; do
   zsh -o NO_BG_NICE -n < "$script"
 done
