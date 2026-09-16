@@ -1,0 +1,43 @@
+{
+  "projects": {
+    "alpha-forge": {
+      "purpose": "Local, discovery-only research runs from msys-alpha-forage",
+      "directory_env": "AI_ALPHA_FORGE_DIR",
+      "fallback_directory": "../msys-alpha-forage",
+      "data_roots": [
+        "/Volumes/TickArchive/panels/universe=crypto16/interval=1h/split/discovery",
+        "/Volumes/TickArchive/msys-alpha-forage"
+      ],
+      "jobs": {
+        "fade-comparison": {
+          "description": "Compare discovery-only FadeTheFakeout and MakerMomentumBurst strategies",
+          "command": ["uv", "run", "--python", "3.12", "--no-project", "--with", "numpy", "--with", "numba", "--with", "polars", "--with", "scipy", "--with", "matplotlib", "--with", "pyyaml", "python3", "run_fade_vs_maker_comparative_backtest.py"]
+        },
+        "plot": {
+          "description": "Generate volatility-squeeze equity-curve plots from the discovery split",
+          "command": ["uv", "run", "--python", "3.12", "--no-project", "--with", "numpy", "--with", "numba", "--with", "polars", "--with", "scipy", "--with", "matplotlib", "--with", "pyyaml", "python3", "run_volatility_squeeze_backtest.py"]
+        },
+        "fade-sweep": {
+          "description": "Run the discovery-only parameter sweep with DSR reporting",
+          "command": ["uv", "run", "--python", "3.12", "--no-project", "--with", "numpy", "--with", "numba", "--with", "polars", "--with", "scipy", "python3", "run_fade_vs_maker_parameter_sweep.py"]
+        },
+        "microstructure-signal": {
+          "description": "Run the 30 bps institutional-friction microstructure signal gate",
+          "command": ["uv", "run", "--python", "3.12", "--no-project", "--with", "numpy", "--with", "polars", "--with", "scipy", "python3", "run_microstructure_signal_backtest.py"]
+        },
+        "gp-direction": {
+          "description": "Run the purged out-of-sample GP direction experiment",
+          "command": ["uv", "run", "--python", "3.12", "--no-project", "--with", "numpy", "--with", "polars", "--with", "scipy", "--with", "gplearn", "--with", "scikit-learn", "python3", "run_gp_direction_signal.py"]
+        },
+        "lob-features": {
+          "description": "Evaluate local futures-LOB PAT/SCA features through the friction gate",
+          "command": ["uv", "run", "--python", "3.12", "--no-project", "--with", "polars", "--with", "pyarrow", "--with", "numpy", "--with", "scipy", "python3", "run_lob_feature_signal.py"]
+        },
+        "lob-dynamic-holding": {
+          "description": "Evaluate local stateful PAT/SCA holding rules",
+          "command": ["uv", "run", "--python", "3.12", "--no-project", "--with", "polars", "--with", "pyarrow", "--with", "numpy", "--with", "scipy", "python3", "run_lob_dynamic_holding_signal.py"]
+        }
+      }
+    }
+  }
+}
