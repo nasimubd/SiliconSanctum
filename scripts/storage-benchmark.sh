@@ -3,6 +3,7 @@ set -euo pipefail
 zmodload zsh/datetime
 source "${0:A:h}/lib.sh"
 require_volume
+need jq
 
 size_gib="${1:-4}"
 [[ "$size_gib" =~ '^[0-9]+$' ]] || die "size must be an integer GiB"
@@ -26,7 +27,8 @@ jq -n \
   --argjson bytes "$((size_gib * 1024 * 1024 * 1024))" \
   --argjson write_seconds "$((write_end - write_start))" \
   --argjson read_seconds "$((read_end - read_start))" \
-  '{volume:$volume,device:$device,bytes:$bytes,write_seconds:$write_seconds,read_seconds:$read_seconds,write_MBps:($bytes/1000000/$write_seconds),read_MBps:($bytes/1000000/$read_seconds)}' | tee "$result"
+  --slurpfile transport <("$repo_dir/scripts/storage-transport.sh") \
+  '{schema_version:2,volume:$volume,device:$device,bytes:$bytes,write_seconds:$write_seconds,read_seconds:$read_seconds,write_MBps:($bytes/1000000/$write_seconds),read_MBps:($bytes/1000000/$read_seconds),transport:$transport[0]}' | tee "$result"
 
 rm -f "$test_file"
 print -- "Saved $result and removed the disposable test file."
