@@ -23,6 +23,7 @@ usage() {
   print -- "  benchmark PROFILE [CONTEXT]    Measure latency, throughput, and memory"
   print -- "  context-ladder [PROFILE]       Display progressive context test levels"
   print -- "  storage-benchmark [SIZE_GIB]   Benchmark the external model drive"
+  print -- "  migrate-thunderbolt [SIZE_GIB] Record transport and run two storage passes"
   print -- "  kaggle-submit                  Submit the reproducible burst worker"
   print -- "  kaggle-output [SLUG]           Download worker artifacts"
   print -- "  validate                       Validate workstation configuration"
@@ -94,6 +95,9 @@ case "$command_name" in
     ;;
   storage-benchmark)
     exec "$repo_dir/scripts/storage-benchmark.sh" "${1:-4}"
+    ;;
+  migrate-thunderbolt)
+    exec "$repo_dir/scripts/thunderbolt-migration.sh" "${1:-16}"
     ;;
   kaggle-submit)
     exec "$repo_dir/scripts/kaggle-submit.sh" "$@"

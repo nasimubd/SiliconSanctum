@@ -27,7 +27,7 @@
       "parallel": 1
     },
     "qwen35-4b-1m": {
-      "purpose": "Experimental literal-million-token text reader",
+      "purpose": "Guarded experimental literal-million-token text reader",
       "ollama_model": "qwen3.5:4b-q4_K_M",
       "context": 1010000,
       "startup_context": 131072,
@@ -37,7 +37,9 @@
       "gpu_layers": "auto",
       "flash_attention": true,
       "vision": false,
-      "parallel": 1
+      "parallel": 1,
+      "minimum_ram_gib": 64,
+      "warning": "1,010,000 tokens is extrapolated rather than native. This profile requires at least 64 GiB RAM by policy; use an external long-context runtime for a verified 1M model."
     },
     "qwen35-9b-daily": {
       "purpose": "Higher-quality focused coding with constrained context",
