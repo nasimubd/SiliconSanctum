@@ -35,4 +35,10 @@ pub enum PluginProtocol {
     Grpc,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PluginEndpoint {
+    pub protocol: PluginProtocol,
+    pub authority: String,
+}
+
 pub struct PluginMarker;
