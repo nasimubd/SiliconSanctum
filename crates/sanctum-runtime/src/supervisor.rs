@@ -153,4 +153,5 @@ mod tests {
     #[test] fn rejects_nul_environment_value() { assert!(EnvironmentEntry::new("A", "x\0y").is_err()); }
     #[test] fn accepts_valid_environment_entry() { let entry = EnvironmentEntry::new("MODEL_HOME", "/models").unwrap(); assert_eq!((entry.key(), entry.value()), ("MODEL_HOME", "/models")); }
     #[test] fn running_state_is_not_terminal() { assert!(!ProcessState::Running.is_terminal()); }
+    #[test] fn exited_state_is_terminal() { assert!(ProcessState::Exited.is_terminal()); }
 }
