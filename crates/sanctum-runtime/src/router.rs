@@ -273,4 +273,11 @@ impl FanoutResult {
     }
 }
 
+pub struct FanoutRouter<I, T, C> {
+    intent: I,
+    tooling: T,
+    complexity: C,
+    policy: RouterPolicy,
+}
+
 pub struct RouterMarker;
