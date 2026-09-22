@@ -81,6 +81,10 @@ fn decode_u64(key: &str, bytes: &[u8]) -> Result<u64, SysctlError> {
     Ok(u64::from_ne_bytes(value))
 }
 
+pub fn wired_limit_mb(backend: &impl SysctlRead) -> Result<u64, SysctlError> {
+    decode_u64(IOGPU_WIRED_LIMIT_KEY, &backend.read(IOGPU_WIRED_LIMIT_KEY)?)
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
