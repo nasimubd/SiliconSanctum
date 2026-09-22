@@ -324,4 +324,15 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    pub fn clear(&mut self) {
+        self.root = RadixNode::default();
+        self.stats = CacheStats {
+            nodes: 1,
+            ..CacheStats::default()
+        };
+        self.sessions.clear();
+    }
+}
+
 pub struct RadixMarker;
