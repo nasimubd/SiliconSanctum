@@ -45,4 +45,10 @@ impl TargetModel{
   Ok(Self{name:name.into(),parameters})
  }
 }
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct ContextCapacity(u32);
+impl ContextCapacity{
+ pub fn new(value:u32)->Result<Self,SpeculativeError>{(value>0).then_some(Self(value)).ok_or(SpeculativeError::ZeroValue("context capacity"))}
+ pub const fn get(self)->u32{self.0}
+}
 // NEXT
