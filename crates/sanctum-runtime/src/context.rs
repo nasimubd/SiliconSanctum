@@ -224,4 +224,11 @@ impl StructuralSymbol {
     }
 }
 
+impl StructuralSymbol {
+    #[must_use]
+    pub fn documentation(&self) -> Option<&str> {
+        self.documentation.as_deref()
+    }
+}
+
 pub struct ContextMarker;
