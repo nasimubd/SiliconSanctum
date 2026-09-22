@@ -156,4 +156,10 @@ impl ParsedDocument {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SourceRange {
+    pub start: usize,
+    pub end: usize,
+}
+
 pub struct ContextMarker;
