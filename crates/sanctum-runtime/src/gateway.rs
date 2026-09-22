@@ -260,4 +260,11 @@ impl JaggednessFilter {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BypassReason {
+    Arithmetic,
+    Counting,
+    Temporal,
+}
+
 pub struct GatewayMarker;
