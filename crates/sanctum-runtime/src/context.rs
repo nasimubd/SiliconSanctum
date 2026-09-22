@@ -128,4 +128,11 @@ impl ParsedDocument {
     }
 }
 
+impl ParsedDocument {
+    #[must_use]
+    pub fn root(&self) -> tree_sitter::Node<'_> {
+        self.tree.root_node()
+    }
+}
+
 pub struct ContextMarker;
