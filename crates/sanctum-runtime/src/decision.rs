@@ -204,4 +204,11 @@ impl FixtureExecutor {
     }
 }
 
+impl FixtureExecutor {
+    #[must_use]
+    pub const fn latency(&self) -> std::time::Duration {
+        self.latency
+    }
+}
+
 pub struct DecisionMarker;
