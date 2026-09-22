@@ -11,6 +11,10 @@ pub trait SysctlRead {
     fn read(&self, key: &str) -> Result<Vec<u8>, SysctlError>;
 }
 
+pub trait SysctlWrite {
+    fn write(&self, key: &str, value: &[u8]) -> Result<(), SysctlError>;
+}
+
 #[derive(Debug, Default, Clone, Copy)]
 pub struct NativeSysctl;
 
