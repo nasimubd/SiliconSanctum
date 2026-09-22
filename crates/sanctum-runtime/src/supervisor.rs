@@ -41,6 +41,14 @@ impl ModelPath {
     pub fn as_path(&self) -> &std::path::Path { &self.0 }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProcessSpec {
+    pub backend: BackendKind,
+    pub executable: ExecutablePath,
+    pub model: ModelPath,
+    pub arguments: Vec<String>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BackendKind {
     LlamaServer,
