@@ -45,4 +45,7 @@ impl TokenSequence {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SessionId(String);
+
 pub struct RadixMarker;
