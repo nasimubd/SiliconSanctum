@@ -474,4 +474,8 @@ pub fn sort_symbols(symbols: &mut [StructuralSymbol]) {
     symbols.sort_by_key(|symbol| symbol.range.start);
 }
 
+pub fn deduplicate_symbols(symbols: &mut Vec<StructuralSymbol>) {
+    symbols.dedup_by(|a, b| a.range == b.range && a.kind == b.kind);
+}
+
 pub struct ContextMarker;
