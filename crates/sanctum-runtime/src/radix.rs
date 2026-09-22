@@ -443,4 +443,11 @@ impl CacheEventLog {
     }
 }
 
+impl CacheEventLog {
+    #[must_use]
+    pub fn entries(&self) -> &std::collections::VecDeque<CacheEvent> {
+        &self.entries
+    }
+}
+
 pub struct RadixMarker;
