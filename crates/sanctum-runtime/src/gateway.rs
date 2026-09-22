@@ -99,4 +99,12 @@ impl JaggednessReport {
     }
 }
 
+impl JaggednessReport {
+    pub fn push(&mut self, evidence: Evidence) {
+        if !self.evidence.contains(&evidence) {
+            self.evidence.push(evidence);
+        }
+    }
+}
+
 pub struct GatewayMarker;
