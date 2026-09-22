@@ -105,6 +105,13 @@ impl ModelFootprint {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ArbiterPolicy {
+    pub wired_limit_bytes: u64,
+    pub recovery_bytes: u64,
+    pub pressure_reserve_bytes: u64,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
