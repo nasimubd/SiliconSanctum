@@ -105,6 +105,11 @@ pub enum MemoryPressure {
     Critical,
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CancellationToken {
+    cancelled: std::sync::Arc<std::sync::atomic::AtomicBool>,
+}
+
 impl TuningThresholds {
     #[must_use]
     pub const fn pressure(self, memory: MemorySnapshot) -> MemoryPressure {
