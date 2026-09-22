@@ -389,4 +389,14 @@ pub const fn family_attention(family: ArchitectureFamily) -> AttentionArchitectu
     }
 }
 
+pub fn validate_model_name(name: &str) -> Result<ModelArchitecture, RadixError> {
+    let family = infer_architecture_family(name);
+    let model = ModelArchitecture {
+        name: name.to_owned(),
+        attention: family_attention(family),
+    };
+    model.validate_prefix_cache()?;
+    Ok(model)
+}
+
 pub struct RadixMarker;
