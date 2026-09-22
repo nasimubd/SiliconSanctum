@@ -30,4 +30,8 @@ impl MemorySnapshot {
     pub const fn available_bytes(self) -> u64 {
         self.available_bytes
     }
+    #[must_use]
+    pub const fn swap_used_bytes(self) -> u64 {
+        self.swap_used_bytes
+    }
 }
