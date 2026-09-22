@@ -111,6 +111,33 @@ impl Drop for AlignedBuffer {
     }
 }
 
+#[derive(Debug)]
+pub struct DirectModelFile {
+    file: std::fs::File,
+}
+
+impl DirectModelFile {
+    /// Opens a model file read-only.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the path cannot be opened.
+    pub fn open(path: impl Into<PathBuf>) -> Result<Self, DirectIoError> {
+        let path = path.into();
+        let file = std::fs::File::open(&path).map_err(|source| DirectIoError::Open {
+            path: path.clone(),
+            source,
+        })?;
+        Ok(Self { file })
+    }
+
+    #[must_use]
+    pub fn raw_fd(&self) -> std::os::fd::RawFd {
+        use std::os::fd::AsRawFd;
+        self.file.as_raw_fd()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{AlignedBuffer, DirectIoError, validate_layout};
