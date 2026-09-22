@@ -169,4 +169,5 @@ mod tests {
     #[test] fn exited_state_is_terminal() { assert!(ProcessState::Exited.is_terminal()); }
     #[test] fn rejects_zero_graceful_timeout() { assert!(ShutdownPolicy::new(std::time::Duration::ZERO, std::time::Duration::from_secs(1)).is_err()); }
     #[test] fn rejects_zero_serialization_timeout() { assert!(ShutdownPolicy::new(std::time::Duration::from_secs(1), std::time::Duration::ZERO).is_err()); }
+    #[test] fn accepts_valid_shutdown_policy() { assert!(ShutdownPolicy::new(std::time::Duration::from_secs(5), std::time::Duration::from_secs(3)).is_ok()); }
 }
