@@ -55,6 +55,8 @@ impl SchedulerMetrics {
     pub fn record_step(&mut self, step: PrefillStep) {
         if step == PrefillStep::Tokens512 {
             self.selected_512 = self.selected_512.saturating_add(1);
+        } else {
+            self.selected_1024 = self.selected_1024.saturating_add(1);
         }
     }
 }
