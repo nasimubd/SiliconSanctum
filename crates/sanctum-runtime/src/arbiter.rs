@@ -351,6 +351,20 @@ pub struct EventLog {
     entries: std::collections::VecDeque<ArbiterEvent>,
 }
 
+impl EventLog {
+    pub fn new(capacity: usize) -> Result<Self, ArbiterError> {
+        if capacity == 0 {
+            return Err(ArbiterError::ZeroValue {
+                field: "event_capacity",
+            });
+        }
+        Ok(Self {
+            capacity,
+            entries: std::collections::VecDeque::with_capacity(capacity),
+        })
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
