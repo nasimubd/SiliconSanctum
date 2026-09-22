@@ -32,9 +32,28 @@ pub fn dispatch_pressure(handler: &impl PressureHandler, flags: usize) {
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Mutex;
+
     use super::{
-        MemoryPressure, PRESSURE_CRITICAL, PRESSURE_NORMAL, PRESSURE_WARNING, decode_pressure,
+        MemoryPressure, PRESSURE_CRITICAL, PRESSURE_NORMAL, PRESSURE_WARNING, PressureHandler,
+        decode_pressure, dispatch_pressure,
     };
+
+    #[derive(Default)]
+    struct Recorder(Mutex<Vec<MemoryPressure>>);
+
+    impl PressureHandler for Recorder {
+        fn on_pressure(&self, pressure: MemoryPressure) {
+            self.0.lock().unwrap().push(pressure);
+        }
+    }
+
+    #[test]
+    fn invokes_warning_callback() {
+        let recorder = Recorder::default();
+        dispatch_pressure(&recorder, PRESSURE_WARNING);
+        assert_eq!(*recorder.0.lock().unwrap(), [MemoryPressure::Warning]);
+    }
 
     #[test]
     fn decodes_normal_event() {
