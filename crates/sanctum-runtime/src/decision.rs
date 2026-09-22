@@ -397,4 +397,6 @@ pub struct Choice {
     items: Vec<ChoiceItem>,
 }
 
+pub const MAX_CHOICE_ITEMS: usize = 255;
+
 pub struct DecisionMarker;
