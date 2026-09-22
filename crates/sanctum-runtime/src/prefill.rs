@@ -22,4 +22,9 @@ impl TokenCount {
         }
         Ok(Self(value))
     }
+
+    #[must_use]
+    pub const fn get(self) -> usize {
+        self.0
+    }
 }
