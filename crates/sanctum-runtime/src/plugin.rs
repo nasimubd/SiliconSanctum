@@ -164,4 +164,12 @@ impl PluginRequest {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PluginStatus {
+    Ok,
+    InvalidRequest,
+    Unavailable,
+    Internal,
+}
+
 pub struct PluginMarker;
