@@ -307,4 +307,10 @@ impl<I: AxisEvaluator, T: AxisEvaluator, C: AxisEvaluator> FanoutRouter<I, T, C>
     }
 }
 
+impl<I: AxisEvaluator, T: AxisEvaluator, C: AxisEvaluator> FanoutRouter<I, T, C> {
+    pub async fn route(&self, p: &RoutingPrompt) -> Result<RouteDecision, RouterError> {
+        Ok(self.evaluate(p).await?.route(self.policy))
+    }
+}
+
 pub struct RouterMarker;
