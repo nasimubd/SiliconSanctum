@@ -434,4 +434,11 @@ impl Choice {
     }
 }
 
+impl Choice {
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.items.len()
+    }
+}
+
 pub struct DecisionMarker;
