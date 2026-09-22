@@ -255,4 +255,15 @@ impl FanoutResult {
     }
 }
 
+impl FanoutResult {
+    #[must_use]
+    pub fn average_confidence(&self) -> f64 {
+        self.evaluations()
+            .into_iter()
+            .map(AxisEvaluation::confidence)
+            .sum::<f64>()
+            / 3.0
+    }
+}
+
 pub struct RouterMarker;
