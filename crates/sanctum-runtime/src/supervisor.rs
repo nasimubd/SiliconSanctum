@@ -224,6 +224,27 @@ impl SupervisedChild {
         self.signal(ProcessSignal::Kill)
     }
 
+    pub async fn shutdown(
+        &mut self,
+        policy: ShutdownPolicy,
+    ) -> Result<ShutdownOutcome, SupervisorError> {
+        if self.try_status()?.is_some() {
+            return Ok(ShutdownOutcome::AlreadyExited);
+        }
+        self.terminate().await?;
+        match tokio::time::timeout(policy.graceful, self.wait()).await {
+            Ok(result) => {
+                result?;
+                Ok(ShutdownOutcome::Graceful)
+            }
+            Err(_) => {
+                self.force_kill().await?;
+                self.wait().await?;
+                Ok(ShutdownOutcome::Forced)
+            }
+        }
+    }
+
     pub fn signal(&mut self, signal: ProcessSignal) -> Result<(), SupervisorError> {
         let pid = self.id().ok_or(SupervisorError::MissingProcessId)?;
         send_signal(pid, signal)?;
