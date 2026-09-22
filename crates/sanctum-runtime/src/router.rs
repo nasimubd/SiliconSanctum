@@ -115,4 +115,11 @@ pub enum RouteReason {
     LowCertainty,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct RouteDecision {
+    pub destination: RouteDestination,
+    pub reason: RouteReason,
+    pub confidence: f64,
+}
+
 pub struct RouterMarker;
