@@ -254,4 +254,10 @@ impl ModelEntry {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RegistryStats {
+    pub models: usize,
+    pub total_weight_bytes: u64,
+}
+
 pub struct RegistryMarker;
