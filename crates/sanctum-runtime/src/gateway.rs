@@ -112,4 +112,13 @@ pub struct PatternSet {
     patterns: Vec<String>,
 }
 
+impl PatternSet {
+    pub fn new(patterns: Vec<String>) -> Result<Self, GatewayError> {
+        if patterns.is_empty() || patterns.iter().any(String::is_empty) {
+            return Err(GatewayError::EmptyPattern);
+        }
+        Ok(Self { patterns })
+    }
+}
+
 pub struct GatewayMarker;
