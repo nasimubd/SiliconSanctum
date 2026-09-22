@@ -2,6 +2,9 @@
 
 use thiserror::Error;
 
+#[cfg(target_os = "macos")]
+use std::ffi::CString;
+
 pub const IOGPU_WIRED_LIMIT_KEY: &str = "iogpu.wired_limit_mb";
 
 pub trait SysctlRead {
@@ -10,6 +13,11 @@ pub trait SysctlRead {
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct NativeSysctl;
+
+#[cfg(target_os = "macos")]
+fn key_c_string(key: &str) -> Result<CString, SysctlError> {
+    CString::new(key).map_err(|_| SysctlError::InvalidKey(key.into()))
+}
 
 #[derive(Debug, Error)]
 pub enum SysctlError {
