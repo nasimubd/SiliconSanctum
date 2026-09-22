@@ -24,4 +24,11 @@ impl TokenSequence {
     }
 }
 
+impl TokenSequence {
+    #[must_use]
+    pub fn tokens(&self) -> &[TokenId] {
+        &self.0
+    }
+}
+
 pub struct RadixMarker;
