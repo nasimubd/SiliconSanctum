@@ -387,4 +387,11 @@ impl HeavyModelTarget {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RoutePlan {
+    Deterministic(DeterministicTarget),
+    Speculative(ModelPair),
+    Heavy(HeavyModelTarget),
+}
+
 pub struct RouterMarker;
