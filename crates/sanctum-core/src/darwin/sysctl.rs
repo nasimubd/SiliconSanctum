@@ -114,6 +114,13 @@ pub fn wired_limit_mb(backend: &impl SysctlRead) -> Result<u64, SysctlError> {
     decode_u64(IOGPU_WIRED_LIMIT_KEY, &backend.read(IOGPU_WIRED_LIMIT_KEY)?)
 }
 
+pub fn set_wired_limit_mb(
+    backend: &impl SysctlWrite,
+    limit_mb: u64,
+) -> Result<(), SysctlError> {
+    backend.write(IOGPU_WIRED_LIMIT_KEY, &limit_mb.to_ne_bytes())
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
