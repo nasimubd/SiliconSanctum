@@ -1,0 +1,22 @@
+[package]
+name = "sanctum-core-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+sanctum-core = { path = "../crates/sanctum-core" }
+
+[[bin]]
+name = "layout"
+path = "fuzz_targets/layout.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]
+members = ["."]
