@@ -178,4 +178,11 @@ impl SourceRange {
     }
 }
 
+impl SourceRange {
+    #[must_use]
+    pub const fn is_empty(self) -> bool {
+        self.start == self.end
+    }
+}
+
 pub struct ContextMarker;
