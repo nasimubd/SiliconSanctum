@@ -120,4 +120,6 @@ pub struct TelemetrySnapshot{pub tokens_per_second:f64,pub acceptance_rate:f64,p
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct ModelProfile{pub draft:String,pub target:String}
 impl ModelProfile{pub fn label(&self)->String{format!("{} -> {}",self.draft,self.target)}}
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub enum DecoderEvent{Started,CycleCompleted{accepted:usize,proposed:usize},WidthChanged{from:u8,to:u8},Stopped}
 // NEXT
