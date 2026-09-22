@@ -284,6 +284,24 @@ mod tests {
     }
 
     #[test]
+    fn streams_chunk_into_aligned_sink() {
+        let fixture = model_fixture(b"abcdefgh");
+        let model = DirectModelFile::open(fixture.path()).unwrap();
+        let mut sink = AlignedBuffer::new(16_384, 16_384).unwrap();
+        let count = super::stream_chunk(
+            &model,
+            super::ChunkRange {
+                offset: 2,
+                length: 3,
+            },
+            &mut sink,
+        )
+        .unwrap();
+        assert_eq!(count, 3);
+        assert_eq!(&sink.as_slice()[..3], b"cde");
+    }
+
+    #[test]
     fn allocation_honors_sixteen_kibibyte_alignment() {
         let buffer = AlignedBuffer::new(16_384, 16_384).unwrap();
         assert_eq!(buffer.as_slice().as_ptr().addr() % 16_384, 0);
