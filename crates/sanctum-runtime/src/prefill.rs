@@ -239,3 +239,10 @@ pub struct PrefillPlan {
     pub scratch_bytes: u64,
     pub kv_bytes: u64,
 }
+
+impl PrefillPlan {
+    #[must_use]
+    pub fn chunk_count(&self) -> usize {
+        self.chunks.len()
+    }
+}
