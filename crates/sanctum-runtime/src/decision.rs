@@ -471,4 +471,11 @@ impl Choice {
     }
 }
 
+impl Choice {
+    #[must_use]
+    pub fn items(&self) -> &[ChoiceItem] {
+        &self.items
+    }
+}
+
 pub struct DecisionMarker;
