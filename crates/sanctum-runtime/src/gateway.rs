@@ -85,4 +85,11 @@ impl JaggednessReport {
     }
 }
 
+impl JaggednessReport {
+    #[must_use]
+    pub fn evidence(&self) -> &[Evidence] {
+        &self.evidence
+    }
+}
+
 pub struct GatewayMarker;
