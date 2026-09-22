@@ -187,4 +187,18 @@ impl Default for CountingDetector {
     }
 }
 
+impl CountingDetector {
+    #[must_use]
+    pub fn detect(&self, p: &GatewayPrompt) -> Vec<Evidence> {
+        let text = p.normalized();
+        self.patterns
+            .matching(&text)
+            .map(|v| Evidence {
+                kind: JaggednessKind::Counting,
+                marker: v.to_owned(),
+            })
+            .collect()
+    }
+}
+
 pub struct GatewayMarker;
