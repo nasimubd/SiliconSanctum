@@ -87,4 +87,7 @@ impl DraftProposal{pub fn new(tokens:Vec<u32>)->Result<Self,SpeculativeError>{(!
 pub struct Verification{pub accepted:usize,pub fallback_token:Option<u32>}
 impl Verification{pub fn emitted_tokens(&self)->usize{self.accepted+usize::from(self.fallback_token.is_some())}}
 pub fn compare_proposal(proposal:&DraftProposal,target:&[u32])->Verification{let accepted=proposal.tokens().iter().zip(target).take_while(|(draft,target)|draft==target).count();Verification{accepted,fallback_token:target.get(accepted).copied()}}
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct CycleOutcome{pub proposal:DraftProposal,pub verification:Verification}
+impl CycleOutcome{pub fn emitted_tokens(&self)->usize{self.verification.emitted_tokens()}}
 // NEXT
