@@ -308,6 +308,12 @@ impl DecisionEngine {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EvictionCandidate {
+    pub model: ModelFootprint,
+    pub last_used_epoch: u64,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
