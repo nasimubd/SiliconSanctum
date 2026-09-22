@@ -265,4 +265,7 @@ pub fn execute_measured(
     })
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Noul(f64);
+
 pub struct DecisionMarker;
