@@ -138,3 +138,15 @@ pub struct TuningThresholds {
     pub constrained_bytes: u64,
     pub comfortable_bytes: u64,
 }
+
+impl TuningThresholds {
+    pub const fn new(constrained_bytes: u64, comfortable_bytes: u64) -> Result<Self, PrefillError> {
+        if constrained_bytes == 0 || constrained_bytes >= comfortable_bytes {
+            return Err(PrefillError::InvalidThresholds);
+        }
+        Ok(Self {
+            constrained_bytes,
+            comfortable_bytes,
+        })
+    }
+}
