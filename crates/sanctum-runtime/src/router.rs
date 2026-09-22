@@ -193,4 +193,14 @@ impl RouterPolicy {
     }
 }
 
+pub trait AxisEvaluator {
+    fn evaluate<'a>(
+        &'a self,
+        axis: EvaluationAxis,
+        prompt: &'a RoutingPrompt,
+    ) -> std::pin::Pin<
+        Box<dyn std::future::Future<Output = Result<AxisEvaluation, RouterError>> + Send + 'a>,
+    >;
+}
+
 pub struct RouterMarker;
