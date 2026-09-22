@@ -502,4 +502,15 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    pub fn lookup_session(&mut self, id: &SessionId) -> Result<PrefixMatch, RadixError> {
+        let sequence = self
+            .sessions
+            .get(id)
+            .cloned()
+            .ok_or(RadixError::MissingSession)?;
+        Ok(self.lookup(&sequence))
+    }
+}
+
 pub struct RadixMarker;
