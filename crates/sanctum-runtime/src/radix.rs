@@ -399,4 +399,14 @@ pub fn validate_model_name(name: &str) -> Result<ModelArchitecture, RadixError> 
     Ok(model)
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CacheEventKind {
+    Inserted,
+    Hit,
+    Miss,
+    Evicted,
+    SessionBound,
+    SessionRemoved,
+}
+
 pub struct RadixMarker;
