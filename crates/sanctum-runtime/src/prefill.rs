@@ -84,6 +84,10 @@ impl PrefillEventLog {
             events: std::collections::VecDeque::with_capacity(capacity),
         })
     }
+
+    pub fn push(&mut self, event: PrefillEvent) {
+        self.events.push_back(event);
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
