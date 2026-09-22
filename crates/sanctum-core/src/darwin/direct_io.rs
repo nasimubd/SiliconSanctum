@@ -27,6 +27,8 @@ pub enum DirectIoError {
     },
     #[error("model offset {offset} does not fit off_t")]
     OffsetOverflow { offset: u64 },
+    #[error("shared Metal buffer has {available} bytes; chunk requires {required}")]
+    SharedBufferTooSmall { required: usize, available: usize },
 }
 
 /// Validates the alignment accepted by `posix_memalign`.
