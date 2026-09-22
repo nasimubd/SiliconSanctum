@@ -148,7 +148,9 @@ impl ProcessSpec {
 
 #[must_use]
 pub fn build_command(spec: &ProcessSpec) -> tokio::process::Command {
-    tokio::process::Command::new(spec.executable.as_path())
+    let mut command = tokio::process::Command::new(spec.executable.as_path());
+    command.args(&spec.arguments);
+    command
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
