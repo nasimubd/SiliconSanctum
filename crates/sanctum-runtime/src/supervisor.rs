@@ -216,6 +216,10 @@ pub struct SupervisedChild {
 }
 
 impl SupervisedChild {
+    pub async fn terminate(&mut self) -> Result<(), SupervisorError> {
+        self.signal(ProcessSignal::Terminate)
+    }
+
     pub fn signal(&mut self, signal: ProcessSignal) -> Result<(), SupervisorError> {
         let pid = self.id().ok_or(SupervisorError::MissingProcessId)?;
         send_signal(pid, signal)?;
