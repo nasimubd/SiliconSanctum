@@ -61,6 +61,13 @@ impl SchedulerMetrics {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrefillEvent {
+    Planned { chunks: usize, step: PrefillStep },
+    Rejected(PrefillError),
+    Cancelled,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TokenCount(usize);
 
