@@ -167,4 +167,10 @@ impl RouterPolicy {
     }
 }
 
+impl Default for RouterPolicy {
+    fn default() -> Self {
+        Self::new(RouteThresholds::default())
+    }
+}
+
 pub struct RouterMarker;
