@@ -51,4 +51,12 @@ impl ContextCapacity{
  pub fn new(value:u32)->Result<Self,SpeculativeError>{(value>0).then_some(Self(value)).ok_or(SpeculativeError::ZeroValue("context capacity"))}
  pub const fn get(self)->u32{self.0}
 }
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct ContextPosition(u32);
+impl ContextPosition{
+ pub fn new(value:u32,capacity:ContextCapacity)->Result<Self,SpeculativeError>{
+  if value>capacity.get(){return Err(SpeculativeError::ContextPositionOutOfRange{position:value,capacity:capacity.get()});} Ok(Self(value))
+ }
+ pub const fn get(self)->u32{self.0}
+}
 // NEXT
