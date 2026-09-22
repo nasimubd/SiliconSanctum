@@ -349,6 +349,25 @@ mod tests {
     }
 
     #[test]
+    fn bounded_workers_preserve_chunk_order() {
+        let fixture = model_fixture(b"abcdefgh");
+        let model = DirectModelFile::open(fixture.path()).unwrap();
+        let ranges = [
+            super::ChunkRange {
+                offset: 4,
+                length: 2,
+            },
+            super::ChunkRange {
+                offset: 0,
+                length: 2,
+            },
+        ];
+        let buffers = super::read_chunks_bounded(&model, &ranges, 2).unwrap();
+        assert_eq!(buffers[0].as_slice(), b"ef");
+        assert_eq!(buffers[1].as_slice(), b"ab");
+    }
+
+    #[test]
     fn allocation_honors_sixteen_kibibyte_alignment() {
         let buffer = AlignedBuffer::new(16_384, 16_384).unwrap();
         assert_eq!(buffer.as_slice().as_ptr().addr() % 16_384, 0);
