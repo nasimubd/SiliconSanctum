@@ -31,6 +31,10 @@ pub enum DirectIoError {
     SharedBufferTooSmall { required: usize, available: usize },
     #[error("shared Metal buffer pointer is not aligned to {required} bytes")]
     SharedBufferMisaligned { required: usize },
+    #[error("direct-read worker panicked")]
+    WorkerPanic,
+    #[error("direct-read worker limit must be greater than zero")]
+    InvalidWorkerLimit,
 }
 
 /// Validates the alignment accepted by `posix_memalign`.
