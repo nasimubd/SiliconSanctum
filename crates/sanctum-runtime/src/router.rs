@@ -464,4 +464,18 @@ pub struct RouteMetrics {
     pub heavy: u64,
 }
 
+impl RouteMetrics {
+    pub fn record(&mut self, d: RouteDestination) {
+        match d {
+            RouteDestination::DeterministicTool => {
+                self.deterministic = self.deterministic.saturating_add(1);
+            }
+            RouteDestination::SpeculativePipeline => {
+                self.speculative = self.speculative.saturating_add(1);
+            }
+            RouteDestination::HeavyModel => self.heavy = self.heavy.saturating_add(1),
+        }
+    }
+}
+
 pub struct RouterMarker;
