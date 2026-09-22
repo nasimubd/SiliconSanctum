@@ -56,3 +56,12 @@ impl PrefillStep {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ScratchBudget(u64);
+
+impl ScratchBudget {
+    pub const fn new(bytes: u64) -> Result<Self, PrefillError> {
+        if bytes == 0 {
+            return Err(PrefillError::ZeroBudget);
+        }
+        Ok(Self(bytes))
+    }
+}
