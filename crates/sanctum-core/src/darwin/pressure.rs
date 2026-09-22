@@ -56,6 +56,13 @@ mod tests {
     }
 
     #[test]
+    fn invokes_critical_callback() {
+        let recorder = Recorder::default();
+        dispatch_pressure(&recorder, PRESSURE_CRITICAL);
+        assert_eq!(*recorder.0.lock().unwrap(), [MemoryPressure::Critical]);
+    }
+
+    #[test]
     fn decodes_normal_event() {
         assert_eq!(decode_pressure(PRESSURE_NORMAL), MemoryPressure::Normal);
     }
