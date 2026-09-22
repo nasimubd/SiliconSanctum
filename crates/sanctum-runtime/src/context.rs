@@ -162,4 +162,13 @@ pub struct SourceRange {
     pub end: usize,
 }
 
+impl SourceRange {
+    pub fn new(start: usize, end: usize) -> Result<Self, ContextError> {
+        if start > end {
+            return Err(ContextError::InvalidRange);
+        }
+        Ok(Self { start, end })
+    }
+}
+
 pub struct ContextMarker;
