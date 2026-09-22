@@ -41,6 +41,13 @@ pub trait MachHost {
 #[derive(Debug, Default, Clone, Copy)]
 pub struct NativeMachHost;
 
+#[cfg(target_os = "macos")]
+#[must_use]
+pub fn native_page_size() -> u64 {
+    // SAFETY: libSystem initializes the read-only Mach page-size global before main.
+    u64::try_from(unsafe { mach2::vm_page_size::vm_page_size }).unwrap_or(u64::MAX)
+}
+
 #[cfg(test)]
 mod tests {
     use super::MachTelemetryError;
