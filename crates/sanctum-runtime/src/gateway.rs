@@ -35,4 +35,11 @@ impl GatewayPrompt {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum JaggednessKind {
+    MultiHopArithmetic,
+    Counting,
+    RelativeTemporal,
+}
+
 pub struct GatewayMarker;
