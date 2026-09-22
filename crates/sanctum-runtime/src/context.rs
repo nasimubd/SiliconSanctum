@@ -246,4 +246,11 @@ impl QuerySpec {
     }
 }
 
+impl QuerySpec {
+    #[must_use]
+    pub fn source(&self) -> &str {
+        &self.source
+    }
+}
+
 pub struct ContextMarker;
