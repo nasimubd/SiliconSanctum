@@ -1,7 +1,7 @@
 //! Ratatui views for runtime telemetry.
 use ratatui::layout::{Constraint,Direction,Layout,Rect};
 use ratatui::Frame;
-use ratatui::widgets::{Block,Borders,Gauge,Paragraph};
+use ratatui::widgets::{Block,Borders,Gauge,Paragraph,Sparkline};
 use super::{DashboardState,MetricHistory};
 pub fn render_dashboard(_frame:&mut Frame<'_>,_state:&DashboardState,_history:&MetricHistory){}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
@@ -13,3 +13,4 @@ pub fn render_footer(frame:&mut Frame<'_>,area:Rect){frame.render_widget(Paragra
 pub fn render_token_rate(frame:&mut Frame<'_>,area:Rect,state:&DashboardState){frame.render_widget(Paragraph::new(format!("Generation: {:.1} tok/s",state.snapshot.token_rate.get())),area);}
 pub fn render_memory(frame:&mut Frame<'_>,area:Rect,state:&DashboardState){let rows=Layout::default().direction(Direction::Vertical).constraints([Constraint::Length(3),Constraint::Length(3),Constraint::Length(3)]).split(area);let memory=state.snapshot.memory;frame.render_widget(Gauge::default().block(Block::default().title("Wired memory").borders(Borders::ALL)).ratio(memory.wired.ratio(memory.total).clamp(0.0,1.0)),rows[0]);frame.render_widget(Gauge::default().block(Block::default().title("OS cache").borders(Borders::ALL)).ratio(memory.os_cache.ratio(memory.total).clamp(0.0,1.0)),rows[1]);frame.render_widget(Gauge::default().block(Block::default().title("KV slots").borders(Borders::ALL)).ratio(f64::from(state.snapshot.kv.ratio()).clamp(0.0,1.0)),rows[2]);}
 pub fn render_compute(frame:&mut Frame<'_>,area:Rect,state:&DashboardState){let rows=Layout::default().direction(Direction::Vertical).constraints([Constraint::Length(3),Constraint::Length(3)]).split(area);frame.render_widget(Gauge::default().block(Block::default().title("P cores").borders(Borders::ALL)).ratio(f64::from(state.snapshot.cpu.performance.get())),rows[0]);frame.render_widget(Gauge::default().block(Block::default().title("E cores").borders(Borders::ALL)).ratio(f64::from(state.snapshot.cpu.efficiency.get())),rows[1]);}
+pub fn render_history(frame:&mut Frame<'_>,area:Rect,history:&MetricHistory){let samples:Vec<u64>=history.token_rates().iter().map(|rate|*rate as u64).collect();frame.render_widget(Sparkline::default().block(Block::default().title("Token rate history").borders(Borders::ALL)).data(&samples),area);}
