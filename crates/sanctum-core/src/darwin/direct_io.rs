@@ -122,6 +122,13 @@ mod tests {
     }
 
     #[test]
+    fn zero_length_allocation_exposes_empty_slice() {
+        let buffer = AlignedBuffer::new(0, 16_384).unwrap();
+        assert!(buffer.is_empty());
+        assert!(buffer.as_slice().is_empty());
+    }
+
+    #[test]
     fn rejects_non_power_of_two_alignment() {
         assert!(matches!(
             validate_layout(4096, 12),
