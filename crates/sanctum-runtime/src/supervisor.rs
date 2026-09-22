@@ -98,6 +98,7 @@ pub struct ProcessSpec {
     pub executable: ExecutablePath,
     pub model: ModelPath,
     pub arguments: Vec<String>,
+    pub environment: Vec<EnvironmentEntry>,
 }
 
 impl ProcessSpec {
@@ -108,6 +109,7 @@ impl ProcessSpec {
             executable,
             model,
             arguments: Vec::new(),
+            environment: Vec::new(),
         }
     }
 
@@ -118,6 +120,7 @@ impl ProcessSpec {
             executable,
             model,
             arguments: Vec::new(),
+            environment: Vec::new(),
         }
     }
 }
