@@ -45,4 +45,11 @@ impl SourceLanguage {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SourceDocument {
+    path: std::path::PathBuf,
+    language: SourceLanguage,
+    source: Vec<u8>,
+}
+
 pub struct ContextMarker;
