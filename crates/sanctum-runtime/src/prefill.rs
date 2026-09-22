@@ -51,6 +51,12 @@ impl SchedulerMetrics {
     pub fn record_rejection(&mut self) {
         self.rejected = self.rejected.saturating_add(1);
     }
+
+    pub fn record_step(&mut self, step: PrefillStep) {
+        if step == PrefillStep::Tokens512 {
+            self.selected_512 = self.selected_512.saturating_add(1);
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
