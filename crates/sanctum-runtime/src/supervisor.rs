@@ -141,4 +141,5 @@ mod tests {
         assert_eq!(spec.backend, BackendKind::MlxLm);
     }
     #[test] fn rejects_environment_assignment_key() { assert!(EnvironmentEntry::new("A=B", "x").is_err()); }
+    #[test] fn rejects_nul_environment_key() { assert!(EnvironmentEntry::new("A\0B", "x").is_err()); }
 }
