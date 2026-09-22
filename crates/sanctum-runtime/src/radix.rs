@@ -354,4 +354,13 @@ pub fn shared_prefix(left: &TokenSequence, right: &TokenSequence) -> Option<Toke
     (len > 0).then(|| TokenSequence(left.tokens()[..len].to_vec()))
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArchitectureFamily {
+    Transformer,
+    Gemma,
+    QwenSsm,
+    Mamba,
+    Unknown,
+}
+
 pub struct RadixMarker;
