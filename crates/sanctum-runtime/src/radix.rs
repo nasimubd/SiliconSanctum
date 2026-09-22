@@ -379,4 +379,14 @@ pub fn infer_architecture_family(name: &str) -> ArchitectureFamily {
     }
 }
 
+#[must_use]
+pub const fn family_attention(family: ArchitectureFamily) -> AttentionArchitecture {
+    match family {
+        ArchitectureFamily::Transformer => AttentionArchitecture::Full,
+        ArchitectureFamily::Gemma => AttentionArchitecture::SlidingWindow,
+        ArchitectureFamily::QwenSsm | ArchitectureFamily::Mamba => AttentionArchitecture::Recurrent,
+        ArchitectureFamily::Unknown => AttentionArchitecture::Hybrid,
+    }
+}
+
 pub struct RadixMarker;
