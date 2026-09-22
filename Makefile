@@ -1,9 +1,12 @@
 SHELL := /bin/zsh
 
-.PHONY: doctor storage-init storage-benchmark migrate-thunderbolt backtest bootstrap install-cli validate snapshot lock-models bundle serve-daily serve-long serve-qwen38 context-ladder aider kaggle-submit kaggle-output core-check
+.PHONY: doctor storage-init storage-benchmark migrate-thunderbolt backtest bootstrap install-cli validate snapshot lock-models bundle serve-daily serve-long serve-qwen38 context-ladder aider kaggle-submit kaggle-output core-check core-test
 
 core-check:
 	cargo check --workspace
+
+core-test:
+	cargo test --workspace
 
 doctor:
 	./scripts/doctor.sh
