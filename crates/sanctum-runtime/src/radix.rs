@@ -343,4 +343,9 @@ impl RadixCache {
     }
 }
 
+#[must_use]
+pub fn common_prefix_len(left: &[TokenId], right: &[TokenId]) -> usize {
+    left.iter().zip(right).take_while(|(a, b)| a == b).count()
+}
+
 pub struct RadixMarker;
