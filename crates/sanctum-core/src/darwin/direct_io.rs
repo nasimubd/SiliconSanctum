@@ -116,6 +116,19 @@ pub struct DirectModelFile {
     file: std::fs::File,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ChunkRange {
+    pub offset: u64,
+    pub length: usize,
+}
+
+impl ChunkRange {
+    #[must_use]
+    pub fn end(self) -> Option<u64> {
+        self.offset.checked_add(u64::try_from(self.length).ok()?)
+    }
+}
+
 impl DirectModelFile {
     /// Opens a model file read-only.
     ///
