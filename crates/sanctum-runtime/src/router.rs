@@ -144,4 +144,15 @@ impl RouteDecision {
     }
 }
 
+impl RouteDecision {
+    #[must_use]
+    pub const fn heavy(c: f64) -> Self {
+        Self {
+            destination: RouteDestination::HeavyModel,
+            reason: RouteReason::LowCertainty,
+            confidence: c,
+        }
+    }
+}
+
 pub struct RouterMarker;
