@@ -500,4 +500,9 @@ pub fn requires_counting_bypass(text: &str) -> bool {
     counting_marker_count(text) > 0
 }
 
+#[must_use]
+pub fn requires_temporal_bypass(text: &str) -> bool {
+    temporal_marker_count(text) > 0
+}
+
 pub struct GatewayMarker;
