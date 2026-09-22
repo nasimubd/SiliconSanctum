@@ -19,3 +19,6 @@ pub struct MemoryBytes(pub u64);
 impl MemoryBytes{pub fn ratio(self,total:Self)->f64{if total.0==0{0.0}else{self.0 as f64/total.0 as f64}}}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub struct MemoryTelemetry{pub wired:MemoryBytes,pub os_cache:MemoryBytes,pub total:MemoryBytes}
+#[derive(Debug,Clone,Copy,PartialEq)]
+pub struct Utilization(f32);
+impl Utilization{pub fn new(value:f32)->Result<Self,DashboardError>{if !value.is_finite()||!(0.0..=1.0).contains(&value){return Err(DashboardError::InvalidPercentage);}Ok(Self(value))}pub const fn get(self)->f32{self.0}}
