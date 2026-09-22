@@ -33,3 +33,6 @@ impl ActiveProfile{pub fn new(value:impl Into<String>)->Result<Self,DashboardErr
 #[derive(Debug,Clone,PartialEq)]
 pub struct DashboardSnapshot{pub token_rate:TokenRate,pub memory:MemoryTelemetry,pub cpu:CpuTelemetry,pub kv:KvResidency,pub profile:ActiveProfile}
 pub trait TelemetrySource{fn snapshot(&mut self)->Result<DashboardSnapshot,DashboardError>;}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub enum DashboardTab{Overview,Memory,Compute}
+impl DashboardTab{pub const fn next(self)->Self{match self{Self::Overview=>Self::Memory,Self::Memory=>Self::Compute,Self::Compute=>Self::Overview}}}
