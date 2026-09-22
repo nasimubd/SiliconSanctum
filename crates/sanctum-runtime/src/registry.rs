@@ -218,4 +218,11 @@ impl ModelRegistry {
     }
 }
 
+impl ModelRegistry {
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
+    }
+}
+
 pub struct RegistryMarker;
