@@ -17,3 +17,5 @@ impl TokenRate{pub fn new(value:f64)->Result<Self,DashboardError>{if !value.is_f
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub struct MemoryBytes(pub u64);
 impl MemoryBytes{pub fn ratio(self,total:Self)->f64{if total.0==0{0.0}else{self.0 as f64/total.0 as f64}}}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct MemoryTelemetry{pub wired:MemoryBytes,pub os_cache:MemoryBytes,pub total:MemoryBytes}
