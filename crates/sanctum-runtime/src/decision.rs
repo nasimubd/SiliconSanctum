@@ -498,4 +498,17 @@ pub struct ScoreRubric {
     points: Vec<RubricPoint>,
 }
 
+impl ScoreRubric {
+    pub fn new(points: Vec<RubricPoint>) -> Result<Self, DecisionError> {
+        if points.len() < 2
+            || !points
+                .windows(2)
+                .all(|pair| pair[0].position < pair[1].position)
+        {
+            return Err(DecisionError::InvalidRubric);
+        }
+        Ok(Self { points })
+    }
+}
+
 pub struct DecisionMarker;
