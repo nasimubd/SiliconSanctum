@@ -289,6 +289,19 @@ pub struct ShutdownPolicy {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CacheMarker(std::path::PathBuf);
 
+impl CacheMarker {
+    pub fn new(path: impl Into<std::path::PathBuf>) -> Result<Self, SupervisorError> {
+        let path = path.into();
+        if !path.is_absolute() {
+            return Err(SupervisorError::RelativePath {
+                field: "cache marker",
+                path,
+            });
+        }
+        Ok(Self(path))
+    }
+}
+
 impl ShutdownPolicy {
     pub fn new(
         graceful: std::time::Duration,
