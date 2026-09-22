@@ -408,4 +408,14 @@ pub struct PruningPolicy {
     pub retain_documentation: bool,
 }
 
+impl Default for PruningPolicy {
+    fn default() -> Self {
+        Self {
+            remove_bodies: true,
+            remove_boilerplate: true,
+            retain_documentation: true,
+        }
+    }
+}
+
 pub struct ContextMarker;
