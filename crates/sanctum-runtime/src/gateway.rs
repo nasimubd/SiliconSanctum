@@ -48,4 +48,10 @@ pub enum EscalationTarget {
     HeavyReasoningModel,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Evidence {
+    pub kind: JaggednessKind,
+    pub marker: String,
+}
+
 pub struct GatewayMarker;
