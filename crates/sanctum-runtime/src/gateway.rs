@@ -399,4 +399,10 @@ pub enum GatewayEvent {
     Forwarded,
 }
 
+#[derive(Debug, Clone)]
+pub struct GatewayEventLog {
+    capacity: usize,
+    entries: std::collections::VecDeque<GatewayEvent>,
+}
+
 pub struct GatewayMarker;
