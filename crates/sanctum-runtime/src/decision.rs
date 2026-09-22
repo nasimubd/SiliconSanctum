@@ -511,4 +511,7 @@ impl ScoreRubric {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Score(f64);
+
 pub struct DecisionMarker;
