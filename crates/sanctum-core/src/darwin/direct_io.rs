@@ -236,6 +236,15 @@ mod tests {
     }
 
     #[test]
+    fn chunk_end_rejects_offset_overflow() {
+        let range = super::ChunkRange {
+            offset: u64::MAX,
+            length: 1,
+        };
+        assert_eq!(range.end(), None);
+    }
+
+    #[test]
     fn allocation_honors_sixteen_kibibyte_alignment() {
         let buffer = AlignedBuffer::new(16_384, 16_384).unwrap();
         assert_eq!(buffer.as_slice().as_ptr().addr() % 16_384, 0);
