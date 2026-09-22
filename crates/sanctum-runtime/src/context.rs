@@ -266,4 +266,9 @@ pub fn python_query() -> QuerySpec {
     QuerySpec { source: "[(class_definition name: (identifier) @name) (function_definition name: (identifier) @name)] @definition".to_owned() }
 }
 
+#[must_use]
+pub fn rust_query() -> QuerySpec {
+    QuerySpec { source: "[(struct_item name: (type_identifier) @name) (enum_item name: (type_identifier) @name) (function_item name: (identifier) @name)] @definition".to_owned() }
+}
+
 pub struct ContextMarker;
