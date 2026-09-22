@@ -231,4 +231,9 @@ impl StructuralSymbol {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QuerySpec {
+    source: String,
+}
+
 pub struct ContextMarker;
