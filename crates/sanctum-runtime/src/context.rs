@@ -253,4 +253,12 @@ impl QuerySpec {
     }
 }
 
+pub fn compile_query(
+    language: SourceLanguage,
+    spec: &QuerySpec,
+) -> Result<tree_sitter::Query, ContextError> {
+    tree_sitter::Query::new(&grammar(language), spec.source())
+        .map_err(|_| ContextError::QueryCompilation)
+}
+
 pub struct ContextMarker;
