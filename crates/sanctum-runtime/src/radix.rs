@@ -96,4 +96,10 @@ impl ModelArchitecture {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CacheCapacity {
+    pub max_nodes: usize,
+    pub max_bytes: usize,
+}
+
 pub struct RadixMarker;
