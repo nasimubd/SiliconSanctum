@@ -231,4 +231,11 @@ impl AxisEvaluator for FixedAxisEvaluator {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct FanoutResult {
+    pub intent: AxisEvaluation,
+    pub tooling: AxisEvaluation,
+    pub complexity: AxisEvaluation,
+}
+
 pub struct RouterMarker;
