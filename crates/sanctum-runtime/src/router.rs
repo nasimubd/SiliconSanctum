@@ -292,4 +292,19 @@ impl<I, T, C> FanoutRouter<I, T, C> {
     }
 }
 
+impl<I: AxisEvaluator, T: AxisEvaluator, C: AxisEvaluator> FanoutRouter<I, T, C> {
+    pub async fn evaluate(&self, p: &RoutingPrompt) -> Result<FanoutResult, RouterError> {
+        let (i, t, c) = tokio::join!(
+            self.intent.evaluate(EvaluationAxis::Intent, p),
+            self.tooling.evaluate(EvaluationAxis::Tooling, p),
+            self.complexity.evaluate(EvaluationAxis::Complexity, p)
+        );
+        Ok(FanoutResult {
+            intent: i?,
+            tooling: t?,
+            complexity: c?,
+        })
+    }
+}
+
 pub struct RouterMarker;
