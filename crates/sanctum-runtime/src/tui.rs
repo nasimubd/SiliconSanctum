@@ -40,6 +40,7 @@ pub struct DashboardSnapshot{pub token_rate:TokenRate,pub memory:MemoryTelemetry
 pub struct MetricHistory{capacity:usize,token_rates:VecDeque<f64>,wired_ratios:VecDeque<f64>,performance_ratios:VecDeque<f32>}
 impl MetricHistory{pub fn new(capacity:usize)->Result<Self,DashboardError>{if capacity==0{return Err(DashboardError::InvalidMetric);}Ok(Self{capacity,token_rates:VecDeque::new(),wired_ratios:VecDeque::new(),performance_ratios:VecDeque::new()})}}
 impl MetricHistory{pub fn record(&mut self,snapshot:&DashboardSnapshot){if self.token_rates.len()==self.capacity{self.token_rates.pop_front();self.wired_ratios.pop_front();self.performance_ratios.pop_front();}self.token_rates.push_back(snapshot.token_rate.get());self.wired_ratios.push_back(snapshot.memory.wired.ratio(snapshot.memory.total));self.performance_ratios.push_back(snapshot.cpu.performance.get());}}
+impl MetricHistory{pub fn token_rates(&self)->&VecDeque<f64>{&self.token_rates}pub fn wired_ratios(&self)->&VecDeque<f64>{&self.wired_ratios}pub fn performance_ratios(&self)->&VecDeque<f32>{&self.performance_ratios}}
 impl DashboardSnapshot{pub fn new(token_rate:TokenRate,memory:MemoryTelemetry,cpu:CpuTelemetry,kv:KvResidency,profile:ActiveProfile)->Self{Self{token_rate,memory,cpu,kv,profile}}}
 pub trait TelemetrySource{fn snapshot(&mut self)->Result<DashboardSnapshot,DashboardError>;}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
