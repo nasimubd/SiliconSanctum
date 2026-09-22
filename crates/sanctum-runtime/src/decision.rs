@@ -514,4 +514,11 @@ impl ScoreRubric {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Score(f64);
 
+impl Score {
+    #[must_use]
+    pub const fn value(self) -> f64 {
+        self.0
+    }
+}
+
 pub struct DecisionMarker;
