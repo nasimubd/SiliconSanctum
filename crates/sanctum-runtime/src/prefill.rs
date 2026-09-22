@@ -245,4 +245,9 @@ impl PrefillPlan {
     pub fn chunk_count(&self) -> usize {
         self.chunks.len()
     }
+
+    #[must_use]
+    pub fn planned_tokens(&self) -> usize {
+        self.chunks.iter().map(|chunk| chunk.len()).sum()
+    }
 }
