@@ -220,4 +220,14 @@ impl PluginCatalog {
     }
 }
 
+impl PluginCatalog {
+    #[must_use]
+    pub fn for_capability(&self, capability: &str) -> Vec<&PluginManifest> {
+        self.entries
+            .values()
+            .filter(|entry| entry.supports(capability))
+            .collect()
+    }
+}
+
 pub struct PluginMarker;
