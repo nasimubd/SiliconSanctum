@@ -29,4 +29,10 @@ impl PluginId {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PluginProtocol {
+    Http,
+    Grpc,
+}
+
 pub struct PluginMarker;
