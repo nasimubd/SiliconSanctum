@@ -8,3 +8,6 @@ impl std::error::Error for DashboardError{}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub struct RefreshRate(std::time::Duration);
 impl RefreshRate{pub fn new(value:std::time::Duration)->Result<Self,DashboardError>{if value.is_zero(){return Err(DashboardError::ZeroRefreshRate);}Ok(Self(value))}pub const fn duration(self)->std::time::Duration{self.0}}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct DashboardSize{pub width:u16,pub height:u16}
+impl DashboardSize{pub fn new(width:u16,height:u16)->Result<Self,DashboardError>{if width==0||height==0{return Err(DashboardError::ZeroDimension);}Ok(Self{width,height})}}
