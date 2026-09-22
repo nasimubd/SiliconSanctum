@@ -27,6 +27,16 @@ pub struct VmPageCounters {
     pub compressed: u64,
 }
 
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct MemoryTelemetry {
+    pub page_size: u64,
+    pub free_bytes: u64,
+    pub active_bytes: u64,
+    pub inactive_bytes: u64,
+    pub wired_bytes: u64,
+    pub compressed_bytes: u64,
+}
+
 pub trait MachHost {
     /// Returns the VM page size in bytes.
     ///
