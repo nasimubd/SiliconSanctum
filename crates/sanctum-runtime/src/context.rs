@@ -105,4 +105,12 @@ pub fn grammar(language: SourceLanguage) -> tree_sitter::Language {
     }
 }
 
+pub fn parser_for(language: SourceLanguage) -> Result<tree_sitter::Parser, ContextError> {
+    let mut parser = tree_sitter::Parser::new();
+    parser
+        .set_language(&grammar(language))
+        .map_err(|_| ContextError::ParserConfiguration)?;
+    Ok(parser)
+}
+
 pub struct ContextMarker;
