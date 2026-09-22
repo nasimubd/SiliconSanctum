@@ -57,7 +57,25 @@ pub fn bind_inference_thread(setter: &impl QosSetter) -> Result<(), QosError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{QOS_CLASS_USER_INTERACTIVE, QosError};
+    use std::cell::Cell;
+
+    use super::{QOS_CLASS_USER_INTERACTIVE, QosClass, QosError, QosSetter, bind_inference_thread};
+
+    struct Recorder(Cell<Option<(QosClass, i32)>>);
+
+    impl QosSetter for Recorder {
+        fn set_current(&self, class: QosClass, priority: i32) -> Result<(), QosError> {
+            self.0.set(Some((class, priority)));
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn inference_binding_uses_interactive_zero_priority() {
+        let recorder = Recorder(Cell::new(None));
+        bind_inference_thread(&recorder).unwrap();
+        assert_eq!(recorder.0.get(), Some((QOS_CLASS_USER_INTERACTIVE, 0)));
+    }
 
     #[test]
     fn interactive_class_matches_darwin_encoding() {
