@@ -1,6 +1,13 @@
 //! Asynchronous model-process supervision.
 
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum SupervisorError {
+    #[error("{field} path must be absolute: {path}")]
+    RelativePath { field: &'static str, path: std::path::PathBuf },
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BackendKind {
