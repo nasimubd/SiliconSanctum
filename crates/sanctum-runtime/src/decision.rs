@@ -366,4 +366,7 @@ impl std::fmt::Display for Noul {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ChoiceId(String);
+
 pub struct DecisionMarker;
