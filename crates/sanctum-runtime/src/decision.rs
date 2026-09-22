@@ -392,4 +392,9 @@ pub struct ChoiceItem {
     pub probability: f64,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct Choice {
+    items: Vec<ChoiceItem>,
+}
+
 pub struct DecisionMarker;
