@@ -9,4 +9,11 @@ pub enum RouterError {
     EmptyRouteTarget,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum EvaluationAxis {
+    Intent,
+    Tooling,
+    Complexity,
+}
+
 pub struct RouterMarker;
