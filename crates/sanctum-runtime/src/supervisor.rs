@@ -159,6 +159,7 @@ pub fn build_command(spec: &ProcessSpec) -> tokio::process::Command {
         command.current_dir(directory);
     }
     command.stdin(std::process::Stdio::null());
+    command.stdout(std::process::Stdio::piped());
     command
 }
 
