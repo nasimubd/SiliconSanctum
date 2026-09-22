@@ -92,4 +92,11 @@ impl JaggednessReport {
     }
 }
 
+impl JaggednessReport {
+    #[must_use]
+    pub fn contains(&self, kind: JaggednessKind) -> bool {
+        self.evidence.iter().any(|item| item.kind == kind)
+    }
+}
+
 pub struct GatewayMarker;
