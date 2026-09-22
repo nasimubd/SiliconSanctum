@@ -491,4 +491,15 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    pub fn extend_session(&mut self, id: &SessionId, tokens: &[TokenId]) -> Result<(), RadixError> {
+        let sequence = self
+            .sessions
+            .get_mut(id)
+            .ok_or(RadixError::MissingSession)?;
+        sequence.0.extend_from_slice(tokens);
+        Ok(())
+    }
+}
+
 pub struct RadixMarker;
