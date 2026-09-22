@@ -348,4 +348,10 @@ impl TryFrom<f64> for Noul {
     }
 }
 
+impl From<Noul> for f64 {
+    fn from(value: Noul) -> Self {
+        value.probability()
+    }
+}
+
 pub struct DecisionMarker;
