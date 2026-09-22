@@ -102,4 +102,16 @@ pub struct CacheCapacity {
     pub max_bytes: usize,
 }
 
+impl CacheCapacity {
+    pub fn new(max_nodes: usize, max_bytes: usize) -> Result<Self, RadixError> {
+        if max_nodes == 0 || max_bytes == 0 {
+            return Err(RadixError::ZeroCapacity);
+        }
+        Ok(Self {
+            max_nodes,
+            max_bytes,
+        })
+    }
+}
+
 pub struct RadixMarker;
