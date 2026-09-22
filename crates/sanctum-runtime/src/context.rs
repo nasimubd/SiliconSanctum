@@ -347,4 +347,10 @@ pub fn node_name(node: tree_sitter::Node<'_>, source: &[u8]) -> String {
         .to_owned()
 }
 
+#[must_use]
+pub fn signature_end(node: tree_sitter::Node<'_>, language: SourceLanguage) -> usize {
+    node.child_by_field_name(body_field(language))
+        .map_or(node.end_byte(), |body| body.start_byte())
+}
+
 pub struct ContextMarker;
