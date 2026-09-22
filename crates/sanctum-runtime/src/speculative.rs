@@ -117,4 +117,7 @@ pub struct TimingSample{pub tokens:u64,pub elapsed_seconds:f64}
 impl TimingSample{pub fn tokens_per_second(self)->f64{if self.elapsed_seconds<=0.0{0.0}else{self.tokens as f64/self.elapsed_seconds}}}
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub struct TelemetrySnapshot{pub tokens_per_second:f64,pub acceptance_rate:f64,pub verify_width:u8,pub context_pressure:f32,pub bandwidth_utilization:f32}
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct ModelProfile{pub draft:String,pub target:String}
+impl ModelProfile{pub fn label(&self)->String{format!("{} -> {}",self.draft,self.target)}}
 // NEXT
