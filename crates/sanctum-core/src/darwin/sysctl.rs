@@ -289,6 +289,19 @@ mod tests {
     }
 
     #[test]
+    fn wired_limit_guard_restores_limit_on_drop() {
+        let backend = FakeBackend {
+            current: 8192,
+            writes: RefCell::default(),
+        };
+        {
+            let _guard = WiredLimitGuard::apply(&backend, 10_400).unwrap();
+        }
+
+        assert_eq!(backend.writes.into_inner(), [10_400, 8192]);
+    }
+
+    #[test]
     fn invalid_width_display_includes_key_and_sizes() {
         let error = SysctlError::InvalidWidth {
             key: "example".into(),
