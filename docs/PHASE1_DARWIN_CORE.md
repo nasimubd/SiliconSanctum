@@ -29,3 +29,10 @@ warning, and critical events. Warning callbacks are the early-eviction signal;
 critical callbacks require immediate eviction. The event context remains owned by
 libdispatch until source finalization, and monitor drop cancels and releases the
 source exactly once.
+
+## Thread quality of service
+
+Inference workers call `pthread_set_qos_class_self_np` with
+`QOS_CLASS_USER_INTERACTIVE` and zero relative priority. This is Darwin's strongest
+latency scheduling hint; it is not a hard CPU-affinity API and does not guarantee
+that every scheduling quantum runs on a performance core.
