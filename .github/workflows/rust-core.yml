@@ -32,3 +32,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --workspace --locked
+
+  fuzz-smoke:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - run: cargo install cargo-fuzz --locked
+      - run: cargo fuzz run layout -- -runs=10000
+      - run: cargo fuzz run telemetry -- -runs=10000
+      - run: cargo fuzz run sysctl_payload -- -runs=10000
