@@ -460,4 +460,9 @@ impl Default for DetectionLimits {
     }
 }
 
+#[must_use]
+pub fn contains_digit(text: &str) -> bool {
+    text.bytes().any(|v| v.is_ascii_digit())
+}
+
 pub struct GatewayMarker;
