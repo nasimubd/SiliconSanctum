@@ -185,4 +185,12 @@ impl SourceRange {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SymbolKind {
+    Class,
+    Function,
+    Interface,
+    Type,
+}
+
 pub struct ContextMarker;
