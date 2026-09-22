@@ -95,4 +95,14 @@ impl SourceDocument {
     }
 }
 
+#[must_use]
+pub fn grammar(language: SourceLanguage) -> tree_sitter::Language {
+    match language {
+        SourceLanguage::Python => tree_sitter_python::LANGUAGE.into(),
+        SourceLanguage::Rust => tree_sitter_rust::LANGUAGE.into(),
+        SourceLanguage::Cpp => tree_sitter_cpp::LANGUAGE.into(),
+        SourceLanguage::TypeScript => tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into(),
+    }
+}
+
 pub struct ContextMarker;
