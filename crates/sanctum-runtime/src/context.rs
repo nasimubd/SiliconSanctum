@@ -309,4 +309,20 @@ impl QueryCapture {
     }
 }
 
+#[must_use]
+pub fn symbol_kind(language: SourceLanguage, node_kind: &str) -> Option<SymbolKind> {
+    match (language, node_kind) {
+        (_, "class_definition" | "class_specifier" | "class_declaration") => {
+            Some(SymbolKind::Class)
+        }
+        (SourceLanguage::TypeScript, "interface_declaration") => Some(SymbolKind::Interface),
+        (
+            _,
+            "function_definition" | "function_item" | "function_declaration" | "method_definition",
+        ) => Some(SymbolKind::Function),
+        (SourceLanguage::Rust, "struct_item" | "enum_item") => Some(SymbolKind::Type),
+        _ => None,
+    }
+}
+
 pub struct ContextMarker;
