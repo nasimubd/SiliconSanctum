@@ -28,7 +28,9 @@ The monitor owns a `DISPATCH_SOURCE_TYPE_MEMORYPRESSURE` source covering normal,
 warning, and critical events. Warning callbacks are the early-eviction signal;
 critical callbacks require immediate eviction. The event context remains owned by
 libdispatch until source finalization, and monitor drop cancels and releases the
-source exactly once.
+source exactly once. An unwinding handler panic is contained at the C ABI boundary,
+recorded by `callback_panicked`, and disables subsequent callback delivery. A
+`panic=abort` build still terminates by definition.
 
 ## Thread quality of service
 
