@@ -201,4 +201,9 @@ impl PluginResponse {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct PluginCatalog {
+    entries: std::collections::BTreeMap<String, PluginManifest>,
+}
+
 pub struct PluginMarker;
