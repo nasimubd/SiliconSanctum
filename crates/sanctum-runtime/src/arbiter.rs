@@ -337,6 +337,14 @@ pub fn select_reload_candidate(models: &[EvictionCandidate]) -> Option<&Eviction
         .max_by_key(|item| (item.model.priority, std::cmp::Reverse(item.last_used_epoch)))
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ArbiterEvent {
+    Sampled(MemorySnapshot),
+    Decision(ArbiterDecision),
+    EvictionRequested(ModelId),
+    ReloadRequested(ModelId),
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
