@@ -286,6 +286,9 @@ pub struct ShutdownPolicy {
     pub serialization: std::time::Duration,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CacheMarker(std::path::PathBuf);
+
 impl ShutdownPolicy {
     pub fn new(
         graceful: std::time::Duration,
