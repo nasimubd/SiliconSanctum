@@ -34,3 +34,13 @@ pub enum PrefillStep {
     Tokens512,
     Tokens1024,
 }
+
+impl PrefillStep {
+    #[must_use]
+    pub const fn tokens(self) -> usize {
+        match self {
+            Self::Tokens512 => 512,
+            Self::Tokens1024 => 1024,
+        }
+    }
+}
