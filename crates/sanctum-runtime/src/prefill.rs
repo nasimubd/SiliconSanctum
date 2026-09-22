@@ -293,3 +293,15 @@ impl PrefillScheduler {
         }
     }
 }
+
+#[must_use]
+pub fn partition_tokens(tokens: TokenCount, step: PrefillStep) -> Vec<PrefillChunk> {
+    let mut chunks = Vec::new();
+    let mut offset = 0;
+    while offset < tokens.get() {
+        let end = offset.saturating_add(step.tokens()).min(tokens.get());
+        chunks.push(PrefillChunk { offset, end });
+        offset = end;
+    }
+    chunks
+}
