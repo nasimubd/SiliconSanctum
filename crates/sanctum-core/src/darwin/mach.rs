@@ -37,6 +37,21 @@ pub struct MemoryTelemetry {
     pub compressed_bytes: u64,
 }
 
+/// Converts a named page counter into bytes without wrapping.
+///
+/// # Errors
+///
+/// Returns [`MachTelemetryError::CounterOverflow`] when multiplication overflows.
+pub fn pages_to_bytes(
+    counter: &'static str,
+    pages: u64,
+    page_size: u64,
+) -> Result<u64, MachTelemetryError> {
+    pages
+        .checked_mul(page_size)
+        .ok_or(MachTelemetryError::CounterOverflow { counter })
+}
+
 pub trait MachHost {
     /// Returns the VM page size in bytes.
     ///
