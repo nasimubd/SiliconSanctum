@@ -277,4 +277,11 @@ impl Noul {
     }
 }
 
+impl Noul {
+    #[must_use]
+    pub const fn probability(self) -> f64 {
+        self.0
+    }
+}
+
 pub struct DecisionMarker;
