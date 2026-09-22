@@ -4,6 +4,10 @@ use thiserror::Error;
 
 pub const IOGPU_WIRED_LIMIT_KEY: &str = "iogpu.wired_limit_mb";
 
+pub trait SysctlRead {
+    fn read(&self, key: &str) -> Result<Vec<u8>, SysctlError>;
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
