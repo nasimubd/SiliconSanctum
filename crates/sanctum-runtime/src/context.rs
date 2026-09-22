@@ -21,4 +21,16 @@ pub enum SourceLanguage {
     TypeScript,
 }
 
+impl SourceLanguage {
+    pub fn from_extension(v: &str) -> Result<Self, ContextError> {
+        match v.trim_start_matches('.').to_ascii_lowercase().as_str() {
+            "py" => Ok(Self::Python),
+            "rs" => Ok(Self::Rust),
+            "cc" | "cpp" | "cxx" | "hpp" => Ok(Self::Cpp),
+            "ts" | "tsx" => Ok(Self::TypeScript),
+            other => Err(ContextError::UnsupportedExtension(other.to_owned())),
+        }
+    }
+}
+
 pub struct ContextMarker;
