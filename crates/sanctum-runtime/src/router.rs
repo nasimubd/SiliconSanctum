@@ -51,4 +51,11 @@ impl AxisEvaluation {
     }
 }
 
+impl AxisEvaluation {
+    #[must_use]
+    pub const fn confidence(&self) -> f64 {
+        self.confidence
+    }
+}
+
 pub struct RouterMarker;
