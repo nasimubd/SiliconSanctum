@@ -46,6 +46,7 @@ pub fn validate_layout(size: usize, alignment: usize) -> Result<(), DirectIoErro
     if alignment < size_of::<*const ()>()
         || !alignment.is_power_of_two()
         || alignment % size_of::<*const ()>() != 0
+        || std::alloc::Layout::from_size_align(size.max(1), alignment).is_err()
     {
         return Err(DirectIoError::InvalidLayout { size, alignment });
     }
@@ -432,5 +433,11 @@ mod tests {
             validate_layout(4096, 12),
             Err(DirectIoError::InvalidLayout { alignment: 12, .. })
         ));
+    }
+
+    #[test]
+    fn rejects_allocations_larger_than_rust_slice_limit() {
+        assert!(validate_layout(usize::MAX, 16_384).is_err());
+        assert!(AlignedBuffer::new(usize::MAX, 16_384).is_err());
     }
 }
