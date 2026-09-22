@@ -42,6 +42,35 @@ fn query_size(key: &str, native_key: &CString) -> Result<usize, SysctlError> {
     Ok(size)
 }
 
+#[cfg(target_os = "macos")]
+impl SysctlRead for NativeSysctl {
+    fn read(&self, key: &str) -> Result<Vec<u8>, SysctlError> {
+        let native_key = key_c_string(key)?;
+        let mut size = query_size(key, &native_key)?;
+        let mut value = vec![0_u8; size];
+        // SAFETY: both pointers remain valid for the duration of the call and
+        // `size` describes the writable allocation.
+        let result = unsafe {
+            libc::sysctlbyname(
+                native_key.as_ptr(),
+                value.as_mut_ptr().cast(),
+                &mut size,
+                std::ptr::null_mut(),
+                0,
+            )
+        };
+        if result == -1 {
+            return Err(SysctlError::Operation {
+                operation: "read",
+                key: key.into(),
+                source: std::io::Error::last_os_error(),
+            });
+        }
+        value.truncate(size);
+        Ok(value)
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
