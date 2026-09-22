@@ -478,4 +478,7 @@ impl RouteMetrics {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FanoutDeadline(std::time::Duration);
+
 pub struct RouterMarker;
