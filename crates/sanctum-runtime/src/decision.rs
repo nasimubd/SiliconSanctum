@@ -50,4 +50,13 @@ impl LatencyBudget {
     }
 }
 
+impl Default for LatencyBudget {
+    fn default() -> Self {
+        Self {
+            minimum: MIN_DECISION_LATENCY,
+            maximum: MAX_DECISION_LATENCY,
+        }
+    }
+}
+
 pub struct DecisionMarker;
