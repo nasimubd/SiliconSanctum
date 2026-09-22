@@ -101,4 +101,11 @@ impl RouteThresholds {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RouteDestination {
+    DeterministicTool,
+    SpeculativePipeline,
+    HeavyModel,
+}
+
 pub struct RouterMarker;
