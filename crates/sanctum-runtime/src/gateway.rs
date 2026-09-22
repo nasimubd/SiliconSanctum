@@ -280,4 +280,14 @@ pub struct EscalationPolicy {
     temporal: EscalationTarget,
 }
 
+impl Default for EscalationPolicy {
+    fn default() -> Self {
+        Self {
+            counting: EscalationTarget::DeterministicInterpreter,
+            arithmetic: EscalationTarget::DeterministicInterpreter,
+            temporal: EscalationTarget::HeavyReasoningModel,
+        }
+    }
+}
+
 pub struct GatewayMarker;
