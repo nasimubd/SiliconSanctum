@@ -136,17 +136,36 @@ pub fn wired_limit_mb(backend: &impl SysctlRead) -> Result<u64, SysctlError> {
 /// # Errors
 ///
 /// Returns an error when the kernel rejects the write, commonly for lack of privilege.
-pub fn set_wired_limit_mb(backend: &impl SysctlWrite, limit_mb: u64) -> Result<(), SysctlError> {
-    backend.write(IOGPU_WIRED_LIMIT_KEY, &limit_mb.to_ne_bytes())
+pub fn set_wired_limit_mb(
+    backend: &(impl SysctlRead + SysctlWrite),
+    limit_mb: u64,
+) -> Result<(), SysctlError> {
+    let current = backend.read(IOGPU_WIRED_LIMIT_KEY)?;
+    match current.len() {
+        4 => {
+            let value = u32::try_from(limit_mb).map_err(|_| SysctlError::InvalidWidth {
+                key: IOGPU_WIRED_LIMIT_KEY.into(),
+                expected: size_of::<u32>(),
+                actual: size_of::<u64>(),
+            })?;
+            backend.write(IOGPU_WIRED_LIMIT_KEY, &value.to_ne_bytes())
+        }
+        8 => backend.write(IOGPU_WIRED_LIMIT_KEY, &limit_mb.to_ne_bytes()),
+        actual => Err(SysctlError::InvalidWidth {
+            key: IOGPU_WIRED_LIMIT_KEY.into(),
+            expected: size_of::<u32>(),
+            actual,
+        }),
+    }
 }
 
-pub struct WiredLimitGuard<'a, B: SysctlWrite> {
+pub struct WiredLimitGuard<'a, B: SysctlRead + SysctlWrite> {
     backend: &'a B,
     previous_mb: u64,
     armed: bool,
 }
 
-impl<B: SysctlWrite> std::fmt::Debug for WiredLimitGuard<'_, B> {
+impl<B: SysctlRead + SysctlWrite> std::fmt::Debug for WiredLimitGuard<'_, B> {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         formatter
             .debug_struct("WiredLimitGuard")
@@ -173,7 +192,7 @@ impl<'a, B: SysctlRead + SysctlWrite> WiredLimitGuard<'a, B> {
     }
 }
 
-impl<B: SysctlWrite> WiredLimitGuard<'_, B> {
+impl<B: SysctlRead + SysctlWrite> WiredLimitGuard<'_, B> {
     /// Restores the captured ceiling and disarms drop restoration.
     ///
     /// # Errors
@@ -186,7 +205,7 @@ impl<B: SysctlWrite> WiredLimitGuard<'_, B> {
     }
 }
 
-impl<B: SysctlWrite> Drop for WiredLimitGuard<'_, B> {
+impl<B: SysctlRead + SysctlWrite> Drop for WiredLimitGuard<'_, B> {
     fn drop(&mut self) {
         if self.armed {
             let _ = set_wired_limit_mb(self.backend, self.previous_mb);
@@ -243,6 +262,12 @@ mod tests {
         fn write(&self, key: &str, value: &[u8]) -> Result<(), SysctlError> {
             self.0.borrow_mut().push((key.into(), value.into()));
             Ok(())
+        }
+    }
+
+    impl SysctlRead for FakeWrite {
+        fn read(&self, _key: &str) -> Result<Vec<u8>, SysctlError> {
+            Ok(0_u64.to_ne_bytes().into())
         }
     }
 
