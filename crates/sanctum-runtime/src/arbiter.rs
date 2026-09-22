@@ -329,6 +329,14 @@ pub fn select_eviction_candidate(models: &[EvictionCandidate]) -> Option<&Evicti
         .min_by_key(|item| (item.model.priority, item.last_used_epoch))
 }
 
+#[must_use]
+pub fn select_reload_candidate(models: &[EvictionCandidate]) -> Option<&EvictionCandidate> {
+    models
+        .iter()
+        .filter(|item| item.model.residency == ModelResidency::Evicted)
+        .max_by_key(|item| (item.model.priority, std::cmp::Reverse(item.last_used_epoch)))
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
