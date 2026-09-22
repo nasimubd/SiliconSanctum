@@ -401,4 +401,19 @@ pub struct RouteTargets {
     pub heavy: HeavyModelTarget,
 }
 
+impl RouteTargets {
+    #[must_use]
+    pub fn plan(&self, d: RouteDecision) -> RoutePlan {
+        match d.destination {
+            RouteDestination::DeterministicTool => {
+                RoutePlan::Deterministic(self.deterministic.clone())
+            }
+            RouteDestination::SpeculativePipeline => {
+                RoutePlan::Speculative(self.speculative.clone())
+            }
+            RouteDestination::HeavyModel => RoutePlan::Heavy(self.heavy.clone()),
+        }
+    }
+}
+
 pub struct RouterMarker;
