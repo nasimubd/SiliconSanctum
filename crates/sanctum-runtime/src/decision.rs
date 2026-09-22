@@ -360,4 +360,10 @@ impl Default for Noul {
     }
 }
 
+impl std::fmt::Display for Noul {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "{:.6}", self.0)
+    }
+}
+
 pub struct DecisionMarker;
