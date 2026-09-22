@@ -14,6 +14,15 @@ pub struct QosClass(pub u32);
 
 pub const QOS_CLASS_USER_INTERACTIVE: QosClass = QosClass(0x21);
 
+pub trait QosSetter {
+    /// Applies a `QoS` class and relative priority to the calling thread.
+    ///
+    /// # Errors
+    ///
+    /// Returns the pthread error number when the scheduler rejects the request.
+    fn set_current(&self, class: QosClass, relative_priority: i32) -> Result<(), QosError>;
+}
+
 #[cfg(test)]
 mod tests {
     use super::{QOS_CLASS_USER_INTERACTIVE, QosError};
