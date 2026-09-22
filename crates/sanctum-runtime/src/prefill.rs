@@ -231,3 +231,11 @@ impl PrefillChunk {
         self.len() == 0
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PrefillPlan {
+    pub step: PrefillStep,
+    pub chunks: Vec<PrefillChunk>,
+    pub scratch_bytes: u64,
+    pub kv_bytes: u64,
+}
