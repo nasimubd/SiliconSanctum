@@ -205,4 +205,11 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    #[must_use]
+    pub const fn capacity(&self) -> CacheCapacity {
+        self.capacity
+    }
+}
+
 pub struct RadixMarker;
