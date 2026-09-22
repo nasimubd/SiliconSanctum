@@ -1,4 +1,5 @@
 //! Interactive runtime telemetry dashboard.
+use std::collections::VecDeque;
 
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub enum DashboardError{ZeroRefreshRate,ZeroDimension,InvalidPercentage,InvalidMetric,EmptyProfile,Terminal(String)}
@@ -35,6 +36,9 @@ pub struct ActiveProfile(String);
 impl ActiveProfile{pub fn new(value:impl Into<String>)->Result<Self,DashboardError>{let value=value.into();if value.trim().is_empty(){return Err(DashboardError::EmptyProfile);}Ok(Self(value))}pub fn as_str(&self)->&str{&self.0}}
 #[derive(Debug,Clone,PartialEq)]
 pub struct DashboardSnapshot{pub token_rate:TokenRate,pub memory:MemoryTelemetry,pub cpu:CpuTelemetry,pub kv:KvResidency,pub profile:ActiveProfile}
+#[derive(Debug,Clone,PartialEq)]
+pub struct MetricHistory{capacity:usize,token_rates:VecDeque<f64>,wired_ratios:VecDeque<f64>,performance_ratios:VecDeque<f32>}
+impl MetricHistory{pub fn new(capacity:usize)->Result<Self,DashboardError>{if capacity==0{return Err(DashboardError::InvalidMetric);}Ok(Self{capacity,token_rates:VecDeque::new(),wired_ratios:VecDeque::new(),performance_ratios:VecDeque::new()})}}
 impl DashboardSnapshot{pub fn new(token_rate:TokenRate,memory:MemoryTelemetry,cpu:CpuTelemetry,kv:KvResidency,profile:ActiveProfile)->Self{Self{token_rate,memory,cpu,kv,profile}}}
 pub trait TelemetrySource{fn snapshot(&mut self)->Result<DashboardSnapshot,DashboardError>;}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
