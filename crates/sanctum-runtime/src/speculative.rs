@@ -16,4 +16,9 @@ pub enum SpeculativeError {
     IllegalTransition,
 }
 
+impl fmt::Display for SpeculativeError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result { write!(formatter, "{self:?}") }
+}
+impl std::error::Error for SpeculativeError {}
+
 // NEXT
