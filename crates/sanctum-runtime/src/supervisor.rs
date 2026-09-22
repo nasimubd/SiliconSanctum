@@ -281,6 +281,16 @@ mod tests {
         assert_eq!(spec.arguments, ["--port"]);
     }
     #[test]
+    fn appends_process_environment() {
+        let entry = EnvironmentEntry::new("MODE", "local").unwrap();
+        let spec = super::ProcessSpec::mlx_lm(
+            ExecutablePath::new("/bin/mlx").unwrap(),
+            ModelPath::new("/models/a").unwrap(),
+        )
+        .with_environment(entry);
+        assert_eq!(spec.environment[0].key(), "MODE");
+    }
+    #[test]
     fn rejects_environment_assignment_key() {
         assert!(EnvironmentEntry::new("A=B", "x").is_err());
     }
