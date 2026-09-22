@@ -210,6 +210,14 @@ impl ArbiterDecision {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MemoryBudget {
+    pub usable_bytes: u64,
+    pub model_bytes: u64,
+    pub kv_cache_bytes: u64,
+    pub reserve_bytes: u64,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
