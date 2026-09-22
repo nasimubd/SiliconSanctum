@@ -8,6 +8,9 @@ pub trait SysctlRead {
     fn read(&self, key: &str) -> Result<Vec<u8>, SysctlError>;
 }
 
+#[derive(Debug, Default, Clone, Copy)]
+pub struct NativeSysctl;
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
