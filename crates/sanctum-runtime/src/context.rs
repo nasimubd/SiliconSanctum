@@ -335,4 +335,8 @@ pub fn node_text<'a>(node: tree_sitter::Node<'_>, source: &'a [u8]) -> Option<&'
     node.utf8_text(source).ok()
 }
 
+pub fn node_range(node: tree_sitter::Node<'_>) -> Result<SourceRange, ContextError> {
+    SourceRange::new(node.start_byte(), node.end_byte())
+}
+
 pub struct ContextMarker;
