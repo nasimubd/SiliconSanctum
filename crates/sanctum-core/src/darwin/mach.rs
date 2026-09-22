@@ -145,7 +145,30 @@ pub fn memory_telemetry(host: &impl MachHost) -> Result<MemoryTelemetry, MachTel
 
 #[cfg(test)]
 mod tests {
-    use super::{MachTelemetryError, pages_to_bytes};
+    use super::{MachHost, MachTelemetryError, VmPageCounters, memory_telemetry, pages_to_bytes};
+
+    struct FakeHost;
+
+    impl MachHost for FakeHost {
+        fn page_size(&self) -> Result<u64, MachTelemetryError> {
+            Ok(100)
+        }
+
+        fn vm_counters(&self) -> Result<VmPageCounters, MachTelemetryError> {
+            Ok(VmPageCounters {
+                free: 1,
+                active: 2,
+                inactive: 3,
+                wired: 4,
+                compressed: 5,
+            })
+        }
+    }
+
+    #[test]
+    fn telemetry_converts_free_pages() {
+        assert_eq!(memory_telemetry(&FakeHost).unwrap().free_bytes, 100);
+    }
 
     #[test]
     fn page_conversion_multiplies_by_page_size() {
