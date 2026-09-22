@@ -325,6 +325,13 @@ pub enum ShutdownOutcome {
     AlreadyExited,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SupervisorEvent {
+    Spawned { backend: BackendKind, pid: u32 },
+    TerminationRequested { pid: u32 },
+    Exited { pid: u32, forced: bool },
+}
+
 impl CacheMarker {
     pub fn new(path: impl Into<std::path::PathBuf>) -> Result<Self, SupervisorError> {
         let path = path.into();
