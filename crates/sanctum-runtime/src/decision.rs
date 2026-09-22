@@ -26,4 +26,10 @@ pub enum DecisionError {
     InvalidRubric,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LatencyBudget {
+    pub minimum: std::time::Duration,
+    pub maximum: std::time::Duration,
+}
+
 pub struct DecisionMarker;
