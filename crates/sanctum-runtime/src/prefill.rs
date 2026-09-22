@@ -86,3 +86,10 @@ impl MemorySnapshot {
             .saturating_sub(self.reserved_bytes)
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KvQuantization {
+    Bits4,
+    Bits8,
+    Bits16,
+}
