@@ -218,6 +218,13 @@ pub struct MemoryBudget {
     pub reserve_bytes: u64,
 }
 
+impl MemoryBudget {
+    #[must_use]
+    pub const fn total_allocated(self) -> u64 {
+        self.model_bytes.saturating_add(self.kv_cache_bytes)
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
