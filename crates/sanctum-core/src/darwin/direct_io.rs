@@ -201,7 +201,7 @@ pub fn read_chunks_bounded(
                     scope.spawn(move || {
                         let mut buffer =
                             AlignedBuffer::new(range.length, super::APPLE_SILICON_PAGE_SIZE)?;
-                        let _ = model.read_at(buffer.as_mut_slice(), range.offset)?;
+                        model.read_exact_at(buffer.as_mut_slice(), range.offset)?;
                         Ok::<_, DirectIoError>(buffer)
                     })
                 })
@@ -217,6 +217,17 @@ pub fn read_chunks_bounded(
 }
 
 impl DirectModelFile {
+    /// Fills the complete destination, retrying short reads.
+    ///
+    /// # Errors
+    ///
+    /// Reports premature EOF, offset overflow, or an underlying read failure.
+    pub fn read_exact_at(&self, buffer: &mut [u8], offset: u64) -> Result<(), DirectIoError> {
+        read_exact_with(buffer, offset, |bytes, position| {
+            self.read_at(bytes, position)
+        })
+    }
+
     /// Opens a model file read-only and enables uncached reads on macOS.
     ///
     /// # Errors
@@ -288,6 +299,41 @@ impl DirectModelFile {
     }
 }
 
+fn read_exact_with(
+    mut buffer: &mut [u8],
+    mut offset: u64,
+    mut read: impl FnMut(&mut [u8], u64) -> Result<usize, DirectIoError>,
+) -> Result<(), DirectIoError> {
+    let length =
+        u64::try_from(buffer.len()).map_err(|_| DirectIoError::OffsetOverflow { offset })?;
+    offset
+        .checked_add(length)
+        .filter(|end| i64::try_from(*end).is_ok())
+        .ok_or(DirectIoError::OffsetOverflow { offset })?;
+    while !buffer.is_empty() {
+        let count = match read(buffer, offset) {
+            Err(DirectIoError::Read { source, .. })
+                if source.kind() == std::io::ErrorKind::Interrupted =>
+            {
+                continue;
+            }
+            result => result?,
+        };
+        if count == 0 || count > buffer.len() {
+            return Err(DirectIoError::Read {
+                offset,
+                source: std::io::Error::new(
+                    std::io::ErrorKind::UnexpectedEof,
+                    "incomplete model chunk",
+                ),
+            });
+        }
+        offset += count as u64;
+        buffer = &mut buffer[count..];
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use proptest::prelude::*;
@@ -299,6 +345,42 @@ mod tests {
         let mut fixture = tempfile::NamedTempFile::new().unwrap();
         fixture.write_all(bytes).unwrap();
         fixture
+    }
+
+    #[test]
+    fn exact_reads_retry_interruptions_and_short_reads() {
+        let mut calls = 0;
+        let mut bytes = [0; 4];
+        super::read_exact_with(&mut bytes, 8, |destination, offset| {
+            calls += 1;
+            if calls == 1 {
+                return Err(DirectIoError::Read {
+                    offset,
+                    source: std::io::ErrorKind::Interrupted.into(),
+                });
+            }
+            destination[..2].copy_from_slice(if offset == 8 { b"ab" } else { b"cd" });
+            Ok(2)
+        })
+        .unwrap();
+        assert_eq!(bytes, *b"abcd");
+        assert_eq!(calls, 3);
+    }
+
+    #[test]
+    fn workers_reject_truncated_model_chunks() {
+        let fixture = model_fixture(b"abc");
+        let model = DirectModelFile::open(fixture.path()).unwrap();
+        let result = super::read_chunks_bounded(
+            &model,
+            &[super::ChunkRange {
+                offset: 0,
+                length: 4,
+            }],
+            1,
+        );
+        assert!(matches!(result, Err(DirectIoError::Read { source, .. })
+            if source.kind() == std::io::ErrorKind::UnexpectedEof));
     }
 
     #[test]
