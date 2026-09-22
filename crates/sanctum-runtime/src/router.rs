@@ -450,4 +450,11 @@ impl RouterEventLog {
     }
 }
 
+impl RouterEventLog {
+    #[must_use]
+    pub fn entries(&self) -> &std::collections::VecDeque<RouterEvent> {
+        &self.entries
+    }
+}
+
 pub struct RouterMarker;
