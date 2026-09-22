@@ -136,6 +136,22 @@ impl DirectModelFile {
         use std::os::fd::AsRawFd;
         self.file.as_raw_fd()
     }
+
+    /// Requests uncached I/O for the model descriptor.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when `fcntl(F_NOCACHE)` fails.
+    #[cfg(target_os = "macos")]
+    pub fn enable_no_cache(&self) -> Result<(), DirectIoError> {
+        // SAFETY: the descriptor is owned and live; F_NOCACHE accepts an integer flag.
+        let result = unsafe { libc::fcntl(self.raw_fd(), libc::F_NOCACHE, 1) };
+        if result == -1 {
+            Err(DirectIoError::NoCache(std::io::Error::last_os_error()))
+        } else {
+            Ok(())
+        }
+    }
 }
 
 #[cfg(test)]
