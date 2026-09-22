@@ -21,3 +21,11 @@ snapshot rather than publishing wrapped memory figures.
 The wired value describes host wired pages, while the compressed value describes
 pages resident in the compressor. Neither value is interchangeable with process
 resident size or the configured IOGPU ceiling.
+
+## Memory pressure
+
+The monitor owns a `DISPATCH_SOURCE_TYPE_MEMORYPRESSURE` source covering normal,
+warning, and critical events. Warning callbacks are the early-eviction signal;
+critical callbacks require immediate eviction. The event context remains owned by
+libdispatch until source finalization, and monitor drop cancels and releases the
+source exactly once.
