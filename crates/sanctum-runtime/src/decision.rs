@@ -334,4 +334,11 @@ impl Noul {
     }
 }
 
+impl Noul {
+    #[must_use]
+    pub fn negative_log_score(self) -> f64 {
+        self.log_score(false)
+    }
+}
+
 pub struct DecisionMarker;
