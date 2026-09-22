@@ -113,4 +113,7 @@ pub enum InferenceBackend {
     Candle,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TensorShape(Vec<usize>);
+
 pub struct DecisionMarker;
