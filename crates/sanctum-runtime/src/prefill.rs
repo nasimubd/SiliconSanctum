@@ -213,3 +213,9 @@ impl PrefillRequest {
         })
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PrefillChunk {
+    pub offset: usize,
+    pub end: usize,
+}
