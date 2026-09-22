@@ -125,4 +125,10 @@ impl PluginManifest {
     }
 }
 
+impl PluginManifest {
+    pub fn capabilities(&self) -> impl Iterator<Item = &str> {
+        self.capabilities.iter().map(String::as_str)
+    }
+}
+
 pub struct PluginMarker;
