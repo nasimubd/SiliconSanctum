@@ -317,4 +317,11 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    #[must_use]
+    pub fn within_capacity(&self) -> bool {
+        self.stats.nodes <= self.capacity.max_nodes && self.stats.bytes <= self.capacity.max_bytes
+    }
+}
+
 pub struct RadixMarker;
