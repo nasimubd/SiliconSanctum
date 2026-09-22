@@ -88,4 +88,11 @@ impl SourceDocument {
     }
 }
 
+impl SourceDocument {
+    #[must_use]
+    pub fn source(&self) -> &[u8] {
+        &self.source
+    }
+}
+
 pub struct ContextMarker;
