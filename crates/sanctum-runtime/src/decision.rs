@@ -106,4 +106,11 @@ impl DecisionModelMetadata {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InferenceBackend {
+    Onnx,
+    CoreMl,
+    Candle,
+}
+
 pub struct DecisionMarker;
