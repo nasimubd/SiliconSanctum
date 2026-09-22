@@ -21,4 +21,10 @@ impl fmt::Display for SpeculativeError {
 }
 impl std::error::Error for SpeculativeError {}
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ParameterCount(u64);
+impl ParameterCount {
+    pub fn new(value: u64) -> Result<Self, SpeculativeError> { (value > 0).then_some(Self(value)).ok_or(SpeculativeError::ZeroValue("parameter count")) }
+    pub const fn get(self) -> u64 { self.0 }
+}
 // NEXT
