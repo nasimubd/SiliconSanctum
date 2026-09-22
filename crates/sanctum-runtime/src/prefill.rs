@@ -77,3 +77,12 @@ pub struct MemorySnapshot {
     pub resident_bytes: u64,
     pub reserved_bytes: u64,
 }
+
+impl MemorySnapshot {
+    #[must_use]
+    pub const fn available_bytes(self) -> u64 {
+        self.total_bytes
+            .saturating_sub(self.resident_bytes)
+            .saturating_sub(self.reserved_bytes)
+    }
+}
