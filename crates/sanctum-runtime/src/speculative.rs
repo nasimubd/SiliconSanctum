@@ -73,4 +73,11 @@ impl VerifyWidthBounds{
  }
 }
 pub fn context_pressure(position:ContextPosition,capacity:ContextCapacity)->f32{position.get() as f32/capacity.get() as f32}
+#[derive(Debug,Clone,Copy,PartialEq)]
+pub struct AdaptationPolicy{pub widths:VerifyWidthBounds,pub medium_pressure:f32,pub high_pressure:f32}
+impl AdaptationPolicy{
+ pub fn select(&self,pressure:f32)->VerifyWidth{
+  if pressure>=self.high_pressure{self.widths.minimum}else if pressure>=self.medium_pressure{VerifyWidth::new((self.widths.maximum.get()/2).max(self.widths.minimum.get())).expect("bounded width")}else{self.widths.maximum}
+ }
+}
 // NEXT
