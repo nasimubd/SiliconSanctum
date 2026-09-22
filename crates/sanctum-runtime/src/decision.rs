@@ -163,4 +163,16 @@ impl InferenceInput {
 #[derive(Debug, Clone, PartialEq)]
 pub struct InferenceLogits(Vec<f32>);
 
+impl InferenceLogits {
+    pub fn new(values: Vec<f32>) -> Result<Self, DecisionError> {
+        if values.is_empty() {
+            return Err(DecisionError::EmptyLogits);
+        }
+        if !values.iter().all(|value| value.is_finite()) {
+            return Err(DecisionError::NonFiniteLogit);
+        }
+        Ok(Self(values))
+    }
+}
+
 pub struct DecisionMarker;
