@@ -186,4 +186,11 @@ impl RouterPolicy {
     }
 }
 
+impl RouterPolicy {
+    #[must_use]
+    pub const fn thresholds(self) -> RouteThresholds {
+        self.thresholds
+    }
+}
+
 pub struct RouterMarker;
