@@ -44,10 +44,15 @@ streaming. Buffers come from `posix_memalign` at a 16,384-byte boundary and rema
 uniquely owned until release. `pread` preserves descriptor position, retries
 interruptions, and reports short reads without fabricating bytes.
 
-The `SharedMetalBuffer` boundary represents writable bytes from a
-`MTLResourceStorageModeShared` resource. Transfers reject undersized or misaligned
-storage. Bounded scoped workers issue concurrent positional reads while retaining
-request order and limiting the number of live worker threads.
+`NativeSharedBuffer` owns a page-aligned CPU allocation and a no-copy
+`MTLResourceStorageModeShared` buffer over the same bytes. The Metal object is
+released before its backing allocation. Resource access is unsafe because callers
+must finish GPU commands before CPU access or owner destruction.
+
+Transfers reject undersized or misaligned storage and require complete requested
+ranges. Bounded scoped workers borrow only exclusive CPU slices, preserve request
+order, limit live threads, and preflight the page-rounded retained allocation
+against the caller's memory budget.
 
 ## Validation matrix
 
