@@ -215,6 +215,8 @@ pub enum SysctlError {
 mod tests {
     use std::cell::RefCell;
 
+    use proptest::prelude::*;
+
     use super::{
         IOGPU_WIRED_LIMIT_KEY, SysctlError, SysctlRead, SysctlWrite, WiredLimitGuard, decode_u64,
         set_wired_limit_mb, wired_limit_mb,
@@ -329,6 +331,13 @@ mod tests {
         }
 
         assert_eq!(backend.writes.into_inner(), [10_400, 8192]);
+    }
+
+    proptest! {
+        #[test]
+        fn unsigned_decode_round_trips_fuzzed_values(value: u64) {
+            prop_assert_eq!(decode_u64("fuzz", &value.to_ne_bytes()).unwrap(), value);
+        }
     }
 
     #[test]
