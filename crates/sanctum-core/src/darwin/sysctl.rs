@@ -137,6 +137,18 @@ impl<B: SysctlWrite> std::fmt::Debug for WiredLimitGuard<'_, B> {
     }
 }
 
+impl<'a, B: SysctlRead + SysctlWrite> WiredLimitGuard<'a, B> {
+    pub fn apply(backend: &'a B, limit_mb: u64) -> Result<Self, SysctlError> {
+        let previous_mb = wired_limit_mb(backend)?;
+        set_wired_limit_mb(backend, limit_mb)?;
+        Ok(Self {
+            backend,
+            previous_mb,
+            armed: true,
+        })
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
