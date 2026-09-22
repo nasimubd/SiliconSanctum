@@ -274,4 +274,10 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    pub fn bind_session(&mut self, id: SessionId, sequence: TokenSequence) {
+        self.sessions.insert(id, sequence);
+    }
+}
+
 pub struct RadixMarker;
