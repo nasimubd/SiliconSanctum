@@ -185,6 +185,16 @@ pub enum ProcessSignal {
     Kill,
 }
 
+impl ProcessSignal {
+    #[must_use]
+    pub const fn number(self) -> libc::c_int {
+        match self {
+            Self::Terminate => libc::SIGTERM,
+            Self::Kill => libc::SIGKILL,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct SupervisedChild {
     child: tokio::process::Child,
