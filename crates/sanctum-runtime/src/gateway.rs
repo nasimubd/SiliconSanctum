@@ -439,4 +439,16 @@ pub struct DetectionLimits {
     pub max_evidence: usize,
 }
 
+impl DetectionLimits {
+    pub fn new(max_prompt_bytes: usize, max_evidence: usize) -> Result<Self, GatewayError> {
+        if max_prompt_bytes == 0 || max_evidence == 0 {
+            return Err(GatewayError::InvalidLimit);
+        }
+        Ok(Self {
+            max_prompt_bytes,
+            max_evidence,
+        })
+    }
+}
+
 pub struct GatewayMarker;
