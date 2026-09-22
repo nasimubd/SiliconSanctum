@@ -52,6 +52,14 @@ impl ModelId {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModelResidency {
+    Resident,
+    Evicting,
+    Evicted,
+    Reloading,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
