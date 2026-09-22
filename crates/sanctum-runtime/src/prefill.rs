@@ -132,3 +132,9 @@ impl ModelGeometry {
             .div_ceil(8)
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TuningThresholds {
+    pub constrained_bytes: u64,
+    pub comfortable_bytes: u64,
+}
