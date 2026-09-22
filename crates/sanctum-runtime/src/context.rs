@@ -389,4 +389,16 @@ fn collect_nodes(
     }
 }
 
+#[must_use]
+pub fn extract_symbols(parsed: &ParsedDocument) -> Vec<StructuralSymbol> {
+    let mut output = Vec::new();
+    collect_nodes(
+        parsed.root(),
+        parsed.language(),
+        parsed.source(),
+        &mut output,
+    );
+    output
+}
+
 pub struct ContextMarker;
