@@ -572,4 +572,8 @@ impl ScoreRubric {
     }
 }
 
-pub struct DecisionMarker;
+impl From<Score> for f64 {
+    fn from(value: Score) -> Self {
+        value.value()
+    }
+}
