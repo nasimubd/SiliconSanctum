@@ -2,6 +2,7 @@
 
 pub mod arbiter;
 pub mod decision;
+pub mod gateway;
 pub mod plugin;
 pub mod registry;
 pub mod router;
