@@ -25,4 +25,9 @@ mod tests {
     fn formats_llama_server_backend() {
         assert_eq!(BackendKind::LlamaServer.to_string(), "llama-server");
     }
+
+    #[test]
+    fn formats_mlx_backend() {
+        assert_eq!(BackendKind::MlxLm.to_string(), "mlx-lm");
+    }
 }
