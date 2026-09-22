@@ -9,3 +9,6 @@ path = "src/lib.rs"
 
 [lints]
 workspace = true
+
+[dependencies]
+libc = "0.2.176"
