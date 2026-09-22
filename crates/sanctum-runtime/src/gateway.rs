@@ -267,4 +267,10 @@ pub enum BypassReason {
     Temporal,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BypassDecision {
+    pub target: EscalationTarget,
+    pub reason: BypassReason,
+}
+
 pub struct GatewayMarker;
