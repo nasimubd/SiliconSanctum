@@ -97,4 +97,15 @@ pub struct PluginManifest {
     capabilities: std::collections::BTreeSet<String>,
 }
 
+impl PluginManifest {
+    #[must_use]
+    pub fn new(id: PluginId, endpoint: PluginEndpoint) -> Self {
+        Self {
+            id,
+            endpoint,
+            capabilities: std::collections::BTreeSet::new(),
+        }
+    }
+}
+
 pub struct PluginMarker;
