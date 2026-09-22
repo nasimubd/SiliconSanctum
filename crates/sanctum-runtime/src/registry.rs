@@ -104,4 +104,11 @@ impl ContextLadder {
     }
 }
 
+impl ContextLadder {
+    #[must_use]
+    pub fn largest(&self) -> u32 {
+        self.levels[self.levels.len() - 1]
+    }
+}
+
 pub struct RegistryMarker;
