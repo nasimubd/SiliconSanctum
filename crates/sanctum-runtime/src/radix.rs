@@ -48,4 +48,14 @@ impl TokenSequence {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SessionId(String);
 
+impl SessionId {
+    pub fn new(v: impl Into<String>) -> Result<Self, RadixError> {
+        let v = v.into();
+        if v.trim().is_empty() {
+            return Err(RadixError::EmptySession);
+        }
+        Ok(Self(v))
+    }
+}
+
 pub struct RadixMarker;
