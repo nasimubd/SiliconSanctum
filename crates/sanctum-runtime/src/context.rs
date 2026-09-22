@@ -302,4 +302,11 @@ pub struct QueryCapture {
     pub text: String,
 }
 
+impl QueryCapture {
+    #[must_use]
+    pub fn start_byte(&self) -> usize {
+        self.range.start
+    }
+}
+
 pub struct ContextMarker;
