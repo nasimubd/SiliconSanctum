@@ -218,4 +218,11 @@ impl FixtureExecutor {
     }
 }
 
+impl DecisionExecutor for FixtureExecutor {
+    fn execute(&mut self, _input: &InferenceInput) -> Result<InferenceLogits, DecisionError> {
+        self.invocations = self.invocations.saturating_add(1);
+        Ok(self.logits.clone())
+    }
+}
+
 pub struct DecisionMarker;
