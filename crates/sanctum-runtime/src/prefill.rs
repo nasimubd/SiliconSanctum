@@ -86,6 +86,9 @@ impl PrefillEventLog {
     }
 
     pub fn push(&mut self, event: PrefillEvent) {
+        if self.events.len() == self.capacity {
+            self.events.pop_front();
+        }
         self.events.push_back(event);
     }
 }
