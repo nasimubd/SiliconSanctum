@@ -42,7 +42,7 @@ impl std::fmt::Display for BackendKind {
 
 #[cfg(test)]
 mod tests {
-    use super::BackendKind;
+    use super::{BackendKind, ExecutablePath, SupervisorError};
 
     #[test]
     fn formats_llama_server_backend() {
@@ -52,5 +52,10 @@ mod tests {
     #[test]
     fn formats_mlx_backend() {
         assert_eq!(BackendKind::MlxLm.to_string(), "mlx-lm");
+    }
+
+    #[test]
+    fn rejects_relative_executable_path() {
+        assert!(matches!(ExecutablePath::new("bin/server"), Err(SupervisorError::RelativePath { field: "executable", .. })));
     }
 }
