@@ -4,3 +4,10 @@
 pub const BYTES_PER_GIB: u64 = 1_073_741_824;
 pub const WIRED_LIMIT_BYTES: u64 = 10_400 * 1_048_576;
 pub const DEFAULT_HEADROOM_BYTES: u64 = 512 * 1_048_576;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MemorySnapshot {
+    pub wired_bytes: u64,
+    pub available_bytes: u64,
+    pub swap_used_bytes: u64,
+}
