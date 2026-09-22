@@ -107,4 +107,5 @@ pub trait DecoderBackend{
  fn verify(&mut self,proposal:&DraftProposal)->Result<Vec<u32>,SpeculativeError>;
 }
 pub fn run_cycle<B:DecoderBackend>(backend:&mut B,width:VerifyWidth)->Result<CycleOutcome,SpeculativeError>{let proposal=backend.propose(width)?;let target=backend.verify(&proposal)?;let verification=compare_proposal(&proposal,&target);Ok(CycleOutcome{proposal,verification})}
+pub fn generate<B:DecoderBackend>(backend:&mut B,state:&mut SessionState,capacity:ContextCapacity,width:VerifyWidth,requested:u32)->Result<Vec<CycleOutcome>,SpeculativeError>{let mut cycles=Vec::new();while state.emitted<u64::from(requested){let cycle=run_cycle(backend,width)?;let emitted=u32::try_from(cycle.emitted_tokens()).map_err(|_|SpeculativeError::ContextExhausted)?;if emitted==0{return Err(SpeculativeError::Backend("cycle emitted no tokens".into()));}state.advance(emitted,capacity)?;cycles.push(cycle);}Ok(cycles)}
 // NEXT
