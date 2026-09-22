@@ -493,4 +493,9 @@ impl RubricPoint {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct ScoreRubric {
+    points: Vec<RubricPoint>,
+}
+
 pub struct DecisionMarker;
