@@ -558,4 +558,11 @@ impl ScoreRubric {
     }
 }
 
+impl ScoreRubric {
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.points.len()
+    }
+}
+
 pub struct DecisionMarker;
