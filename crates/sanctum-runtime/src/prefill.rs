@@ -64,4 +64,9 @@ impl ScratchBudget {
         }
         Ok(Self(bytes))
     }
+
+    #[must_use]
+    pub const fn bytes(self) -> u64 {
+        self.0
+    }
 }
