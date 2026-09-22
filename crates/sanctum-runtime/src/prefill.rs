@@ -47,6 +47,10 @@ impl SchedulerMetrics {
     pub fn record_chunks(&mut self, count: usize) {
         self.chunks = self.chunks.saturating_add(count as u64);
     }
+
+    pub fn record_rejection(&mut self) {
+        self.rejected = self.rejected.saturating_add(1);
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
