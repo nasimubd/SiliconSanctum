@@ -113,4 +113,9 @@ pub fn parser_for(language: SourceLanguage) -> Result<tree_sitter::Parser, Conte
     Ok(parser)
 }
 
+pub struct ParsedDocument {
+    document: SourceDocument,
+    tree: tree_sitter::Tree,
+}
+
 pub struct ContextMarker;
