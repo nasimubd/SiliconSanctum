@@ -245,4 +245,14 @@ impl FanoutResult {
     }
 }
 
+impl FanoutResult {
+    #[must_use]
+    pub fn minimum_confidence(&self) -> f64 {
+        self.evaluations()
+            .into_iter()
+            .map(AxisEvaluation::confidence)
+            .fold(1.0, f64::min)
+    }
+}
+
 pub struct RouterMarker;
