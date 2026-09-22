@@ -59,4 +59,10 @@ impl ContextPosition{
  }
  pub const fn get(self)->u32{self.0}
 }
+#[derive(Debug,Clone,Copy,PartialEq,Eq,PartialOrd,Ord)]
+pub struct VerifyWidth(u8);
+impl VerifyWidth{
+ pub fn new(value:u8)->Result<Self,SpeculativeError>{(value>0).then_some(Self(value)).ok_or(SpeculativeError::ZeroValue("verify width"))}
+ pub const fn get(self)->u8{self.0}
+}
 // NEXT
