@@ -111,13 +111,15 @@ impl SysctlWrite for NativeSysctl {
 }
 
 fn decode_u64(key: &str, bytes: &[u8]) -> Result<u64, SysctlError> {
-    let value: [u8; size_of::<u64>()] =
-        bytes.try_into().map_err(|_| SysctlError::InvalidWidth {
+    match bytes.len() {
+        4 => Ok(u64::from(u32::from_ne_bytes(bytes.try_into().unwrap()))),
+        8 => Ok(u64::from_ne_bytes(bytes.try_into().unwrap())),
+        actual => Err(SysctlError::InvalidWidth {
             key: key.into(),
-            expected: size_of::<u64>(),
-            actual: bytes.len(),
-        })?;
-    Ok(u64::from_ne_bytes(value))
+            expected: size_of::<u32>(),
+            actual,
+        }),
+    }
 }
 
 /// Reads the current IOGPU wired-memory ceiling in mebibytes.
@@ -271,12 +273,12 @@ mod tests {
 
     #[test]
     fn unsigned_values_reject_invalid_width() {
-        let error = decode_u64("example", &[0; 4]).unwrap_err();
+        let error = decode_u64("example", &[0; 3]).unwrap_err();
         assert!(matches!(
             error,
             SysctlError::InvalidWidth {
-                expected: 8,
-                actual: 4,
+                expected: 4,
+                actual: 3,
                 ..
             }
         ));
