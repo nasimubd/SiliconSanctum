@@ -369,4 +369,14 @@ impl std::fmt::Display for Noul {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ChoiceId(String);
 
+impl ChoiceId {
+    pub fn new(value: impl Into<String>) -> Result<Self, DecisionError> {
+        let value = value.into();
+        if value.trim().is_empty() {
+            return Err(DecisionError::EmptyField { field: "choice_id" });
+        }
+        Ok(Self(value))
+    }
+}
+
 pub struct DecisionMarker;
