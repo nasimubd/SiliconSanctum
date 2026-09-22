@@ -14,6 +14,15 @@ pub enum SupervisorError {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnvironmentEntry { key: String, value: String }
 
+impl EnvironmentEntry {
+    pub fn new(key: impl Into<String>, value: impl Into<String>) -> Result<Self, SupervisorError> {
+        let key = key.into();
+        let value = value.into();
+        if key.contains('=') { return Err(SupervisorError::InvalidEnvironment { field: "key" }); }
+        Ok(Self { key, value })
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExecutablePath(std::path::PathBuf);
 
