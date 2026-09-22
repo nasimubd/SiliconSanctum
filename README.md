@@ -11,6 +11,14 @@ make core-test
 make core-lint
 ```
 
+The fuzz package requires nightly Rust and `cargo-fuzz`:
+
+```bash
+cargo +nightly fuzz run layout
+cargo +nightly fuzz run telemetry
+cargo +nightly fuzz run sysctl_payload
+```
+
 See [Phase 1 Darwin Core](docs/PHASE1_DARWIN_CORE.md) for safety invariants and
 the kernel/storage contracts.
 
