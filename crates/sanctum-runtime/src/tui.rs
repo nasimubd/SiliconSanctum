@@ -1,4 +1,5 @@
 //! Interactive runtime telemetry dashboard.
+pub mod render;
 use std::collections::VecDeque;
 
 #[derive(Debug,Clone,PartialEq,Eq)]
