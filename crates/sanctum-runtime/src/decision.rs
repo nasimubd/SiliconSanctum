@@ -484,4 +484,13 @@ pub struct RubricPoint {
     pub value: f64,
 }
 
+impl RubricPoint {
+    pub fn new(position: f64, value: f64) -> Result<Self, DecisionError> {
+        if !position.is_finite() || !value.is_finite() {
+            return Err(DecisionError::InvalidRubric);
+        }
+        Ok(Self { position, value })
+    }
+}
+
 pub struct DecisionMarker;
