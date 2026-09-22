@@ -336,6 +336,25 @@ mod tests {
     }
 
     #[test]
+    fn wired_limit_writer_preserves_32_bit_kernel_width() {
+        struct Backend(RefCell<Vec<u8>>);
+        impl SysctlRead for Backend {
+            fn read(&self, _key: &str) -> Result<Vec<u8>, SysctlError> {
+                Ok(0_u32.to_ne_bytes().into())
+            }
+        }
+        impl SysctlWrite for Backend {
+            fn write(&self, _key: &str, value: &[u8]) -> Result<(), SysctlError> {
+                self.0.replace(value.into());
+                Ok(())
+            }
+        }
+        let backend = Backend(RefCell::default());
+        set_wired_limit_mb(&backend, 10_400).unwrap();
+        assert_eq!(*backend.0.borrow(), 10_400_u32.to_ne_bytes());
+    }
+
+    #[test]
     fn wired_limit_guard_captures_limit_before_apply() {
         let backend = FakeBackend {
             current: 8192,
