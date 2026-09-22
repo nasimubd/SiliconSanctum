@@ -313,4 +313,10 @@ impl<I: AxisEvaluator, T: AxisEvaluator, C: AxisEvaluator> FanoutRouter<I, T, C>
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelPair {
+    draft: String,
+    target: String,
+}
+
 pub struct RouterMarker;
