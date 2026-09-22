@@ -256,3 +256,8 @@ impl PrefillPlan {
         self.scratch_bytes
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct PrefillScheduler {
+    policy: TuningPolicy,
+}
