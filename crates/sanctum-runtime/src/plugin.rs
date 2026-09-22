@@ -57,4 +57,15 @@ impl PluginEndpoint {
     }
 }
 
+impl PluginEndpoint {
+    #[must_use]
+    pub fn uri(&self) -> String {
+        let scheme = match self.protocol {
+            PluginProtocol::Http => "http",
+            PluginProtocol::Grpc => "grpc",
+        };
+        format!("{scheme}://{}", self.authority)
+    }
+}
+
 pub struct PluginMarker;
