@@ -169,4 +169,13 @@ impl RadixNode {
     }
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct CacheStats {
+    pub nodes: usize,
+    pub bytes: usize,
+    pub entries: usize,
+    pub hits: u64,
+    pub misses: u64,
+}
+
 pub struct RadixMarker;
