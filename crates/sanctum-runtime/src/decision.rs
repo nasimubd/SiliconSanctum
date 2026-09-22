@@ -521,4 +521,27 @@ impl Score {
     }
 }
 
+impl ScoreRubric {
+    /// # Panics
+    ///
+    /// Panics only if the validated ordered-rubric invariant is violated.
+    #[must_use]
+    pub fn interpolate(&self, position: f64) -> Score {
+        if position <= self.points[0].position {
+            return Score(self.points[0].value);
+        }
+        let last = self.points[self.points.len() - 1];
+        if position >= last.position {
+            return Score(last.value);
+        }
+        let pair = self
+            .points
+            .windows(2)
+            .find(|pair| position <= pair[1].position)
+            .expect("bounded position has rubric interval");
+        let ratio = (position - pair[0].position) / (pair[1].position - pair[0].position);
+        Score(pair[0].value + ratio * (pair[1].value - pair[0].value))
+    }
+}
+
 pub struct DecisionMarker;
