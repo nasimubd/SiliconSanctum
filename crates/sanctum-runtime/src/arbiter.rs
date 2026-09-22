@@ -35,6 +35,16 @@ pub enum ArbiterError {
     ZeroValue { field: &'static str },
 }
 
+impl ModelId {
+    pub fn new(value: impl Into<String>) -> Result<Self, ArbiterError> {
+        let value = value.into();
+        if value.trim().is_empty() {
+            return Err(ArbiterError::EmptyModelId);
+        }
+        Ok(Self(value))
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
