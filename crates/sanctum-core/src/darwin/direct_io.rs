@@ -129,6 +129,13 @@ mod tests {
     }
 
     #[test]
+    fn mutable_slice_updates_aligned_storage() {
+        let mut buffer = AlignedBuffer::new(4, 16_384).unwrap();
+        buffer.as_mut_slice().copy_from_slice(&[1, 2, 3, 4]);
+        assert_eq!(buffer.as_slice(), [1, 2, 3, 4]);
+    }
+
+    #[test]
     fn rejects_non_power_of_two_alignment() {
         assert!(matches!(
             validate_layout(4096, 12),
