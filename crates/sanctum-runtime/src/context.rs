@@ -339,4 +339,12 @@ pub fn node_range(node: tree_sitter::Node<'_>) -> Result<SourceRange, ContextErr
     SourceRange::new(node.start_byte(), node.end_byte())
 }
 
+#[must_use]
+pub fn node_name(node: tree_sitter::Node<'_>, source: &[u8]) -> String {
+    node.child_by_field_name("name")
+        .and_then(|v| node_text(v, source))
+        .unwrap_or(node.kind())
+        .to_owned()
+}
+
 pub struct ContextMarker;
