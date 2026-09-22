@@ -95,6 +95,7 @@ pub struct ShutdownPolicy { pub graceful: std::time::Duration, pub serialization
 impl ShutdownPolicy {
     pub fn new(graceful: std::time::Duration, serialization: std::time::Duration) -> Result<Self, SupervisorError> {
         if graceful.is_zero() { return Err(SupervisorError::ZeroTimeout { field: "graceful" }); }
+        if serialization.is_zero() { return Err(SupervisorError::ZeroTimeout { field: "serialization" }); }
         Ok(Self { graceful, serialization })
     }
 }
