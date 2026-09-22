@@ -111,4 +111,16 @@ impl ContextLadder {
     }
 }
 
+impl ContextLadder {
+    #[must_use]
+    pub fn floor(&self, requested: u32) -> u32 {
+        self.levels
+            .iter()
+            .copied()
+            .take_while(|level| *level <= requested)
+            .last()
+            .unwrap_or(self.smallest())
+    }
+}
+
 pub struct RegistryMarker;
