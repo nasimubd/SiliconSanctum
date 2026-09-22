@@ -80,4 +80,7 @@ impl AdaptationPolicy{
   if pressure>=self.high_pressure{self.widths.minimum}else if pressure>=self.medium_pressure{VerifyWidth::new((self.widths.maximum.get()/2).max(self.widths.minimum.get())).expect("bounded width")}else{self.widths.maximum}
  }
 }
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct DraftProposal(Vec<u32>);
+impl DraftProposal{pub fn new(tokens:Vec<u32>)->Result<Self,SpeculativeError>{(!tokens.is_empty()).then_some(Self(tokens)).ok_or(SpeculativeError::EmptyProposal)}pub fn tokens(&self)->&[u32]{&self.0}}
 // NEXT
