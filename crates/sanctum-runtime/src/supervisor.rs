@@ -220,6 +220,10 @@ impl SupervisedChild {
         self.signal(ProcessSignal::Terminate)
     }
 
+    pub async fn force_kill(&mut self) -> Result<(), SupervisorError> {
+        self.signal(ProcessSignal::Kill)
+    }
+
     pub fn signal(&mut self, signal: ProcessSignal) -> Result<(), SupervisorError> {
         let pid = self.id().ok_or(SupervisorError::MissingProcessId)?;
         send_signal(pid, signal)?;
