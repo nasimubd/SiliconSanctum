@@ -173,4 +173,17 @@ impl Default for RouterPolicy {
     }
 }
 
+impl RouterPolicy {
+    #[must_use]
+    pub fn select(self, c: f64) -> RouteDecision {
+        if c > self.thresholds.high() {
+            RouteDecision::deterministic(c)
+        } else if c >= self.thresholds.moderate() {
+            RouteDecision::speculative(c)
+        } else {
+            RouteDecision::heavy(c)
+        }
+    }
+}
+
 pub struct RouterMarker;
