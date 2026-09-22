@@ -11,4 +11,14 @@ pub enum GatewayError {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GatewayPrompt(String);
 
+impl GatewayPrompt {
+    pub fn new(v: impl Into<String>) -> Result<Self, GatewayError> {
+        let v = v.into();
+        if v.trim().is_empty() {
+            return Err(GatewayError::EmptyPrompt);
+        }
+        Ok(Self(v))
+    }
+}
+
 pub struct GatewayMarker;
