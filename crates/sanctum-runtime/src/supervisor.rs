@@ -49,6 +49,13 @@ pub struct ProcessSpec {
     pub arguments: Vec<String>,
 }
 
+impl ProcessSpec {
+    #[must_use]
+    pub fn llama_server(executable: ExecutablePath, model: ModelPath) -> Self {
+        Self { backend: BackendKind::LlamaServer, executable, model, arguments: Vec::new() }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BackendKind {
     LlamaServer,
