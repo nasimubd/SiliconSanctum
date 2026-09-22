@@ -5,6 +5,7 @@ pub mod context;
 pub mod decision;
 pub mod gateway;
 pub mod plugin;
+pub mod radix;
 pub mod registry;
 pub mod router;
 pub mod supervisor;
