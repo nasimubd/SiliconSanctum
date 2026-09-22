@@ -68,6 +68,12 @@ pub enum PrefillEvent {
     Cancelled,
 }
 
+#[derive(Debug, Clone)]
+pub struct PrefillEventLog {
+    capacity: usize,
+    events: std::collections::VecDeque<PrefillEvent>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TokenCount(usize);
 
