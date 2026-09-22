@@ -1,0 +1,2 @@
+use sanctum_runtime::tui::{ActiveProfile,CpuTelemetry,DashboardSnapshot,KvResidency,MemoryBytes,MemoryTelemetry,TokenRate,Utilization};
+#[test] fn constructs_snapshot(){let s=DashboardSnapshot::new(TokenRate::new(42.0).unwrap(),MemoryTelemetry::new(MemoryBytes(4),MemoryBytes(2),MemoryBytes(16)).unwrap(),CpuTelemetry{performance:Utilization::new(0.5).unwrap(),efficiency:Utilization::new(0.2).unwrap()},KvResidency::new(1,4).unwrap(),ActiveProfile::new("focused").unwrap());assert_eq!(s.profile.as_str(),"focused");}
