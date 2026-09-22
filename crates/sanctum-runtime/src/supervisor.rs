@@ -84,6 +84,9 @@ pub enum BackendKind {
     MlxLm,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessState { Starting, Running, Stopping, Exited, Failed }
+
 impl std::fmt::Display for BackendKind {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         formatter.write_str(match self {
