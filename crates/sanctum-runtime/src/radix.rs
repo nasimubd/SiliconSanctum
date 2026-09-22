@@ -31,4 +31,11 @@ impl TokenSequence {
     }
 }
 
+impl TokenSequence {
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+}
+
 pub struct RadixMarker;
