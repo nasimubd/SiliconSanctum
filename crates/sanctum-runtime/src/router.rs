@@ -423,4 +423,10 @@ pub enum RouterEvent {
     RouteSelected(RouteDecision),
 }
 
+#[derive(Debug, Clone)]
+pub struct RouterEventLog {
+    capacity: usize,
+    entries: std::collections::VecDeque<RouterEvent>,
+}
+
 pub struct RouterMarker;
