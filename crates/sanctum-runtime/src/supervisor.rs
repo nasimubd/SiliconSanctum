@@ -289,6 +289,13 @@ pub struct ShutdownPolicy {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CacheMarker(std::path::PathBuf);
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShutdownOutcome {
+    Graceful,
+    Forced,
+    AlreadyExited,
+}
+
 impl CacheMarker {
     pub fn new(path: impl Into<std::path::PathBuf>) -> Result<Self, SupervisorError> {
         let path = path.into();
