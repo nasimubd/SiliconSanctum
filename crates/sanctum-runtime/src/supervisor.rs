@@ -9,6 +9,8 @@ pub enum SupervisorError {
     RelativePath { field: &'static str, path: std::path::PathBuf },
     #[error("invalid subprocess environment {field}")]
     InvalidEnvironment { field: &'static str },
+    #[error("{field} timeout must be nonzero")]
+    ZeroTimeout { field: &'static str },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
