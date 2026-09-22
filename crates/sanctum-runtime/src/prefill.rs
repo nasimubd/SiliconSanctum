@@ -70,3 +70,10 @@ impl ScratchBudget {
         self.0
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MemorySnapshot {
+    pub total_bytes: u64,
+    pub resident_bytes: u64,
+    pub reserved_bytes: u64,
+}
