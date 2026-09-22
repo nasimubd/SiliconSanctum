@@ -319,4 +319,12 @@ impl Noul {
 
 pub const LOG_SCORE_EPSILON: f64 = 1.0e-12;
 
+impl Noul {
+    #[must_use]
+    pub fn log_score(self, observed: bool) -> f64 {
+        let selected = if observed { self.0 } else { 1.0 - self.0 };
+        selected.clamp(LOG_SCORE_EPSILON, 1.0).ln()
+    }
+}
+
 pub struct DecisionMarker;
