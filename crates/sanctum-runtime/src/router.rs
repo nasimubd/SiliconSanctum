@@ -203,4 +203,10 @@ pub trait AxisEvaluator {
     >;
 }
 
+#[derive(Debug, Clone)]
+pub struct FixedAxisEvaluator {
+    confidence: f64,
+    delay: std::time::Duration,
+}
+
 pub struct RouterMarker;
