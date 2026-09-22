@@ -217,18 +217,21 @@ pub fn read_chunks_bounded(
 }
 
 impl DirectModelFile {
-    /// Opens a model file read-only.
+    /// Opens a model file read-only and enables uncached reads on macOS.
     ///
     /// # Errors
     ///
-    /// Returns an error when the path cannot be opened.
+    /// Returns an error when the path cannot be opened or caching cannot be disabled.
     pub fn open(path: impl Into<PathBuf>) -> Result<Self, DirectIoError> {
         let path = path.into();
         let file = std::fs::File::open(&path).map_err(|source| DirectIoError::Open {
             path: path.clone(),
             source,
         })?;
-        Ok(Self { file })
+        let model = Self { file };
+        #[cfg(target_os = "macos")]
+        model.enable_no_cache()?;
+        Ok(model)
     }
 
     #[must_use]
