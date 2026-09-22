@@ -138,4 +138,30 @@ pub struct PluginRequest {
     pub payload: Vec<u8>,
 }
 
+impl PluginRequest {
+    pub fn new(
+        request_id: impl Into<String>,
+        capability: impl Into<String>,
+        payload: Vec<u8>,
+    ) -> Result<Self, PluginError> {
+        let request_id = request_id.into();
+        let capability = capability.into();
+        if request_id.trim().is_empty() {
+            return Err(PluginError::EmptyField {
+                field: "request_id",
+            });
+        }
+        if capability.trim().is_empty() {
+            return Err(PluginError::EmptyField {
+                field: "capability",
+            });
+        }
+        Ok(Self {
+            request_id,
+            capability,
+            payload,
+        })
+    }
+}
+
 pub struct PluginMarker;
