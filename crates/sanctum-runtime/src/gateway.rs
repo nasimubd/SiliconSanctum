@@ -472,4 +472,13 @@ pub fn arithmetic_operator_count(text: &str) -> usize {
         .count()
 }
 
+#[must_use]
+pub fn temporal_marker_count(text: &str) -> usize {
+    let t = text.to_lowercase();
+    ["before", "after", "earlier", "later", "ago"]
+        .iter()
+        .filter(|m| t.contains(**m))
+        .count()
+}
+
 pub struct GatewayMarker;
