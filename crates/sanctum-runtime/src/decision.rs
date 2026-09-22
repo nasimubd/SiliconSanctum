@@ -87,4 +87,16 @@ pub struct DecisionModelMetadata {
     parameters: u64,
 }
 
+impl DecisionModelMetadata {
+    pub fn new(id: DecisionModelId, parameters: u64) -> Result<Self, DecisionError> {
+        if parameters == 0 {
+            return Err(DecisionError::ZeroParameterCount);
+        }
+        if parameters >= MAX_DECISION_PARAMETERS {
+            return Err(DecisionError::ParameterLimitExceeded { parameters });
+        }
+        Ok(Self { id, parameters })
+    }
+}
+
 pub struct DecisionMarker;
