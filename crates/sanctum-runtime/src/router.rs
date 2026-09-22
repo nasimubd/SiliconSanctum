@@ -64,4 +64,13 @@ pub struct RouteThresholds {
     high: f64,
 }
 
+impl Default for RouteThresholds {
+    fn default() -> Self {
+        Self {
+            moderate: 0.60,
+            high: 0.95,
+        }
+    }
+}
+
 pub struct RouterMarker;
