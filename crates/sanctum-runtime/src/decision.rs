@@ -62,4 +62,14 @@ impl Default for LatencyBudget {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DecisionModelId(String);
 
+impl DecisionModelId {
+    pub fn new(value: impl Into<String>) -> Result<Self, DecisionError> {
+        let value = value.into();
+        if value.trim().is_empty() {
+            return Err(DecisionError::EmptyField { field: "model_id" });
+        }
+        Ok(Self(value))
+    }
+}
+
 pub struct DecisionMarker;
