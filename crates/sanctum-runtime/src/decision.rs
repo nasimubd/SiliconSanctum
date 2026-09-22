@@ -211,4 +211,11 @@ impl FixtureExecutor {
     }
 }
 
+impl FixtureExecutor {
+    #[must_use]
+    pub const fn invocations(&self) -> u64 {
+        self.invocations
+    }
+}
+
 pub struct DecisionMarker;
