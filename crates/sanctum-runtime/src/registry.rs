@@ -269,5 +269,3 @@ impl ModelRegistry {
         }
     }
 }
-
-pub struct RegistryMarker;

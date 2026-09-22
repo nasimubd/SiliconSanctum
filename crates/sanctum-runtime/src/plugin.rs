@@ -237,5 +237,3 @@ pub trait PluginTransport {
         request: &PluginRequest,
     ) -> Result<PluginResponse, PluginError>;
 }
-
-pub struct PluginMarker;
