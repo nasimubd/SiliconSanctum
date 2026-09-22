@@ -429,4 +429,16 @@ pub struct RouterEventLog {
     entries: std::collections::VecDeque<RouterEvent>,
 }
 
+impl RouterEventLog {
+    pub fn new(capacity: usize) -> Result<Self, RouterError> {
+        if capacity == 0 {
+            return Err(RouterError::EmptyRouteTarget);
+        }
+        Ok(Self {
+            capacity,
+            entries: std::collections::VecDeque::with_capacity(capacity),
+        })
+    }
+}
+
 pub struct RouterMarker;
