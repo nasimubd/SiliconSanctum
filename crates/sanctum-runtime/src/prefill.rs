@@ -165,3 +165,18 @@ pub struct TuningPolicy {
     pub thresholds: TuningThresholds,
     pub scratch_budget: ScratchBudget,
 }
+
+impl TuningPolicy {
+    pub const fn new(
+        thresholds: TuningThresholds,
+        scratch_budget: ScratchBudget,
+    ) -> Result<Self, PrefillError> {
+        if thresholds.constrained_bytes >= thresholds.comfortable_bytes {
+            return Err(PrefillError::InvalidThresholds);
+        }
+        Ok(Self {
+            thresholds,
+            scratch_budget,
+        })
+    }
+}
