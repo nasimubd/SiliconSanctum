@@ -268,4 +268,13 @@ pub fn execute_measured(
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Noul(f64);
 
+impl Noul {
+    pub fn new(probability: f64) -> Result<Self, DecisionError> {
+        if !probability.is_finite() || !(0.0..=1.0).contains(&probability) {
+            return Err(DecisionError::ProbabilityOutOfRange);
+        }
+        Ok(Self(probability))
+    }
+}
+
 pub struct DecisionMarker;
