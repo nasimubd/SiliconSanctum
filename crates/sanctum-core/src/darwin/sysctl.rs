@@ -102,7 +102,12 @@ pub enum SysctlError {
 
 #[cfg(test)]
 mod tests {
-    use super::SysctlError;
+    use super::{SysctlError, decode_u64};
+
+    #[test]
+    fn unsigned_values_use_native_byte_order() {
+        assert_eq!(decode_u64("example", &42_u64.to_ne_bytes()).unwrap(), 42);
+    }
 
     #[test]
     fn invalid_width_display_includes_key_and_sizes() {
