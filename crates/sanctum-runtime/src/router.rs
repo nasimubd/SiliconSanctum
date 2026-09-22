@@ -490,4 +490,9 @@ impl FanoutDeadline {
     }
 }
 
-pub struct RouterMarker;
+impl FanoutDeadline {
+    #[must_use]
+    pub const fn duration(self) -> std::time::Duration {
+        self.0
+    }
+}
