@@ -5,6 +5,8 @@ pub const APPLE_SILICON_PAGE_SIZE: usize = 16_384;
 
 pub mod direct_io;
 pub mod mach;
+#[cfg(target_os = "macos")]
+pub mod metal_buffer;
 pub mod pressure;
 pub mod qos;
 pub mod sysctl;
