@@ -175,4 +175,11 @@ impl InferenceLogits {
     }
 }
 
+impl InferenceLogits {
+    #[must_use]
+    pub fn values(&self) -> &[f32] {
+        &self.0
+    }
+}
+
 pub struct DecisionMarker;
