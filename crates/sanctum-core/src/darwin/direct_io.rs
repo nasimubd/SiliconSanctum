@@ -29,6 +29,8 @@ pub enum DirectIoError {
     OffsetOverflow { offset: u64 },
     #[error("shared Metal buffer has {available} bytes; chunk requires {required}")]
     SharedBufferTooSmall { required: usize, available: usize },
+    #[error("shared Metal buffer pointer is not aligned to {required} bytes")]
+    SharedBufferMisaligned { required: usize },
 }
 
 /// Validates the alignment accepted by `posix_memalign`.
