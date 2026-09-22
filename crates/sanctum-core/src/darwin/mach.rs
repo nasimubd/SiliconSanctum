@@ -16,6 +16,12 @@ pub enum MachTelemetryError {
     },
     #[error("memory counter overflowed while converting {counter} pages")]
     CounterOverflow { counter: &'static str },
+    #[error("Mach {operation} returned {actual} integers; expected at least {expected}")]
+    ShortCount {
+        operation: &'static str,
+        expected: u32,
+        actual: u32,
+    },
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
