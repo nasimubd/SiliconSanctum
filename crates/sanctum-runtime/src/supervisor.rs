@@ -95,7 +95,7 @@ impl std::fmt::Display for BackendKind {
 
 #[cfg(test)]
 mod tests {
-    use super::{BackendKind, ExecutablePath, ModelPath, SupervisorError};
+    use super::{BackendKind, EnvironmentEntry, ExecutablePath, ModelPath, SupervisorError};
 
     #[test]
     fn formats_llama_server_backend() {
@@ -140,4 +140,5 @@ mod tests {
         let spec = super::ProcessSpec::mlx_lm(ExecutablePath::new("/bin/mlx").unwrap(), ModelPath::new("/models/a").unwrap());
         assert_eq!(spec.backend, BackendKind::MlxLm);
     }
+    #[test] fn rejects_environment_assignment_key() { assert!(EnvironmentEntry::new("A=B", "x").is_err()); }
 }
