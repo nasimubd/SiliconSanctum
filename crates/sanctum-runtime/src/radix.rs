@@ -178,4 +178,14 @@ pub struct CacheStats {
     pub misses: u64,
 }
 
+#[derive(Debug)]
+pub struct RadixCache {
+    root: RadixNode,
+    capacity: CacheCapacity,
+    stats: CacheStats,
+    next_handle: u64,
+    clock: u64,
+    sessions: std::collections::HashMap<SessionId, TokenSequence>,
+}
+
 pub struct RadixMarker;
