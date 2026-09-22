@@ -355,6 +355,25 @@ mod tests {
     }
 
     #[test]
+    fn wired_limit_writer_rejects_32_bit_overflow() {
+        struct Backend;
+        impl SysctlRead for Backend {
+            fn read(&self, _key: &str) -> Result<Vec<u8>, SysctlError> {
+                Ok(0_u32.to_ne_bytes().into())
+            }
+        }
+        impl SysctlWrite for Backend {
+            fn write(&self, _key: &str, _value: &[u8]) -> Result<(), SysctlError> {
+                panic!("overflow must fail before writing")
+            }
+        }
+        assert!(matches!(
+            set_wired_limit_mb(&Backend, u64::from(u32::MAX) + 1),
+            Err(SysctlError::InvalidWidth { .. })
+        ));
+    }
+
+    #[test]
     fn wired_limit_guard_captures_limit_before_apply() {
         let backend = FakeBackend {
             current: 8192,
