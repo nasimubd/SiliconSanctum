@@ -22,3 +22,5 @@ pub struct MemoryTelemetry{pub wired:MemoryBytes,pub os_cache:MemoryBytes,pub to
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub struct Utilization(f32);
 impl Utilization{pub fn new(value:f32)->Result<Self,DashboardError>{if !value.is_finite()||!(0.0..=1.0).contains(&value){return Err(DashboardError::InvalidPercentage);}Ok(Self(value))}pub const fn get(self)->f32{self.0}}
+#[derive(Debug,Clone,Copy,PartialEq)]
+pub struct CpuTelemetry{pub performance:Utilization,pub efficiency:Utilization}
