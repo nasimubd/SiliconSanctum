@@ -69,4 +69,13 @@ pub struct JaggednessReport {
     evidence: Vec<Evidence>,
 }
 
+impl JaggednessReport {
+    #[must_use]
+    pub const fn clear() -> Self {
+        Self {
+            evidence: Vec::new(),
+        }
+    }
+}
+
 pub struct GatewayMarker;
