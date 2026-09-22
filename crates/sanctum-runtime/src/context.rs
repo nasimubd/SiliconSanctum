@@ -448,4 +448,11 @@ pub struct StructuralSummarizer {
     policy: PruningPolicy,
 }
 
+impl StructuralSummarizer {
+    #[must_use]
+    pub const fn new(policy: PruningPolicy) -> Self {
+        Self { policy }
+    }
+}
+
 pub struct ContextMarker;
