@@ -173,4 +173,11 @@ impl ModelEntry {
     }
 }
 
+impl ModelEntry {
+    #[must_use]
+    pub fn total_bytes_for(&self, tokens: u32) -> u64 {
+        self.weights_bytes.saturating_add(self.kv_bytes_for(tokens))
+    }
+}
+
 pub struct RegistryMarker;
