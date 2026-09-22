@@ -8,6 +8,8 @@ use thiserror::Error;
 pub enum DirectIoError {
     #[error("invalid buffer layout: size={size}, alignment={alignment}")]
     InvalidLayout { size: usize, alignment: usize },
+    #[error("posix_memalign failed with errno {code}")]
+    Allocation { code: i32 },
     #[error("failed to open model file {path}: {source}")]
     Open {
         path: PathBuf,
