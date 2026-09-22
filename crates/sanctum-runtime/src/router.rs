@@ -367,4 +367,7 @@ impl DeterministicTarget {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HeavyModelTarget(String);
+
 pub struct RouterMarker;
