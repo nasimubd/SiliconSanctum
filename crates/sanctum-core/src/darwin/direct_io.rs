@@ -90,6 +90,18 @@ impl AlignedBuffer {
     pub const fn alignment(&self) -> usize {
         self.alignment
     }
+
+    #[must_use]
+    pub fn as_slice(&self) -> &[u8] {
+        // SAFETY: the allocation remains live and initialized for `length` bytes.
+        unsafe { std::slice::from_raw_parts(self.pointer.as_ptr(), self.length) }
+    }
+
+    #[must_use]
+    pub fn as_mut_slice(&mut self) -> &mut [u8] {
+        // SAFETY: the exclusive borrow guarantees unique access to the allocation.
+        unsafe { std::slice::from_raw_parts_mut(self.pointer.as_ptr(), self.length) }
+    }
 }
 
 impl Drop for AlignedBuffer {
