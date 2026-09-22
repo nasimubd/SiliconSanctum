@@ -407,4 +407,31 @@ pub fn stable_softmax(logits: &[f64]) -> Vec<f64> {
     values.into_iter().map(|value| value / total).collect()
 }
 
+impl Choice {
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn from_logits(ids: Vec<ChoiceId>, logits: Vec<f64>) -> Result<Self, DecisionError> {
+        if ids.is_empty() || ids.len() != logits.len() {
+            return Err(DecisionError::EmptyChoices);
+        }
+        if ids.len() > MAX_CHOICE_ITEMS {
+            return Err(DecisionError::TooManyChoices);
+        }
+        if !logits.iter().all(|value| value.is_finite()) {
+            return Err(DecisionError::NonFiniteLogit);
+        }
+        let mut unique = std::collections::HashSet::new();
+        if ids.iter().any(|id| !unique.insert(id.as_str())) {
+            return Err(DecisionError::DuplicateChoice(String::new()));
+        }
+        let probabilities = stable_softmax(&logits);
+        Ok(Self {
+            items: ids
+                .into_iter()
+                .zip(probabilities)
+                .map(|(id, probability)| ChoiceItem { id, probability })
+                .collect(),
+        })
+    }
+}
+
 pub struct DecisionMarker;
