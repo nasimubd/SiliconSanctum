@@ -250,4 +250,19 @@ pub struct ExecutionMeasurement {
     pub class: LatencyClass,
 }
 
+pub fn execute_measured(
+    executor: &mut impl DecisionExecutor,
+    input: &InferenceInput,
+    budget: LatencyBudget,
+) -> Result<ExecutionMeasurement, DecisionError> {
+    let started = std::time::Instant::now();
+    let logits = executor.execute(input)?;
+    let elapsed = started.elapsed();
+    Ok(ExecutionMeasurement {
+        logits,
+        elapsed,
+        class: classify_latency(elapsed, budget),
+    })
+}
+
 pub struct DecisionMarker;
