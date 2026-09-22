@@ -117,4 +117,10 @@ mod tests {
         let spec = super::ProcessSpec::llama_server(ExecutablePath::new("/bin/server").unwrap(), ModelPath::new("/models/a.gguf").unwrap());
         assert_eq!(spec.backend, BackendKind::LlamaServer);
     }
+
+    #[test]
+    fn constructs_mlx_runtime_specification() {
+        let spec = super::ProcessSpec::mlx_lm(ExecutablePath::new("/bin/mlx").unwrap(), ModelPath::new("/models/a").unwrap());
+        assert_eq!(spec.backend, BackendKind::MlxLm);
+    }
 }
