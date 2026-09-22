@@ -192,4 +192,15 @@ impl ModelRegistry {
     }
 }
 
+impl ModelRegistry {
+    pub fn insert(&mut self, entry: ModelEntry) -> Result<(), RegistryError> {
+        let key = entry.id.as_str().to_owned();
+        if self.entries.contains_key(&key) {
+            return Err(RegistryError::DuplicateModel(key));
+        }
+        self.entries.insert(key, entry);
+        Ok(())
+    }
+}
+
 pub struct RegistryMarker;
