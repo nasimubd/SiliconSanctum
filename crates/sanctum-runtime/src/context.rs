@@ -135,4 +135,11 @@ impl ParsedDocument {
     }
 }
 
+impl ParsedDocument {
+    #[must_use]
+    pub fn sexp(&self) -> String {
+        self.root().to_sexp()
+    }
+}
+
 pub struct ContextMarker;
