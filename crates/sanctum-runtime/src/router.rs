@@ -350,4 +350,14 @@ impl ModelPair {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DeterministicTarget(String);
 
+impl DeterministicTarget {
+    pub fn new(v: impl Into<String>) -> Result<Self, RouterError> {
+        let v = v.into();
+        if v.trim().is_empty() {
+            return Err(RouterError::EmptyRouteTarget);
+        }
+        Ok(Self(v))
+    }
+}
+
 pub struct RouterMarker;
