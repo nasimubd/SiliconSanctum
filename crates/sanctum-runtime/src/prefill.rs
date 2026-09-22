@@ -122,6 +122,22 @@ impl CancellationToken {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct ChunkCursor {
+    chunks: Vec<PrefillChunk>,
+    position: usize,
+}
+
+impl ChunkCursor {
+    #[must_use]
+    pub const fn new(chunks: Vec<PrefillChunk>) -> Self {
+        Self {
+            chunks,
+            position: 0,
+        }
+    }
+}
+
 impl TuningThresholds {
     #[must_use]
     pub const fn pressure(self, memory: MemorySnapshot) -> MemoryPressure {
