@@ -22,3 +22,22 @@ pub enum SysctlError {
         actual: usize,
     },
 }
+
+#[cfg(test)]
+mod tests {
+    use super::SysctlError;
+
+    #[test]
+    fn invalid_width_display_includes_key_and_sizes() {
+        let error = SysctlError::InvalidWidth {
+            key: "example".into(),
+            expected: 8,
+            actual: 4,
+        };
+
+        assert_eq!(
+            error.to_string(),
+            "sysctl example returned 4 bytes; expected 8"
+        );
+    }
+}
