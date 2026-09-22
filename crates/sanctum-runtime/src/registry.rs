@@ -166,4 +166,11 @@ impl ModelEntry {
     }
 }
 
+impl ModelEntry {
+    #[must_use]
+    pub fn kv_bytes_for(&self, tokens: u32) -> u64 {
+        self.bytes_per_kv_token.saturating_mul(u64::from(tokens))
+    }
+}
+
 pub struct RegistryMarker;
