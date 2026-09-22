@@ -300,4 +300,11 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    #[must_use]
+    pub fn root(&self) -> &RadixNode {
+        &self.root
+    }
+}
+
 pub struct RadixMarker;
