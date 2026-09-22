@@ -457,4 +457,11 @@ impl RouterEventLog {
     }
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct RouteMetrics {
+    pub deterministic: u64,
+    pub speculative: u64,
+    pub heavy: u64,
+}
+
 pub struct RouterMarker;
