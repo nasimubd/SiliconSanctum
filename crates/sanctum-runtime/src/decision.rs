@@ -186,4 +186,11 @@ pub trait DecisionExecutor {
     fn execute(&mut self, input: &InferenceInput) -> Result<InferenceLogits, DecisionError>;
 }
 
+#[derive(Debug, Clone)]
+pub struct FixtureExecutor {
+    logits: InferenceLogits,
+    latency: std::time::Duration,
+    invocations: u64,
+}
+
 pub struct DecisionMarker;
