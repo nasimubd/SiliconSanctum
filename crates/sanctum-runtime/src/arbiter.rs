@@ -429,6 +429,11 @@ pub trait MemoryTelemetrySource {
     fn sample(&mut self) -> Result<MemorySnapshot, ArbiterError>;
 }
 
+#[derive(Debug, Clone)]
+pub struct StaticTelemetry {
+    snapshot: MemorySnapshot,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
