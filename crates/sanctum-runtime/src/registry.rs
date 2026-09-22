@@ -134,4 +134,36 @@ pub struct ModelEntry {
     pub contexts: ContextLadder,
 }
 
+impl ModelEntry {
+    pub fn new(
+        id: RegistryModelId,
+        backend: ModelBackend,
+        format: ModelFormat,
+        quantization: Quantization,
+        weights_bytes: u64,
+        bytes_per_kv_token: u64,
+        contexts: ContextLadder,
+    ) -> Result<Self, RegistryError> {
+        if weights_bytes == 0 {
+            return Err(RegistryError::ZeroValue {
+                field: "weights_bytes",
+            });
+        }
+        if bytes_per_kv_token == 0 {
+            return Err(RegistryError::ZeroValue {
+                field: "bytes_per_kv_token",
+            });
+        }
+        Ok(Self {
+            id,
+            backend,
+            format,
+            quantization,
+            weights_bytes,
+            bytes_per_kv_token,
+            contexts,
+        })
+    }
+}
+
 pub struct RegistryMarker;
