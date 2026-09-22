@@ -307,6 +307,9 @@ impl PrefillScheduler {
             .geometry
             .kv_bytes_per_token(request.quantization)
             .saturating_mul(request.tokens.get() as u64);
+        if kv_bytes.saturating_add(scratch_bytes) > memory.available_bytes() {
+            return Err(PrefillError::InsufficientMemory);
+        }
         Ok(PrefillPlan {
             step,
             chunks: partition_tokens(request.tokens, step),
