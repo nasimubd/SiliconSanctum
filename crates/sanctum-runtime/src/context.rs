@@ -285,4 +285,14 @@ pub fn typescript_query() -> QuerySpec {
     QuerySpec { source: "[(class_declaration name: (type_identifier) @name) (function_declaration name: (identifier) @name) (interface_declaration name: (type_identifier) @name)] @definition".to_owned() }
 }
 
+#[must_use]
+pub fn query_for(language: SourceLanguage) -> QuerySpec {
+    match language {
+        SourceLanguage::Python => python_query(),
+        SourceLanguage::Rust => rust_query(),
+        SourceLanguage::Cpp => cpp_query(),
+        SourceLanguage::TypeScript => typescript_query(),
+    }
+}
+
 pub struct ContextMarker;
