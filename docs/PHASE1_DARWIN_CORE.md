@@ -48,3 +48,17 @@ The `SharedMetalBuffer` boundary represents writable bytes from a
 `MTLResourceStorageModeShared` resource. Transfers reject undersized or misaligned
 storage. Bounded scoped workers issue concurrent positional reads while retaining
 request order and limiting the number of live worker threads.
+
+## Validation matrix
+
+| Surface | Validation |
+| --- | --- |
+| Sysctl codec and guard | Unit, property, and live read smoke tests |
+| Mach page conversion | Unit, overflow, and live host telemetry tests |
+| Dispatch pressure | Flag/callback unit tests and live source lifecycle test |
+| Thread QoS | Parameter unit test and live pthread binding test |
+| Direct I/O | Alignment, boundary, concurrency, property, and live F_NOCACHE tests |
+| Toolchain | rustfmt, Cargo check, Clippy with warnings denied, and Cargo test |
+
+The live tests are compiled only for macOS. CI runs the complete suite on an
+Apple Silicon `macos-14` runner so the Darwin FFI paths are compiled and invoked.
