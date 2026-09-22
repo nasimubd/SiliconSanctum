@@ -87,4 +87,11 @@ impl RouteThresholds {
     }
 }
 
+impl RouteThresholds {
+    #[must_use]
+    pub const fn moderate(self) -> f64 {
+        self.moderate
+    }
+}
+
 pub struct RouterMarker;
