@@ -85,4 +85,10 @@ mod tests {
     fn rejects_relative_model_path() {
         assert!(matches!(ModelPath::new("models/model.gguf"), Err(SupervisorError::RelativePath { field: "model", .. })));
     }
+
+    #[test]
+    fn accepts_absolute_model_path() {
+        let path = ModelPath::new("/Volumes/models/model.gguf").unwrap();
+        assert_eq!(path.as_path(), std::path::Path::new("/Volumes/models/model.gguf"));
+    }
 }
