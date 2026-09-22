@@ -16,7 +16,12 @@ pub const QOS_CLASS_USER_INTERACTIVE: QosClass = QosClass(0x21);
 
 #[cfg(test)]
 mod tests {
-    use super::QosError;
+    use super::{QOS_CLASS_USER_INTERACTIVE, QosError};
+
+    #[test]
+    fn interactive_class_matches_darwin_encoding() {
+        assert_eq!(QOS_CLASS_USER_INTERACTIVE.0, 0x21);
+    }
 
     #[test]
     fn error_display_includes_errno() {
