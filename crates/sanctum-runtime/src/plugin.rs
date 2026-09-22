@@ -68,4 +68,7 @@ impl PluginEndpoint {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Capability(String);
+
 pub struct PluginMarker;
