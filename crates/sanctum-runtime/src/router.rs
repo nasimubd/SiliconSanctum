@@ -36,4 +36,10 @@ impl RoutingPrompt {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct AxisEvaluation {
+    pub axis: EvaluationAxis,
+    confidence: f64,
+}
+
 pub struct RouterMarker;
