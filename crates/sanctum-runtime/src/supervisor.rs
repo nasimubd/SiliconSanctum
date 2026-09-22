@@ -411,6 +411,17 @@ mod tests {
         assert!(marker.is_complete().await.unwrap());
     }
 
+    #[tokio::test]
+    async fn supervises_successful_process_exit() {
+        let spec = super::ProcessSpec::llama_server(
+            ExecutablePath::new("/usr/bin/true").unwrap(),
+            ModelPath::new("/tmp/model").unwrap(),
+        );
+        let mut child = super::SupervisedChild::spawn(&spec).unwrap();
+        assert!(child.wait().await.unwrap().success());
+        assert_eq!(child.state(), ProcessState::Exited);
+    }
+
     #[test]
     fn formats_llama_server_backend() {
         assert_eq!(BackendKind::LlamaServer.to_string(), "llama-server");
