@@ -186,6 +186,13 @@ pub struct SupervisedChild {
     state: ProcessState,
 }
 
+impl SupervisedChild {
+    #[must_use]
+    pub fn id(&self) -> Option<u32> {
+        self.child.id()
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ShutdownPolicy {
     pub graceful: std::time::Duration,
