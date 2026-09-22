@@ -422,4 +422,16 @@ pub struct CacheEventLog {
     entries: std::collections::VecDeque<CacheEvent>,
 }
 
+impl CacheEventLog {
+    pub fn new(capacity: usize) -> Result<Self, RadixError> {
+        if capacity == 0 {
+            return Err(RadixError::ZeroCapacity);
+        }
+        Ok(Self {
+            capacity,
+            entries: std::collections::VecDeque::with_capacity(capacity),
+        })
+    }
+}
+
 pub struct RadixMarker;
