@@ -89,6 +89,9 @@ pub enum BackendKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState { Starting, Running, Stopping, Exited, Failed }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ShutdownPolicy { pub graceful: std::time::Duration, pub serialization: std::time::Duration }
+
 impl ProcessState {
     #[must_use]
     pub const fn is_terminal(self) -> bool { matches!(self, Self::Exited | Self::Failed) }
