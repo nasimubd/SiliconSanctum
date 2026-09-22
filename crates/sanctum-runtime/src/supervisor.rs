@@ -195,6 +195,17 @@ impl ProcessSignal {
     }
 }
 
+fn send_signal(pid: u32, signal: ProcessSignal) -> Result<(), SupervisorError> {
+    let result = unsafe { libc::kill(pid as libc::pid_t, signal.number()) };
+    if result == 0 {
+        return Ok(());
+    }
+    Err(SupervisorError::ProcessIo {
+        operation: "signal",
+        source: std::io::Error::last_os_error(),
+    })
+}
+
 #[derive(Debug)]
 pub struct SupervisedChild {
     child: tokio::process::Child,
