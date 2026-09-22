@@ -99,6 +99,7 @@ pub struct ProcessSpec {
     pub model: ModelPath,
     pub arguments: Vec<String>,
     pub environment: Vec<EnvironmentEntry>,
+    pub working_directory: Option<std::path::PathBuf>,
 }
 
 impl ProcessSpec {
@@ -110,6 +111,7 @@ impl ProcessSpec {
             model,
             arguments: Vec::new(),
             environment: Vec::new(),
+            working_directory: None,
         }
     }
 
@@ -121,6 +123,7 @@ impl ProcessSpec {
             model,
             arguments: Vec::new(),
             environment: Vec::new(),
+            working_directory: None,
         }
     }
 }
