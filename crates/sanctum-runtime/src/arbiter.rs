@@ -21,4 +21,9 @@ impl MemorySnapshot {
             swap_used_bytes,
         }
     }
+
+    #[must_use]
+    pub const fn wired_bytes(self) -> u64 {
+        self.wired_bytes
+    }
 }
