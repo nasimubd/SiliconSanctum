@@ -513,4 +513,7 @@ impl RadixCache {
     }
 }
 
-pub struct RadixMarker;
+#[must_use]
+pub fn estimated_token_bytes(tokens: usize, bytes_per_token: usize) -> usize {
+    tokens.saturating_mul(bytes_per_token)
+}
