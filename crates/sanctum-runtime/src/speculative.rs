@@ -36,4 +36,13 @@ impl DraftModel {
   Ok(Self{name:name.into(),parameters})
  }
 }
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct TargetModel{pub name:String,pub parameters:ParameterCount}
+impl TargetModel{
+ pub const MIN_PARAMETERS:u64=7_000_000_000;
+ pub fn new(name:impl Into<String>,parameters:ParameterCount)->Result<Self,SpeculativeError>{
+  if parameters.get()<Self::MIN_PARAMETERS{return Err(SpeculativeError::TargetModelTooSmall(parameters.get()));}
+  Ok(Self{name:name.into(),parameters})
+ }
+}
 // NEXT
