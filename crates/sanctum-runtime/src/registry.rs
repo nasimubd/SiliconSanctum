@@ -233,4 +233,25 @@ pub struct ContextPlan {
     pub total_bytes: u64,
 }
 
+impl ModelEntry {
+    #[must_use]
+    pub fn plan_with_budget(&self, budget_bytes: u64) -> Option<ContextPlan> {
+        self.contexts
+            .levels()
+            .iter()
+            .rev()
+            .copied()
+            .find_map(|tokens| {
+                let kv_cache_bytes = self.kv_bytes_for(tokens);
+                let total_bytes = self.weights_bytes.saturating_add(kv_cache_bytes);
+                (total_bytes <= budget_bytes).then_some(ContextPlan {
+                    context_tokens: tokens,
+                    weights_bytes: self.weights_bytes,
+                    kv_cache_bytes,
+                    total_bytes,
+                })
+            })
+    }
+}
+
 pub struct RegistryMarker;
