@@ -461,4 +461,14 @@ impl Choice {
     }
 }
 
+impl Choice {
+    #[must_use]
+    pub fn probability(&self, id: &str) -> Option<f64> {
+        self.items
+            .iter()
+            .find(|item| item.id.as_str() == id)
+            .map(|item| item.probability)
+    }
+}
+
 pub struct DecisionMarker;
