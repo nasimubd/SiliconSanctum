@@ -172,4 +172,11 @@ pub enum PluginStatus {
     Internal,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PluginResponse {
+    pub request_id: String,
+    pub status: PluginStatus,
+    pub payload: Vec<u8>,
+}
+
 pub struct PluginMarker;
