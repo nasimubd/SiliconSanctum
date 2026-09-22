@@ -389,6 +389,18 @@ pub struct ArbiterState {
     pub last_decision: ArbiterDecision,
 }
 
+impl ArbiterState {
+    #[must_use]
+    pub fn new(snapshot: MemorySnapshot) -> Self {
+        Self {
+            snapshot,
+            pressure: PressureLevel::Normal,
+            models: Vec::new(),
+            last_decision: ArbiterDecision::hold(),
+        }
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
