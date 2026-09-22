@@ -42,4 +42,13 @@ pub struct AxisEvaluation {
     confidence: f64,
 }
 
+impl AxisEvaluation {
+    pub fn new(axis: EvaluationAxis, confidence: f64) -> Result<Self, RouterError> {
+        if !confidence.is_finite() || !(0.0..=1.0).contains(&confidence) {
+            return Err(RouterError::ProbabilityOutOfRange);
+        }
+        Ok(Self { axis, confidence })
+    }
+}
+
 pub struct RouterMarker;
