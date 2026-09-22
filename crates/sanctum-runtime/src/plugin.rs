@@ -131,4 +131,11 @@ impl PluginManifest {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PluginRequest {
+    pub request_id: String,
+    pub capability: String,
+    pub payload: Vec<u8>,
+}
+
 pub struct PluginMarker;
