@@ -58,4 +58,10 @@ mod tests {
     fn rejects_relative_executable_path() {
         assert!(matches!(ExecutablePath::new("bin/server"), Err(SupervisorError::RelativePath { field: "executable", .. })));
     }
+
+    #[test]
+    fn accepts_absolute_executable_path() {
+        let path = ExecutablePath::new("/usr/bin/true").unwrap();
+        assert_eq!(path.as_path(), std::path::Path::new("/usr/bin/true"));
+    }
 }
