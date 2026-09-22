@@ -66,4 +66,9 @@ impl Quantization {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ContextLadder {
+    levels: Vec<u32>,
+}
+
 pub struct RegistryMarker;
