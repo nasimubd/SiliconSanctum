@@ -211,4 +211,11 @@ impl ModelRegistry {
     }
 }
 
+impl ModelRegistry {
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+}
+
 pub struct RegistryMarker;
