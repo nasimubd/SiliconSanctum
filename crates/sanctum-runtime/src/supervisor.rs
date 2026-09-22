@@ -106,4 +106,10 @@ mod tests {
         let path = ModelPath::new("/Volumes/models/model.gguf").unwrap();
         assert_eq!(path.as_path(), std::path::Path::new("/Volumes/models/model.gguf"));
     }
+
+    #[test]
+    fn constructs_llama_server_specification() {
+        let spec = super::ProcessSpec::llama_server(ExecutablePath::new("/bin/server").unwrap(), ModelPath::new("/models/a.gguf").unwrap());
+        assert_eq!(spec.backend, BackendKind::LlamaServer);
+    }
 }
