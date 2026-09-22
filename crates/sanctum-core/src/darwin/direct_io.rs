@@ -152,6 +152,37 @@ impl DirectModelFile {
             Ok(())
         }
     }
+
+    /// Reads bytes at an absolute model-file offset without changing file position.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the offset cannot be represented or `pread` fails.
+    pub fn read_at(&self, buffer: &mut [u8], offset: u64) -> Result<usize, DirectIoError> {
+        let native_offset =
+            libc::off_t::try_from(offset).map_err(|_| DirectIoError::OffsetOverflow { offset })?;
+        loop {
+            // SAFETY: the descriptor is live and buffer is writable for its full length.
+            let count = unsafe {
+                libc::pread(
+                    self.raw_fd(),
+                    buffer.as_mut_ptr().cast(),
+                    buffer.len(),
+                    native_offset,
+                )
+            };
+            if count >= 0 {
+                return usize::try_from(count).map_err(|_| DirectIoError::Read {
+                    offset,
+                    source: std::io::Error::other("pread returned an invalid byte count"),
+                });
+            }
+            let source = std::io::Error::last_os_error();
+            if source.kind() != std::io::ErrorKind::Interrupted {
+                return Err(DirectIoError::Read { offset, source });
+            }
+        }
+    }
 }
 
 #[cfg(test)]
