@@ -157,6 +157,14 @@ impl<B: SysctlWrite> WiredLimitGuard<'_, B> {
     }
 }
 
+impl<B: SysctlWrite> Drop for WiredLimitGuard<'_, B> {
+    fn drop(&mut self) {
+        if self.armed {
+            let _ = set_wired_limit_mb(self.backend, self.previous_mb);
+        }
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
