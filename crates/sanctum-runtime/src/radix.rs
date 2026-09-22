@@ -480,4 +480,15 @@ pub struct EvictionOutcome {
     pub bytes_reclaimed: usize,
 }
 
+impl RadixCache {
+    pub fn evict_all(&mut self) -> EvictionOutcome {
+        let outcome = EvictionOutcome {
+            entries_removed: self.stats.entries,
+            bytes_reclaimed: self.stats.bytes,
+        };
+        self.clear();
+        outcome
+    }
+}
+
 pub struct RadixMarker;
