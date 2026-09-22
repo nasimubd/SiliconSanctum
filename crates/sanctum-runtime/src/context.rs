@@ -424,4 +424,16 @@ pub struct CompressionMetrics {
     pub summary_bytes: usize,
 }
 
+impl CompressionMetrics {
+    #[allow(clippy::cast_precision_loss)]
+    #[must_use]
+    pub fn ratio(self) -> f64 {
+        if self.original_bytes == 0 {
+            0.0
+        } else {
+            1.0 - self.summary_bytes as f64 / self.original_bytes as f64
+        }
+    }
+}
+
 pub struct ContextMarker;
