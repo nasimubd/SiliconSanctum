@@ -75,6 +75,31 @@ impl SysctlRead for NativeSysctl {
     }
 }
 
+#[cfg(target_os = "macos")]
+impl SysctlWrite for NativeSysctl {
+    fn write(&self, key: &str, value: &[u8]) -> Result<(), SysctlError> {
+        let native_key = key_c_string(key)?;
+        // SAFETY: the key is NUL terminated and `value` is readable for its length.
+        let result = unsafe {
+            libc::sysctlbyname(
+                native_key.as_ptr(),
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+                value.as_ptr().cast_mut().cast(),
+                value.len(),
+            )
+        };
+        if result == -1 {
+            return Err(SysctlError::Operation {
+                operation: "write",
+                key: key.into(),
+                source: std::io::Error::last_os_error(),
+            });
+        }
+        Ok(())
+    }
+}
+
 fn decode_u64(key: &str, bytes: &[u8]) -> Result<u64, SysctlError> {
     let value: [u8; size_of::<u64>()] =
         bytes.try_into().map_err(|_| SysctlError::InvalidWidth {
