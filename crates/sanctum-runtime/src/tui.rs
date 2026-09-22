@@ -38,3 +38,5 @@ pub enum DashboardTab{Overview,Memory,Compute}
 impl DashboardTab{pub const fn next(self)->Self{match self{Self::Overview=>Self::Memory,Self::Memory=>Self::Compute,Self::Compute=>Self::Overview}}}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum DashboardFocus{Metrics,History,Help}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub enum DashboardCommand{Quit,TogglePause,NextTab,Refresh,Ignore}
