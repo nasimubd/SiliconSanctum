@@ -103,7 +103,7 @@ impl std::fmt::Display for BackendKind {
 
 #[cfg(test)]
 mod tests {
-    use super::{BackendKind, EnvironmentEntry, ExecutablePath, ModelPath, SupervisorError};
+    use super::{BackendKind, EnvironmentEntry, ExecutablePath, ModelPath, ProcessState, SupervisorError};
 
     #[test]
     fn formats_llama_server_backend() {
@@ -152,4 +152,5 @@ mod tests {
     #[test] fn rejects_nul_environment_key() { assert!(EnvironmentEntry::new("A\0B", "x").is_err()); }
     #[test] fn rejects_nul_environment_value() { assert!(EnvironmentEntry::new("A", "x\0y").is_err()); }
     #[test] fn accepts_valid_environment_entry() { let entry = EnvironmentEntry::new("MODEL_HOME", "/models").unwrap(); assert_eq!((entry.key(), entry.value()), ("MODEL_HOME", "/models")); }
+    #[test] fn running_state_is_not_terminal() { assert!(!ProcessState::Running.is_terminal()); }
 }
