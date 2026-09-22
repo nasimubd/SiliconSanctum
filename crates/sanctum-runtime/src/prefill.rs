@@ -277,4 +277,19 @@ impl PrefillScheduler {
     pub const fn comfortable_step(&self) -> PrefillStep {
         PrefillStep::Tokens1024
     }
+
+    #[must_use]
+    pub const fn select_step(
+        &self,
+        request: PrefillRequest,
+        memory: MemorySnapshot,
+    ) -> PrefillStep {
+        if request.tokens.get() <= 512
+            || memory.available_bytes() < self.policy.thresholds.comfortable_bytes
+        {
+            self.constrained_step()
+        } else {
+            self.comfortable_step()
+        }
+    }
 }
