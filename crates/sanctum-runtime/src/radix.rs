@@ -188,4 +188,21 @@ pub struct RadixCache {
     sessions: std::collections::HashMap<SessionId, TokenSequence>,
 }
 
+impl RadixCache {
+    #[must_use]
+    pub fn new(capacity: CacheCapacity) -> Self {
+        Self {
+            root: RadixNode::default(),
+            capacity,
+            stats: CacheStats {
+                nodes: 1,
+                ..CacheStats::default()
+            },
+            next_handle: 1,
+            clock: 0,
+            sessions: std::collections::HashMap::new(),
+        }
+    }
+}
+
 pub struct RadixMarker;
