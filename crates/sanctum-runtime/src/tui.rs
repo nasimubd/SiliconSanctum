@@ -24,3 +24,6 @@ pub struct Utilization(f32);
 impl Utilization{pub fn new(value:f32)->Result<Self,DashboardError>{if !value.is_finite()||!(0.0..=1.0).contains(&value){return Err(DashboardError::InvalidPercentage);}Ok(Self(value))}pub const fn get(self)->f32{self.0}}
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub struct CpuTelemetry{pub performance:Utilization,pub efficiency:Utilization}
+#[derive(Debug,Clone,Copy,PartialEq)]
+pub struct KvResidency{pub occupied:u16,pub capacity:u16}
+impl KvResidency{pub fn ratio(self)->f32{if self.capacity==0{0.0}else{f32::from(self.occupied)/f32::from(self.capacity)}}}
