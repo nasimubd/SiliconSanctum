@@ -65,4 +65,12 @@ impl SessionId {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AttentionArchitecture {
+    Full,
+    SlidingWindow,
+    Recurrent,
+    Hybrid,
+}
+
 pub struct RadixMarker;
