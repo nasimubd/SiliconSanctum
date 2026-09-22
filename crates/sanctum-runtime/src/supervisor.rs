@@ -187,6 +187,20 @@ pub struct SupervisedChild {
 }
 
 impl SupervisedChild {
+    pub fn spawn(spec: &ProcessSpec) -> Result<Self, SupervisorError> {
+        let child = build_command(spec)
+            .spawn()
+            .map_err(|source| SupervisorError::ProcessIo {
+                operation: "spawn",
+                source,
+            })?;
+        Ok(Self {
+            child,
+            backend: spec.backend,
+            state: ProcessState::Running,
+        })
+    }
+
     #[must_use]
     pub fn id(&self) -> Option<u32> {
         self.child.id()
