@@ -113,7 +113,13 @@ impl Drop for AlignedBuffer {
 
 #[cfg(test)]
 mod tests {
-    use super::{DirectIoError, validate_layout};
+    use super::{AlignedBuffer, DirectIoError, validate_layout};
+
+    #[test]
+    fn allocation_honors_sixteen_kibibyte_alignment() {
+        let buffer = AlignedBuffer::new(16_384, 16_384).unwrap();
+        assert_eq!(buffer.as_slice().as_ptr().addr() % 16_384, 0);
+    }
 
     #[test]
     fn rejects_non_power_of_two_alignment() {
