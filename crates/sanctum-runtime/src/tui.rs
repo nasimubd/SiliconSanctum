@@ -29,6 +29,7 @@ pub struct CpuTelemetry{pub performance:Utilization,pub efficiency:Utilization}
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub struct KvResidency{pub occupied:u16,pub capacity:u16}
 impl KvResidency{pub fn new(occupied:u16,capacity:u16)->Result<Self,DashboardError>{if capacity==0||occupied>capacity{return Err(DashboardError::InvalidMetric);}Ok(Self{occupied,capacity})}pub fn ratio(self)->f32{if self.capacity==0{0.0}else{f32::from(self.occupied)/f32::from(self.capacity)}}}
+impl KvResidency{pub fn severity(self)->MetricSeverity{severity(f64::from(self.ratio()))}}
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct ActiveProfile(String);
 impl ActiveProfile{pub fn new(value:impl Into<String>)->Result<Self,DashboardError>{let value=value.into();if value.trim().is_empty(){return Err(DashboardError::EmptyProfile);}Ok(Self(value))}pub fn as_str(&self)->&str{&self.0}}
