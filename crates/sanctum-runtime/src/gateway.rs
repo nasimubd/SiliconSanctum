@@ -130,4 +130,9 @@ impl PatternSet {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct ArithmeticDetector {
+    patterns: PatternSet,
+}
+
 pub struct GatewayMarker;
