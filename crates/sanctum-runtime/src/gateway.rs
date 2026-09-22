@@ -325,4 +325,11 @@ impl EscalationPolicy {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GatewayPath {
+    SystemOne,
+    DeterministicInterpreter,
+    HeavyReasoningModel,
+}
+
 pub struct GatewayMarker;
