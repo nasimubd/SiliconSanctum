@@ -160,6 +160,7 @@ pub fn build_command(spec: &ProcessSpec) -> tokio::process::Command {
     }
     command.stdin(std::process::Stdio::null());
     command.stdout(std::process::Stdio::piped());
+    command.stderr(std::process::Stdio::piped());
     command
 }
 
