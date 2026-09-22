@@ -448,4 +448,17 @@ impl Choice {
     }
 }
 
+impl Choice {
+    /// # Panics
+    ///
+    /// Panics only if the validated distribution invariant is violated.
+    #[must_use]
+    pub fn winner(&self) -> &ChoiceItem {
+        self.items
+            .iter()
+            .max_by(|a, b| a.probability.total_cmp(&b.probability))
+            .expect("validated choice is nonempty")
+    }
+}
+
 pub struct DecisionMarker;
