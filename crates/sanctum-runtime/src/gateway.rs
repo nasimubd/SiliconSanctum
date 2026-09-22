@@ -392,4 +392,11 @@ impl GatewayMetrics {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum GatewayEvent {
+    Inspected,
+    Bypassed(BypassReason),
+    Forwarded,
+}
+
 pub struct GatewayMarker;
