@@ -150,3 +150,12 @@ impl TuningThresholds {
         })
     }
 }
+
+impl Default for TuningThresholds {
+    fn default() -> Self {
+        Self {
+            constrained_bytes: 512 * 1024 * 1024,
+            comfortable_bytes: 2 * 1024 * 1024 * 1024,
+        }
+    }
+}
