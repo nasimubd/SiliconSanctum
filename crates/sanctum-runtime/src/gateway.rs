@@ -345,4 +345,10 @@ impl GatewayDecision {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct SystemOneGateway {
+    filter: JaggednessFilter,
+    policy: EscalationPolicy,
+}
+
 pub struct GatewayMarker;
