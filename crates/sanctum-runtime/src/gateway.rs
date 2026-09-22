@@ -206,4 +206,20 @@ pub struct TemporalDetector {
     patterns: PatternSet,
 }
 
+impl Default for TemporalDetector {
+    fn default() -> Self {
+        Self {
+            patterns: PatternSet::new(vec![
+                "before".into(),
+                "after".into(),
+                "earlier".into(),
+                "later".into(),
+                "from now".into(),
+                "ago".into(),
+            ])
+            .expect("static patterns"),
+        }
+    }
+}
+
 pub struct GatewayMarker;
