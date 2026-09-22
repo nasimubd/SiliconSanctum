@@ -92,4 +92,7 @@ pub struct CycleOutcome{pub proposal:DraftProposal,pub verification:Verification
 impl CycleOutcome{pub fn emitted_tokens(&self)->usize{self.verification.emitted_tokens()}}
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct DecoderConfig{pub draft:DraftModel,pub target:TargetModel,pub capacity:ContextCapacity}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct SessionState{pub position:ContextPosition,pub emitted:u64}
+impl SessionState{pub fn new(capacity:ContextCapacity)->Self{Self{position:ContextPosition::new(0,capacity).expect("zero position"),emitted:0}}}
 // NEXT
