@@ -272,6 +272,15 @@ mod tests {
         assert_eq!(spec.backend, BackendKind::MlxLm);
     }
     #[test]
+    fn appends_process_argument() {
+        let spec = super::ProcessSpec::llama_server(
+            ExecutablePath::new("/bin/server").unwrap(),
+            ModelPath::new("/models/a.gguf").unwrap(),
+        )
+        .with_argument("--port");
+        assert_eq!(spec.arguments, ["--port"]);
+    }
+    #[test]
     fn rejects_environment_assignment_key() {
         assert!(EnvironmentEntry::new("A=B", "x").is_err());
     }
