@@ -236,4 +236,14 @@ pub struct QuerySpec {
     source: String,
 }
 
+impl QuerySpec {
+    pub fn new(source: impl Into<String>) -> Result<Self, ContextError> {
+        let source = source.into();
+        if source.trim().is_empty() {
+            return Err(ContextError::EmptyQuery);
+        }
+        Ok(Self { source })
+    }
+}
+
 pub struct ContextMarker;
