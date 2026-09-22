@@ -39,6 +39,12 @@ pub struct SchedulerMetrics {
     pub selected_1024: u64,
 }
 
+impl SchedulerMetrics {
+    pub fn record_request(&mut self) {
+        self.requests = self.requests.saturating_add(1);
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TokenCount(usize);
 
