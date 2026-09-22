@@ -225,6 +225,12 @@ impl MemoryBudget {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BudgetRequest {
+    pub model_bytes: u64,
+    pub requested_kv_bytes: u64,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
