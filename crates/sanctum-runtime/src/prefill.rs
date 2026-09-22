@@ -91,6 +91,11 @@ impl PrefillEventLog {
         }
         self.events.push_back(event);
     }
+
+    #[must_use]
+    pub fn events(&self) -> &std::collections::VecDeque<PrefillEvent> {
+        &self.events
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
