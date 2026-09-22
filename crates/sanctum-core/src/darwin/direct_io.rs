@@ -187,7 +187,23 @@ impl DirectModelFile {
 
 #[cfg(test)]
 mod tests {
-    use super::{AlignedBuffer, DirectIoError, validate_layout};
+    use super::{AlignedBuffer, DirectIoError, DirectModelFile, validate_layout};
+
+    fn model_fixture(bytes: &[u8]) -> tempfile::NamedTempFile {
+        use std::io::Write;
+        let mut fixture = tempfile::NamedTempFile::new().unwrap();
+        fixture.write_all(bytes).unwrap();
+        fixture
+    }
+
+    #[test]
+    fn positional_read_starts_at_requested_offset() {
+        let fixture = model_fixture(b"abcdefgh");
+        let model = DirectModelFile::open(fixture.path()).unwrap();
+        let mut buffer = [0; 3];
+        assert_eq!(model.read_at(&mut buffer, 2).unwrap(), 3);
+        assert_eq!(&buffer, b"cde");
+    }
 
     #[test]
     fn allocation_honors_sixteen_kibibyte_alignment() {
