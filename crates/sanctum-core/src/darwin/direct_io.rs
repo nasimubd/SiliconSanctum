@@ -130,6 +130,12 @@ pub trait SharedMetalBuffer {
     fn writable_bytes(&mut self) -> &mut [u8];
 }
 
+impl SharedMetalBuffer for AlignedBuffer {
+    fn writable_bytes(&mut self) -> &mut [u8] {
+        self.as_mut_slice()
+    }
+}
+
 impl ChunkRange {
     #[must_use]
     pub fn end(self) -> Option<u64> {
