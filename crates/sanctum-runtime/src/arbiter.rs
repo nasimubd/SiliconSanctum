@@ -281,6 +281,33 @@ impl DecisionEngine {
     }
 }
 
+impl DecisionEngine {
+    #[must_use]
+    pub const fn evaluate(
+        self,
+        snapshot: MemorySnapshot,
+        pressure: PressureLevel,
+        has_evicted: bool,
+    ) -> ArbiterDecision {
+        if snapshot.swap_used_bytes > 0 {
+            return ArbiterDecision::evict(DecisionReason::SwapDetected);
+        }
+        if matches!(pressure, PressureLevel::Critical) {
+            return ArbiterDecision::evict(DecisionReason::PressureCritical);
+        }
+        if snapshot.wired_bytes >= self.policy.eviction_threshold() {
+            return ArbiterDecision::evict(DecisionReason::WiredCeiling);
+        }
+        if matches!(pressure, PressureLevel::Warning) {
+            return ArbiterDecision::evict(DecisionReason::PressureWarning);
+        }
+        if has_evicted && snapshot.wired_bytes <= self.policy.reload_threshold() {
+            return ArbiterDecision::reload();
+        }
+        ArbiterDecision::hold()
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
