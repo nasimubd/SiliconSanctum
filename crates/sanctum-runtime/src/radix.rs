@@ -114,4 +114,13 @@ impl CacheCapacity {
     }
 }
 
+impl Default for CacheCapacity {
+    fn default() -> Self {
+        Self {
+            max_nodes: 65_536,
+            max_bytes: 512 * 1024 * 1024,
+        }
+    }
+}
+
 pub struct RadixMarker;
