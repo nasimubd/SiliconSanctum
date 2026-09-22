@@ -133,4 +133,15 @@ impl RouteDecision {
     }
 }
 
+impl RouteDecision {
+    #[must_use]
+    pub const fn speculative(c: f64) -> Self {
+        Self {
+            destination: RouteDestination::SpeculativePipeline,
+            reason: RouteReason::ModerateCertainty,
+            confidence: c,
+        }
+    }
+}
+
 pub struct RouterMarker;
