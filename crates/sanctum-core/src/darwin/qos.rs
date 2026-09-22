@@ -8,6 +8,12 @@ pub struct QosError {
     pub code: i32,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(transparent)]
+pub struct QosClass(pub u32);
+
+pub const QOS_CLASS_USER_INTERACTIVE: QosClass = QosClass(0x21);
+
 #[cfg(test)]
 mod tests {
     use super::QosError;
