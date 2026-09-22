@@ -44,4 +44,13 @@ pub enum ModelFormat {
     Safetensors,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Quantization {
+    F16,
+    Q8,
+    Q6,
+    Q5,
+    Q4,
+}
+
 pub struct RegistryMarker;
