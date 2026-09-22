@@ -121,6 +121,22 @@ pub fn set_wired_limit_mb(
     backend.write(IOGPU_WIRED_LIMIT_KEY, &limit_mb.to_ne_bytes())
 }
 
+pub struct WiredLimitGuard<'a, B: SysctlWrite> {
+    backend: &'a B,
+    previous_mb: u64,
+    armed: bool,
+}
+
+impl<B: SysctlWrite> std::fmt::Debug for WiredLimitGuard<'_, B> {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("WiredLimitGuard")
+            .field("previous_mb", &self.previous_mb)
+            .field("armed", &self.armed)
+            .finish_non_exhaustive()
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
