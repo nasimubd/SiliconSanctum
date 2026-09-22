@@ -21,3 +21,13 @@ pub const fn decode_pressure(flags: usize) -> MemoryPressure {
         MemoryPressure::Normal
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{MemoryPressure, PRESSURE_NORMAL, decode_pressure};
+
+    #[test]
+    fn decodes_normal_event() {
+        assert_eq!(decode_pressure(PRESSURE_NORMAL), MemoryPressure::Normal);
+    }
+}
