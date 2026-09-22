@@ -140,4 +140,12 @@ impl PrefixMatch {
     }
 }
 
+#[derive(Debug, Default)]
+pub struct RadixNode {
+    children: std::collections::BTreeMap<TokenId, RadixNode>,
+    handle: Option<CacheHandle>,
+    bytes: usize,
+    last_used: u64,
+}
+
 pub struct RadixMarker;
