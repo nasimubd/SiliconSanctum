@@ -261,3 +261,10 @@ impl PrefillPlan {
 pub struct PrefillScheduler {
     policy: TuningPolicy,
 }
+
+impl PrefillScheduler {
+    #[must_use]
+    pub const fn new(policy: TuningPolicy) -> Self {
+        Self { policy }
+    }
+}
