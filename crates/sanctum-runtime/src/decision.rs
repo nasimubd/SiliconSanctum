@@ -565,4 +565,11 @@ impl ScoreRubric {
     }
 }
 
+impl ScoreRubric {
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.points.is_empty()
+    }
+}
+
 pub struct DecisionMarker;
