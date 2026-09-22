@@ -196,3 +196,20 @@ pub struct PrefillRequest {
     pub geometry: ModelGeometry,
     pub quantization: KvQuantization,
 }
+
+impl PrefillRequest {
+    pub const fn new(
+        tokens: TokenCount,
+        geometry: ModelGeometry,
+        quantization: KvQuantization,
+    ) -> Result<Self, PrefillError> {
+        if tokens.get() == 0 {
+            return Err(PrefillError::EmptyRequest);
+        }
+        Ok(Self {
+            tokens,
+            geometry,
+            quantization,
+        })
+    }
+}
