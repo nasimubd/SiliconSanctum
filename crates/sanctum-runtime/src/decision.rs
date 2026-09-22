@@ -308,4 +308,13 @@ pub fn stable_sigmoid(logit: f64) -> f64 {
     }
 }
 
+impl Noul {
+    pub fn from_logit(logit: f64) -> Result<Self, DecisionError> {
+        if !logit.is_finite() {
+            return Err(DecisionError::NonFiniteLogit);
+        }
+        Self::new(stable_sigmoid(logit))
+    }
+}
+
 pub struct DecisionMarker;
