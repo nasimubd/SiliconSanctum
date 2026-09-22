@@ -340,4 +340,11 @@ impl ModelPair {
     }
 }
 
+impl ModelPair {
+    #[must_use]
+    pub fn target(&self) -> &str {
+        &self.target
+    }
+}
+
 pub struct RouterMarker;
