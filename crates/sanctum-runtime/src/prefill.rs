@@ -105,6 +105,20 @@ pub enum MemoryPressure {
     Critical,
 }
 
+impl TuningThresholds {
+    #[must_use]
+    pub const fn pressure(self, memory: MemorySnapshot) -> MemoryPressure {
+        let available = memory.available_bytes();
+        if available < self.constrained_bytes {
+            MemoryPressure::Critical
+        } else if available < self.comfortable_bytes {
+            MemoryPressure::Warning
+        } else {
+            MemoryPressure::Normal
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TokenCount(usize);
 
