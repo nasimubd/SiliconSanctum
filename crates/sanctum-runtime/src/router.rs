@@ -333,4 +333,11 @@ impl ModelPair {
     }
 }
 
+impl ModelPair {
+    #[must_use]
+    pub fn draft(&self) -> &str {
+        &self.draft
+    }
+}
+
 pub struct RouterMarker;
