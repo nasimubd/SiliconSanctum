@@ -286,6 +286,8 @@ impl DirectModelFile {
 
 #[cfg(test)]
 mod tests {
+    use proptest::prelude::*;
+
     use super::{AlignedBuffer, DirectIoError, DirectModelFile, validate_layout};
 
     fn model_fixture(bytes: &[u8]) -> tempfile::NamedTempFile {
@@ -375,6 +377,15 @@ mod tests {
             super::read_chunks_bounded(&model, &[], 0),
             Err(DirectIoError::InvalidWorkerLimit)
         ));
+    }
+
+    proptest! {
+        #[test]
+        fn aligned_allocations_hold_for_fuzzed_lengths(length in 0_usize..131_072) {
+            let buffer = AlignedBuffer::new(length, 16_384).unwrap();
+            prop_assert_eq!(buffer.as_slice().as_ptr().addr() % 16_384, 0);
+            prop_assert_eq!(buffer.len(), length);
+        }
     }
 
     #[test]
