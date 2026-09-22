@@ -76,6 +76,28 @@ pub struct ModelFootprint {
     pub residency: ModelResidency,
 }
 
+impl ModelFootprint {
+    pub fn new(
+        id: ModelId,
+        weights_bytes: u64,
+        kv_bytes: u64,
+        priority: u8,
+    ) -> Result<Self, ArbiterError> {
+        if weights_bytes == 0 {
+            return Err(ArbiterError::ZeroValue {
+                field: "weights_bytes",
+            });
+        }
+        Ok(Self {
+            id,
+            weights_bytes,
+            kv_bytes,
+            priority,
+            residency: ModelResidency::Resident,
+        })
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
