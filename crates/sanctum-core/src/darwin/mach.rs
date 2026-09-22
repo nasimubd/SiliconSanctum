@@ -89,6 +89,17 @@ pub fn native_vm_counters() -> Result<VmPageCounters, MachTelemetryError> {
     })
 }
 
+#[cfg(target_os = "macos")]
+impl MachHost for NativeMachHost {
+    fn page_size(&self) -> Result<u64, MachTelemetryError> {
+        Ok(native_page_size())
+    }
+
+    fn vm_counters(&self) -> Result<VmPageCounters, MachTelemetryError> {
+        native_vm_counters()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::MachTelemetryError;
