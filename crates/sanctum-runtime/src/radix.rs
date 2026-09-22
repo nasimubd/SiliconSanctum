@@ -123,4 +123,7 @@ impl Default for CacheCapacity {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CacheHandle(pub u64);
+
 pub struct RadixMarker;
