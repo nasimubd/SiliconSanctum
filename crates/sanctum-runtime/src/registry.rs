@@ -71,4 +71,23 @@ pub struct ContextLadder {
     levels: Vec<u32>,
 }
 
+impl ContextLadder {
+    pub fn new(levels: Vec<u32>) -> Result<Self, RegistryError> {
+        if levels.is_empty() {
+            return Err(RegistryError::EmptyField {
+                field: "context_ladder",
+            });
+        }
+        if levels.contains(&0) {
+            return Err(RegistryError::ZeroValue {
+                field: "context_tokens",
+            });
+        }
+        if !levels.windows(2).all(|pair| pair[0] < pair[1]) {
+            return Err(RegistryError::UnorderedContextLadder);
+        }
+        Ok(Self { levels })
+    }
+}
+
 pub struct RegistryMarker;
