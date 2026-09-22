@@ -69,6 +69,8 @@ against the caller's memory budget.
 | Fuzzing | libFuzzer targets for layouts, telemetry arithmetic, and sysctl payloads |
 | Toolchain | rustfmt, Cargo check, Clippy with warnings denied, and Cargo test |
 
-The live tests are compiled only for macOS. CI runs the complete suite on an
-Apple Silicon `macos-14` runner so the Darwin FFI paths are compiled and invoked.
-CI also performs a bounded smoke run of every fuzz target under nightly Rust.
+The live tests are compiled only for macOS. CI runs them on a `macos-14` runner
+so the Darwin FFI paths are compiled and invoked. Native Metal tests execute when
+the host exposes a default Metal device and otherwise skip; an Apple Silicon host
+is required for hardware-backed validation. CI also performs a bounded smoke run
+of every fuzz target under nightly Rust.
