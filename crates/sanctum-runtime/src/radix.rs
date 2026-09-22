@@ -162,4 +162,11 @@ impl RadixNode {
     }
 }
 
+impl RadixNode {
+    #[must_use]
+    pub const fn stored_bytes(&self) -> usize {
+        self.bytes
+    }
+}
+
 pub struct RadixMarker;
