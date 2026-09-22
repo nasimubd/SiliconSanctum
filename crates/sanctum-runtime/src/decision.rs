@@ -341,4 +341,11 @@ impl Noul {
     }
 }
 
+impl TryFrom<f64> for Noul {
+    type Error = DecisionError;
+    fn try_from(value: f64) -> Result<Self, Self::Error> {
+        Self::new(value)
+    }
+}
+
 pub struct DecisionMarker;
