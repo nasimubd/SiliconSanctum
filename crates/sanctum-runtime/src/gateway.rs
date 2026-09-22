@@ -243,4 +243,21 @@ pub struct JaggednessFilter {
     temporal: TemporalDetector,
 }
 
+impl JaggednessFilter {
+    #[must_use]
+    pub fn inspect(&self, p: &GatewayPrompt) -> JaggednessReport {
+        let mut r = JaggednessReport::clear();
+        for e in self
+            .arithmetic
+            .detect(p)
+            .into_iter()
+            .chain(self.counting.detect(p))
+            .chain(self.temporal.detect(p))
+        {
+            r.push(e);
+        }
+        r
+    }
+}
+
 pub struct GatewayMarker;
