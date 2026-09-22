@@ -319,4 +319,18 @@ pub struct ModelPair {
     target: String,
 }
 
+impl ModelPair {
+    pub fn new(d: impl Into<String>, t: impl Into<String>) -> Result<Self, RouterError> {
+        let d = d.into();
+        let t = t.into();
+        if d.trim().is_empty() || t.trim().is_empty() {
+            return Err(RouterError::EmptyRouteTarget);
+        }
+        Ok(Self {
+            draft: d,
+            target: t,
+        })
+    }
+}
+
 pub struct RouterMarker;
