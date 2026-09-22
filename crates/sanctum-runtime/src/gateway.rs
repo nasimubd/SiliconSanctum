@@ -358,4 +358,19 @@ impl SystemOneGateway {
     }
 }
 
+impl SystemOneGateway {
+    #[must_use]
+    pub fn decide(&self, p: &GatewayPrompt) -> GatewayDecision {
+        let report = self.filter.inspect(p);
+        let path = match self.policy.decide(&report).map(|v| v.target) {
+            Some(EscalationTarget::DeterministicInterpreter) => {
+                GatewayPath::DeterministicInterpreter
+            }
+            Some(EscalationTarget::HeavyReasoningModel) => GatewayPath::HeavyReasoningModel,
+            None => GatewayPath::SystemOne,
+        };
+        GatewayDecision { path, report }
+    }
+}
+
 pub struct GatewayMarker;
