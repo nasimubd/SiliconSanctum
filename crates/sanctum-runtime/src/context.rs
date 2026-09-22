@@ -74,4 +74,11 @@ impl SourceDocument {
     }
 }
 
+impl SourceDocument {
+    #[must_use]
+    pub const fn language(&self) -> SourceLanguage {
+        self.language
+    }
+}
+
 pub struct ContextMarker;
