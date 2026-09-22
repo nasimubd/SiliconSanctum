@@ -459,6 +459,28 @@ pub struct DaemonConfig {
     pub event_capacity: usize,
 }
 
+impl DaemonConfig {
+    pub fn new(
+        sample_interval: std::time::Duration,
+        event_capacity: usize,
+    ) -> Result<Self, ArbiterError> {
+        if sample_interval.is_zero() {
+            return Err(ArbiterError::ZeroValue {
+                field: "sample_interval",
+            });
+        }
+        if event_capacity == 0 {
+            return Err(ArbiterError::ZeroValue {
+                field: "event_capacity",
+            });
+        }
+        Ok(Self {
+            sample_interval,
+            event_capacity,
+        })
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
