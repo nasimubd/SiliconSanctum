@@ -79,4 +79,6 @@ impl DecisionModelId {
     }
 }
 
+pub const MAX_DECISION_PARAMETERS: u64 = 200_000_000;
+
 pub struct DecisionMarker;
