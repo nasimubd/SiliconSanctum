@@ -42,6 +42,10 @@ pub fn dispatch_pressure(handler: &impl PressureHandler, flags: usize) {
 mod native {
     use std::ffi::{c_long, c_ulong, c_void};
     use std::ptr::NonNull;
+    use std::sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    };
 
     use super::{
         PRESSURE_CRITICAL, PRESSURE_NORMAL, PRESSURE_WARNING, PressureHandler,
@@ -72,19 +76,38 @@ mod native {
     struct CallbackContext {
         source: DispatchObject,
         handler: Box<dyn PressureHandler>,
+        panicked: Arc<AtomicBool>,
+    }
+
+    fn contain_panic(action: impl FnOnce()) -> bool {
+        match std::panic::catch_unwind(std::panic::AssertUnwindSafe(action)) {
+            Ok(()) => false,
+            Err(payload) => {
+                // A custom panic payload may itself panic in Drop. Leaking the
+                // payload keeps unwinding from crossing this C ABI boundary.
+                std::mem::forget(payload);
+                true
+            }
+        }
     }
 
     unsafe extern "C" fn event_handler(context: *mut c_void) {
         // SAFETY: dispatch invokes this only with the context installed below.
         let context = unsafe { &*context.cast::<CallbackContext>() };
+        if context.panicked.load(Ordering::Relaxed) {
+            return;
+        }
         // SAFETY: the source remains retained until after cancellation and finalization.
         let flags = unsafe { dispatch_source_get_data(context.source) };
-        dispatch_pressure(&context.handler, flags);
+        if contain_panic(|| dispatch_pressure(&context.handler, flags)) {
+            context.panicked.store(true, Ordering::Relaxed);
+        }
     }
 
     unsafe extern "C" fn finalize_context(context: *mut c_void) {
         // SAFETY: this reconstructs the single Box transferred to dispatch.
-        drop(unsafe { Box::from_raw(context.cast::<CallbackContext>()) });
+        let owned = unsafe { Box::from_raw(context.cast::<CallbackContext>()) };
+        contain_panic(|| drop(owned));
     }
 
     impl PressureHandler for Box<dyn PressureHandler> {
@@ -95,6 +118,7 @@ mod native {
 
     pub struct MemoryPressureMonitor {
         source: NonNull<c_void>,
+        panicked: Arc<AtomicBool>,
     }
 
     impl MemoryPressureMonitor {
@@ -114,9 +138,11 @@ mod native {
                 )
             };
             let source = NonNull::new(source).ok_or(PressureMonitorError::SourceCreation)?;
+            let panicked = Arc::new(AtomicBool::new(false));
             let context = Box::into_raw(Box::new(CallbackContext {
                 source: source.as_ptr(),
                 handler: Box::new(handler),
+                panicked: Arc::clone(&panicked),
             }));
             // SAFETY: source is owned by this monitor and context is released by its finalizer.
             unsafe {
@@ -125,7 +151,16 @@ mod native {
                 dispatch_source_set_event_handler_f(source.as_ptr(), event_handler);
                 dispatch_activate(source.as_ptr());
             }
-            Ok(Self { source })
+            Ok(Self { source, panicked })
+        }
+
+        /// Reports a handler panic; further delivery is disabled in that case.
+        ///
+        /// The runtime must treat this as a failed pressure monitor. Unwinding
+        /// panics are contained; builds using panic=abort still terminate.
+        #[must_use]
+        pub fn callback_panicked(&self) -> bool {
+            self.panicked.load(Ordering::Relaxed)
         }
 
         pub fn cancel(&self) {
@@ -139,6 +174,15 @@ mod native {
             self.cancel();
             // SAFETY: this releases the monitor's single owning reference.
             unsafe { dispatch_release(self.source.as_ptr()) };
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        #[test]
+        fn callback_boundary_contains_unwinding_panics() {
+            assert!(!super::contain_panic(|| {}));
+            assert!(super::contain_panic(|| panic!("handler failure")));
         }
     }
 }
