@@ -244,4 +244,34 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    pub fn lookup(&mut self, sequence: &TokenSequence) -> PrefixMatch {
+        self.clock = self.clock.saturating_add(1);
+        let mut node = &mut self.root;
+        let mut matched = 0;
+        let mut handle = None;
+        for token in sequence.tokens() {
+            let Some(next) = node.children.get_mut(token) else {
+                break;
+            };
+            node = next;
+            matched += 1;
+            if node.handle.is_some() {
+                handle = node.handle;
+                node.last_used = self.clock;
+            }
+        }
+        if matched > 0 {
+            self.stats.hits = self.stats.hits.saturating_add(1);
+        } else {
+            self.stats.misses = self.stats.misses.saturating_add(1);
+        }
+        PrefixMatch {
+            handle,
+            matched_tokens: matched,
+            remaining_tokens: sequence.len() - matched,
+        }
+    }
+}
+
 pub struct RadixMarker;
