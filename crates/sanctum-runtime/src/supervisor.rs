@@ -391,6 +391,11 @@ mod tests {
     };
 
     #[test]
+    fn maps_termination_signal() {
+        assert_eq!(super::ProcessSignal::Terminate.number(), libc::SIGTERM);
+    }
+
+    #[test]
     fn formats_llama_server_backend() {
         assert_eq!(BackendKind::LlamaServer.to_string(), "llama-server");
     }
