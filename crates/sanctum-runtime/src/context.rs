@@ -418,4 +418,10 @@ impl Default for PruningPolicy {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CompressionMetrics {
+    pub original_bytes: usize,
+    pub summary_bytes: usize,
+}
+
 pub struct ContextMarker;
