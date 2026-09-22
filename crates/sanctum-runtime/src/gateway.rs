@@ -338,4 +338,11 @@ pub struct GatewayDecision {
     pub report: JaggednessReport,
 }
 
+impl GatewayDecision {
+    #[must_use]
+    pub fn bypassed(&self) -> bool {
+        self.path != GatewayPath::SystemOne
+    }
+}
+
 pub struct GatewayMarker;
