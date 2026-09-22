@@ -229,6 +229,19 @@ impl SupervisedChild {
         }
         Ok(status)
     }
+
+    pub async fn wait(&mut self) -> Result<std::process::ExitStatus, SupervisorError> {
+        let status = self
+            .child
+            .wait()
+            .await
+            .map_err(|source| SupervisorError::ProcessIo {
+                operation: "wait",
+                source,
+            })?;
+        self.state = ProcessState::Exited;
+        Ok(status)
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
