@@ -116,4 +116,17 @@ pub enum InferenceBackend {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TensorShape(Vec<usize>);
 
+impl TensorShape {
+    pub fn new(dimensions: Vec<usize>) -> Result<Self, DecisionError> {
+        if dimensions.is_empty() || dimensions.contains(&0) {
+            return Err(DecisionError::ZeroDimension);
+        }
+        dimensions
+            .iter()
+            .try_fold(1usize, |size, value| size.checked_mul(*value))
+            .ok_or(DecisionError::TensorSizeOverflow)?;
+        Ok(Self(dimensions))
+    }
+}
+
 pub struct DecisionMarker;
