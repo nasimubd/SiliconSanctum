@@ -104,6 +104,12 @@ pub struct ProcessSpec {
 
 impl ProcessSpec {
     #[must_use]
+    pub fn with_environment(mut self, entry: EnvironmentEntry) -> Self {
+        self.environment.push(entry);
+        self
+    }
+
+    #[must_use]
     pub fn with_argument(mut self, argument: impl Into<String>) -> Self {
         self.arguments.push(argument.into());
         self
