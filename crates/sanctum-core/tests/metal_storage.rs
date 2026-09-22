@@ -3,7 +3,7 @@
 use objc2_metal::{MTLBuffer, MTLCreateSystemDefaultDevice, MTLResource, MTLStorageMode};
 use sanctum_core::darwin::{
     direct_io::{ChunkRange, DirectModelFile, SharedMetalBuffer, stream_chunk},
-    metal_buffer::{MetalBufferError, NativeSharedBuffer},
+    metal_buffer::{MetalBufferError, NativeSharedBuffer, load_shared_chunks},
 };
 
 #[test]
@@ -51,4 +51,31 @@ fn metal_capacity_checks_include_page_rounding() {
         NativeSharedBuffer::new(&device, usize::MAX, usize::MAX),
         Err(MetalBufferError::Capacity)
     ));
+}
+
+#[test]
+fn workers_preserve_range_order_in_native_buffers() {
+    use std::io::Write;
+    let device = MTLCreateSystemDefaultDevice().expect("Metal device required");
+    let mut fixture = tempfile::NamedTempFile::new().unwrap();
+    fixture.write_all(b"firstsecondthird").unwrap();
+    let model = DirectModelFile::open(fixture.path()).unwrap();
+    let ranges = [
+        ChunkRange {
+            offset: 11,
+            length: 5,
+        },
+        ChunkRange {
+            offset: 0,
+            length: 5,
+        },
+        ChunkRange {
+            offset: 5,
+            length: 6,
+        },
+    ];
+    let buffers = load_shared_chunks(&device, &model, &ranges, 2, 3 * 16_384).unwrap();
+    assert_eq!(buffers[0].as_bytes(), b"third");
+    assert_eq!(buffers[1].as_bytes(), b"first");
+    assert_eq!(buffers[2].as_bytes(), b"second");
 }
