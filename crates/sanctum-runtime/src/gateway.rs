@@ -150,4 +150,22 @@ impl Default for ArithmeticDetector {
     }
 }
 
+impl ArithmeticDetector {
+    #[must_use]
+    pub fn detect(&self, p: &GatewayPrompt) -> Vec<Evidence> {
+        let text = p.normalized();
+        let hits: Vec<_> = self.patterns.matching(&text).collect();
+        if hits.len() >= 2 {
+            hits.into_iter()
+                .map(|v| Evidence {
+                    kind: JaggednessKind::MultiHopArithmetic,
+                    marker: v.to_owned(),
+                })
+                .collect()
+        } else {
+            Vec::new()
+        }
+    }
+}
+
 pub struct GatewayMarker;
