@@ -28,4 +28,11 @@ impl GatewayPrompt {
     }
 }
 
+impl GatewayPrompt {
+    #[must_use]
+    pub fn normalized(&self) -> String {
+        self.0.to_lowercase()
+    }
+}
+
 pub struct GatewayMarker;
