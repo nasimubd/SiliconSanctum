@@ -138,4 +138,7 @@ impl TensorShape {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct InferenceInput(Vec<f32>);
+
 pub struct DecisionMarker;
