@@ -325,4 +325,9 @@ pub fn symbol_kind(language: SourceLanguage, node_kind: &str) -> Option<SymbolKi
     }
 }
 
+#[must_use]
+pub fn body_field(_language: SourceLanguage) -> &'static str {
+    "body"
+}
+
 pub struct ContextMarker;
