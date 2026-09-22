@@ -201,4 +201,9 @@ impl CountingDetector {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct TemporalDetector {
+    patterns: PatternSet,
+}
+
 pub struct GatewayMarker;
