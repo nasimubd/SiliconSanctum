@@ -212,4 +212,11 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    #[must_use]
+    pub const fn stats(&self) -> CacheStats {
+        self.stats
+    }
+}
+
 pub struct RadixMarker;
