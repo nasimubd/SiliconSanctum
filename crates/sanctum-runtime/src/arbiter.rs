@@ -112,6 +112,16 @@ pub struct ArbiterPolicy {
     pub pressure_reserve_bytes: u64,
 }
 
+impl Default for ArbiterPolicy {
+    fn default() -> Self {
+        Self {
+            wired_limit_bytes: WIRED_LIMIT_BYTES,
+            recovery_bytes: DEFAULT_HEADROOM_BYTES,
+            pressure_reserve_bytes: DEFAULT_HEADROOM_BYTES,
+        }
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
