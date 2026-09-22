@@ -291,6 +291,18 @@ mod tests {
         assert_eq!(spec.environment[0].key(), "MODE");
     }
     #[test]
+    fn configures_process_working_directory() {
+        let spec = super::ProcessSpec::mlx_lm(
+            ExecutablePath::new("/bin/mlx").unwrap(),
+            ModelPath::new("/models/a").unwrap(),
+        )
+        .with_working_directory("/tmp".into());
+        assert_eq!(
+            spec.working_directory.as_deref(),
+            Some(std::path::Path::new("/tmp"))
+        );
+    }
+    #[test]
     fn rejects_environment_assignment_key() {
         assert!(EnvironmentEntry::new("A=B", "x").is_err());
     }
