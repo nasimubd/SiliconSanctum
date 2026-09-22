@@ -149,6 +149,14 @@ impl<'a, B: SysctlRead + SysctlWrite> WiredLimitGuard<'a, B> {
     }
 }
 
+impl<B: SysctlWrite> WiredLimitGuard<'_, B> {
+    pub fn restore(mut self) -> Result<(), SysctlError> {
+        set_wired_limit_mb(self.backend, self.previous_mb)?;
+        self.armed = false;
+        Ok(())
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
