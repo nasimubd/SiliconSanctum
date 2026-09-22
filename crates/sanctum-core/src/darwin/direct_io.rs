@@ -206,6 +206,15 @@ mod tests {
     }
 
     #[test]
+    fn positional_read_preserves_short_count() {
+        let fixture = model_fixture(b"abc");
+        let model = DirectModelFile::open(fixture.path()).unwrap();
+        let mut buffer = [0; 8];
+        assert_eq!(model.read_at(&mut buffer, 0).unwrap(), 3);
+        assert_eq!(&buffer[..3], b"abc");
+    }
+
+    #[test]
     fn allocation_honors_sixteen_kibibyte_alignment() {
         let buffer = AlignedBuffer::new(16_384, 16_384).unwrap();
         assert_eq!(buffer.as_slice().as_ptr().addr() % 16_384, 0);
