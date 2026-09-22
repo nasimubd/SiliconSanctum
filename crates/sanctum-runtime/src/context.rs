@@ -13,4 +13,12 @@ pub enum ContextError {
     QueryCompilation,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SourceLanguage {
+    Python,
+    Rust,
+    Cpp,
+    TypeScript,
+}
+
 pub struct ContextMarker;
