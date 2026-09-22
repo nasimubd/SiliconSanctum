@@ -3,6 +3,7 @@
 /// Virtual-memory page alignment used by Apple Silicon hosts.
 pub const APPLE_SILICON_PAGE_SIZE: usize = 16_384;
 
+pub mod direct_io;
 pub mod mach;
 pub mod pressure;
 pub mod qos;
