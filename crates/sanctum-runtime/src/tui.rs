@@ -20,6 +20,7 @@ impl MemoryBytes{pub fn ratio(self,total:Self)->f64{if total.0==0{0.0}else{self.
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub struct MemoryTelemetry{pub wired:MemoryBytes,pub os_cache:MemoryBytes,pub total:MemoryBytes}
 impl MemoryTelemetry{pub fn new(wired:MemoryBytes,os_cache:MemoryBytes,total:MemoryBytes)->Result<Self,DashboardError>{if total.0==0||wired.0>total.0||os_cache.0>total.0{return Err(DashboardError::InvalidMetric);}Ok(Self{wired,os_cache,total})}}
+impl MemoryTelemetry{pub fn severity(self)->MetricSeverity{severity(self.wired.ratio(self.total))}}
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub struct Utilization(f32);
 impl Utilization{pub fn new(value:f32)->Result<Self,DashboardError>{if !value.is_finite()||!(0.0..=1.0).contains(&value){return Err(DashboardError::InvalidPercentage);}Ok(Self(value))}pub const fn get(self)->f32{self.0}}
