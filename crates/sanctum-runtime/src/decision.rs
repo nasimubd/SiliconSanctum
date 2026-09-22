@@ -99,4 +99,11 @@ impl DecisionModelMetadata {
     }
 }
 
+impl DecisionModelMetadata {
+    #[must_use]
+    pub const fn parameters(&self) -> u64 {
+        self.parameters
+    }
+}
+
 pub struct DecisionMarker;
