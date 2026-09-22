@@ -22,4 +22,11 @@ impl PluginId {
     }
 }
 
+impl PluginId {
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
 pub struct PluginMarker;
