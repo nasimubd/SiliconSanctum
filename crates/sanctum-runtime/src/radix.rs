@@ -133,4 +133,11 @@ pub struct PrefixMatch {
     pub remaining_tokens: usize,
 }
 
+impl PrefixMatch {
+    #[must_use]
+    pub const fn hit(&self) -> bool {
+        self.matched_tokens > 0
+    }
+}
+
 pub struct RadixMarker;
