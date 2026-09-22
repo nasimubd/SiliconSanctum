@@ -462,4 +462,16 @@ pub struct EvictionPolicy {
     pub target_bytes: usize,
 }
 
+impl EvictionPolicy {
+    pub fn new(strategy: EvictionStrategy, target_bytes: usize) -> Result<Self, RadixError> {
+        if target_bytes == 0 {
+            return Err(RadixError::ZeroCapacity);
+        }
+        Ok(Self {
+            strategy,
+            target_bytes,
+        })
+    }
+}
+
 pub struct RadixMarker;
