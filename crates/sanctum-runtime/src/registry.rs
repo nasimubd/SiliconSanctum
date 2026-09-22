@@ -11,4 +11,7 @@ pub enum RegistryError {
     InvalidEndpoint,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RegistryModelId(String);
+
 pub struct RegistryMarker;
