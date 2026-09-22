@@ -114,10 +114,7 @@ pub fn wired_limit_mb(backend: &impl SysctlRead) -> Result<u64, SysctlError> {
     decode_u64(IOGPU_WIRED_LIMIT_KEY, &backend.read(IOGPU_WIRED_LIMIT_KEY)?)
 }
 
-pub fn set_wired_limit_mb(
-    backend: &impl SysctlWrite,
-    limit_mb: u64,
-) -> Result<(), SysctlError> {
+pub fn set_wired_limit_mb(backend: &impl SysctlWrite, limit_mb: u64) -> Result<(), SysctlError> {
     backend.write(IOGPU_WIRED_LIMIT_KEY, &limit_mb.to_ne_bytes())
 }
 
@@ -189,8 +186,8 @@ mod tests {
     use std::cell::RefCell;
 
     use super::{
-        IOGPU_WIRED_LIMIT_KEY, SysctlError, SysctlRead, SysctlWrite, decode_u64,
-        WiredLimitGuard, set_wired_limit_mb, wired_limit_mb,
+        IOGPU_WIRED_LIMIT_KEY, SysctlError, SysctlRead, SysctlWrite, WiredLimitGuard, decode_u64,
+        set_wired_limit_mb, wired_limit_mb,
     };
 
     struct FakeRead {
@@ -272,7 +269,10 @@ mod tests {
 
         assert_eq!(
             backend.0.into_inner(),
-            [(IOGPU_WIRED_LIMIT_KEY.into(), 10_400_u64.to_ne_bytes().into())]
+            [(
+                IOGPU_WIRED_LIMIT_KEY.into(),
+                10_400_u64.to_ne_bytes().into()
+            )]
         );
     }
 
