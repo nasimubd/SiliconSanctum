@@ -45,4 +45,5 @@ pub enum DashboardCommand{Quit,TogglePause,NextTab,Refresh,Ignore}
 pub fn map_key(key:crossterm::event::KeyCode)->DashboardCommand{use crossterm::event::KeyCode;match key{KeyCode::Char('q')|KeyCode::Esc=>DashboardCommand::Quit,KeyCode::Char(' ')=>DashboardCommand::TogglePause,KeyCode::Tab=>DashboardCommand::NextTab,KeyCode::Char('r')=>DashboardCommand::Refresh,_=>DashboardCommand::Ignore}}
 #[derive(Debug,Clone,PartialEq)]
 pub struct DashboardState{pub snapshot:DashboardSnapshot,pub tab:DashboardTab,pub paused:bool,pub quit:bool}
+impl DashboardState{pub fn new(snapshot:DashboardSnapshot)->Self{Self{snapshot,tab:DashboardTab::Overview,paused:false,quit:false}}}
 impl DashboardState{pub fn apply(&mut self,command:DashboardCommand){match command{DashboardCommand::Quit=>self.quit=true,DashboardCommand::TogglePause=>self.paused=!self.paused,DashboardCommand::NextTab=>self.tab=self.tab.next(),DashboardCommand::Refresh|DashboardCommand::Ignore=>{}}}}
