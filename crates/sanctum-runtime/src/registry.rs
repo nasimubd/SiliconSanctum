@@ -225,4 +225,12 @@ impl ModelRegistry {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContextPlan {
+    pub context_tokens: u32,
+    pub weights_bytes: u64,
+    pub kv_cache_bytes: u64,
+    pub total_bytes: u64,
+}
+
 pub struct RegistryMarker;
