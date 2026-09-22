@@ -73,4 +73,11 @@ pub enum AttentionArchitecture {
     Hybrid,
 }
 
+impl AttentionArchitecture {
+    #[must_use]
+    pub const fn supports_prefix_cache(self) -> bool {
+        matches!(self, Self::Full)
+    }
+}
+
 pub struct RadixMarker;
