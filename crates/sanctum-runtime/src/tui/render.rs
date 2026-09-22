@@ -1,6 +1,9 @@
 //! Ratatui views for runtime telemetry.
-use ratatui::layout::Rect;
+use ratatui::layout::{Constraint,Direction,Layout,Rect};
 use ratatui::Frame;
 use super::{DashboardState,MetricHistory};
 pub fn render_dashboard(_frame:&mut Frame<'_>,_state:&DashboardState,_history:&MetricHistory){}
-pub fn body_area(area:Rect)->Rect{area}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct DashboardRegions{pub header:Rect,pub body:Rect,pub footer:Rect}
+pub fn regions(area:Rect)->DashboardRegions{let chunks=Layout::default().direction(Direction::Vertical).constraints([Constraint::Length(3),Constraint::Min(1),Constraint::Length(2)]).split(area);DashboardRegions{header:chunks[0],body:chunks[1],footer:chunks[2]}}
+pub fn body_area(area:Rect)->Rect{regions(area).body}
