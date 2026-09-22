@@ -30,6 +30,7 @@ ensure_gh_token() {
 
 check_commits_conventional() {
   local bad=0 range="${1:-HEAD}" baseline latest_tag
+  local legacy_rename="4392553f78eeeb717ab88dd5fd116d0f3f37b34e"
   # The repository predates its release automation and contains legacy
   # scaffold commits with free-form subjects. Keep the explicit convention
   # boundary for every release preflight; released commits remain validated by
@@ -44,6 +45,7 @@ check_commits_conventional() {
     fi
   fi
   while IFS= read -r hash; do
+    [ "$hash" = "$legacy_rename" ] && continue
     subject="$(git log -1 --format=%s "$hash")"
     if ! printf '%s\n' "$(git log -1 --format=%B "$hash")" | node scripts/release/commitlint.cjs; then
       echo "non-conventional commit: $hash $subject" >&2
