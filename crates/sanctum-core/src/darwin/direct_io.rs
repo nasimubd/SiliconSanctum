@@ -25,3 +25,18 @@ pub enum DirectIoError {
     #[error("model offset {offset} does not fit off_t")]
     OffsetOverflow { offset: u64 },
 }
+
+/// Validates the alignment accepted by `posix_memalign`.
+///
+/// # Errors
+///
+/// Returns an error unless alignment is a pointer-sized power of two.
+pub fn validate_layout(size: usize, alignment: usize) -> Result<(), DirectIoError> {
+    if alignment < size_of::<*const ()>()
+        || !alignment.is_power_of_two()
+        || alignment % size_of::<*const ()>() != 0
+    {
+        return Err(DirectIoError::InvalidLayout { size, alignment });
+    }
+    Ok(())
+}
