@@ -129,4 +129,13 @@ impl TensorShape {
     }
 }
 
+impl TensorShape {
+    pub fn elements(&self) -> Result<usize, DecisionError> {
+        self.0
+            .iter()
+            .try_fold(1usize, |size, value| size.checked_mul(*value))
+            .ok_or(DecisionError::TensorSizeOverflow)
+    }
+}
+
 pub struct DecisionMarker;
