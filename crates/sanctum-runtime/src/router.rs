@@ -216,4 +216,19 @@ impl FixedAxisEvaluator {
     }
 }
 
+impl AxisEvaluator for FixedAxisEvaluator {
+    fn evaluate<'a>(
+        &'a self,
+        axis: EvaluationAxis,
+        _: &'a RoutingPrompt,
+    ) -> std::pin::Pin<
+        Box<dyn std::future::Future<Output = Result<AxisEvaluation, RouterError>> + Send + 'a>,
+    > {
+        Box::pin(async move {
+            tokio::time::sleep(self.delay).await;
+            AxisEvaluation::new(axis, self.confidence)
+        })
+    }
+}
+
 pub struct RouterMarker;
