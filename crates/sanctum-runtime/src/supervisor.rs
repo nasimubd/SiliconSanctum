@@ -7,7 +7,12 @@ use thiserror::Error;
 pub enum SupervisorError {
     #[error("{field} path must be absolute: {path}")]
     RelativePath { field: &'static str, path: std::path::PathBuf },
+    #[error("invalid subprocess environment {field}")]
+    InvalidEnvironment { field: &'static str },
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnvironmentEntry { key: String, value: String }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExecutablePath(std::path::PathBuf);
