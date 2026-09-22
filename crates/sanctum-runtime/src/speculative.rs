@@ -79,6 +79,7 @@ impl AdaptationPolicy{
  pub fn select(&self,pressure:f32)->VerifyWidth{
   if pressure>=self.high_pressure{self.widths.minimum}else if pressure>=self.medium_pressure{VerifyWidth::new((self.widths.maximum.get()/2).max(self.widths.minimum.get())).expect("bounded width")}else{self.widths.maximum}
  }
+ pub fn select_with_bandwidth(&self,pressure:f32,bandwidth:BandwidthObservation)->VerifyWidth{if bandwidth.utilization()>=0.9{self.widths.minimum}else{self.select(pressure)}}
 }
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct DraftProposal(Vec<u32>);
