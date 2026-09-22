@@ -137,4 +137,7 @@ pub fn assess_health(acceptance:f64,bandwidth:BandwidthObservation)->DecoderHeal
 #[derive(Debug,Clone,PartialEq,Serialize,Deserialize)]
 pub struct TelemetryDto{pub tokens_per_second:f64,pub acceptance_rate:f64,pub verify_width:u8,pub context_pressure:f32,pub bandwidth_utilization:f32}
 impl From<TelemetrySnapshot> for TelemetryDto{fn from(value:TelemetrySnapshot)->Self{Self{tokens_per_second:value.tokens_per_second,acceptance_rate:value.acceptance_rate,verify_width:value.verify_width,context_pressure:value.context_pressure,bandwidth_utilization:value.bandwidth_utilization}}}
+#[derive(Debug,Clone)]
+pub struct SpeculativeHarness{pub config:DecoderConfig,pub policy:AdaptationPolicy}
+impl SpeculativeHarness{pub fn width(&self,position:ContextPosition,bandwidth:BandwidthObservation)->VerifyWidth{self.policy.select_with_bandwidth(context_pressure(position,self.config.capacity),bandwidth)}}
 // NEXT
