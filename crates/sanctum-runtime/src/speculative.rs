@@ -65,4 +65,11 @@ impl VerifyWidth{
  pub fn new(value:u8)->Result<Self,SpeculativeError>{(value>0).then_some(Self(value)).ok_or(SpeculativeError::ZeroValue("verify width"))}
  pub const fn get(self)->u8{self.0}
 }
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct VerifyWidthBounds{pub minimum:VerifyWidth,pub maximum:VerifyWidth}
+impl VerifyWidthBounds{
+ pub fn new(minimum:VerifyWidth,maximum:VerifyWidth)->Result<Self,SpeculativeError>{
+  if minimum>maximum{return Err(SpeculativeError::InvalidWidthBounds{minimum:minimum.get(),maximum:maximum.get()});} Ok(Self{minimum,maximum})
+ }
+}
 // NEXT
