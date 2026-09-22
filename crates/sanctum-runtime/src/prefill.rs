@@ -123,4 +123,12 @@ impl ModelGeometry {
             head_dim,
         })
     }
+
+    #[must_use]
+    pub const fn kv_bytes_per_token(self, quantization: KvQuantization) -> u64 {
+        let elements = self.layers as u64 * self.kv_heads as u64 * self.head_dim as u64 * 2;
+        elements
+            .saturating_mul(quantization.bits() as u64)
+            .div_ceil(8)
+    }
 }
