@@ -25,6 +25,22 @@ impl ExecutablePath {
     pub fn as_path(&self) -> &std::path::Path { &self.0 }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelPath(std::path::PathBuf);
+
+impl ModelPath {
+    pub fn new(path: impl Into<std::path::PathBuf>) -> Result<Self, SupervisorError> {
+        let path = path.into();
+        if !path.is_absolute() {
+            return Err(SupervisorError::RelativePath { field: "model", path });
+        }
+        Ok(Self(path))
+    }
+
+    #[must_use]
+    pub fn as_path(&self) -> &std::path::Path { &self.0 }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BackendKind {
     LlamaServer,
