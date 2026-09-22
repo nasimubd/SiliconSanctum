@@ -261,4 +261,9 @@ pub fn compile_query(
         .map_err(|_| ContextError::QueryCompilation)
 }
 
+#[must_use]
+pub fn python_query() -> QuerySpec {
+    QuerySpec { source: "[(class_definition name: (identifier) @name) (function_definition name: (identifier) @name)] @definition".to_owned() }
+}
+
 pub struct ContextMarker;
