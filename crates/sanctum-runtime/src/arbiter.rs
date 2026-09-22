@@ -11,3 +11,14 @@ pub struct MemorySnapshot {
     pub available_bytes: u64,
     pub swap_used_bytes: u64,
 }
+
+impl MemorySnapshot {
+    #[must_use]
+    pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
+        Self {
+            wired_bytes,
+            available_bytes,
+            swap_used_bytes,
+        }
+    }
+}
