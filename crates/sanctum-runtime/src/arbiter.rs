@@ -314,6 +314,13 @@ pub struct EvictionCandidate {
     pub last_used_epoch: u64,
 }
 
+impl EvictionCandidate {
+    #[must_use]
+    pub const fn reclaimable_bytes(&self) -> u64 {
+        self.model.total_bytes()
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
