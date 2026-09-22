@@ -332,4 +332,10 @@ pub enum GatewayPath {
     HeavyReasoningModel,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GatewayDecision {
+    pub path: GatewayPath,
+    pub report: JaggednessReport,
+}
+
 pub struct GatewayMarker;
