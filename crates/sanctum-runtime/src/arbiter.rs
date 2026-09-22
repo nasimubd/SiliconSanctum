@@ -241,6 +241,27 @@ impl BudgetRequest {
     }
 }
 
+#[must_use]
+pub fn calculate_budget(
+    snapshot: MemorySnapshot,
+    policy: ArbiterPolicy,
+    request: BudgetRequest,
+) -> MemoryBudget {
+    let usable = policy
+        .wired_limit_bytes
+        .saturating_sub(snapshot.wired_bytes)
+        .saturating_sub(policy.pressure_reserve_bytes);
+    let kv = usable
+        .saturating_sub(request.model_bytes)
+        .min(request.requested_kv_bytes);
+    MemoryBudget {
+        usable_bytes: usable,
+        model_bytes: request.model_bytes.min(usable),
+        kv_cache_bytes: kv,
+        reserve_bytes: policy.pressure_reserve_bytes,
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
