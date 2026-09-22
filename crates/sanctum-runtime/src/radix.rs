@@ -287,4 +287,10 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    pub fn remove_session(&mut self, id: &SessionId) -> Result<TokenSequence, RadixError> {
+        self.sessions.remove(id).ok_or(RadixError::MissingSession)
+    }
+}
+
 pub struct RadixMarker;
