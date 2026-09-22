@@ -64,4 +64,9 @@ impl Evidence {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct JaggednessReport {
+    evidence: Vec<Evidence>,
+}
+
 pub struct GatewayMarker;
