@@ -112,4 +112,7 @@ pub fn generate<B:DecoderBackend>(backend:&mut B,state:&mut SessionState,capacit
 #[derive(Debug,Clone,Default)]
 pub struct CancellationToken(Arc<AtomicBool>);
 impl CancellationToken{pub fn cancel(&self){self.0.store(true,Ordering::Release)}pub fn check(&self)->Result<(),SpeculativeError>{if self.0.load(Ordering::Acquire){Err(SpeculativeError::Cancelled)}else{Ok(())}}}
+#[derive(Debug,Clone,Copy,PartialEq)]
+pub struct TimingSample{pub tokens:u64,pub elapsed_seconds:f64}
+impl TimingSample{pub fn tokens_per_second(self)->f64{if self.elapsed_seconds<=0.0{0.0}else{self.tokens as f64/self.elapsed_seconds}}}
 // NEXT
