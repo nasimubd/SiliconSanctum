@@ -4,6 +4,7 @@ use sanctum_core::darwin::direct_io::DirectModelFile;
 use sanctum_core::darwin::mach::{MachHost, NativeMachHost, memory_telemetry};
 use sanctum_core::darwin::pressure::{MemoryPressure, MemoryPressureMonitor, PressureHandler};
 use sanctum_core::darwin::qos::{NativeQosSetter, bind_inference_thread};
+use sanctum_core::darwin::sysctl::{NativeSysctl, wired_limit_mb};
 
 struct IgnorePressure;
 
@@ -35,4 +36,9 @@ fn enables_no_cache_on_live_descriptor() {
 fn creates_live_memory_pressure_source() {
     let monitor = MemoryPressureMonitor::start(IgnorePressure).unwrap();
     monitor.cancel();
+}
+
+#[test]
+fn reads_live_iogpu_wired_limit() {
+    assert!(wired_limit_mb(&NativeSysctl).is_ok());
 }
