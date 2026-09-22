@@ -215,6 +215,20 @@ impl SupervisedChild {
     pub const fn backend(&self) -> BackendKind {
         self.backend
     }
+
+    pub fn try_status(&mut self) -> Result<Option<std::process::ExitStatus>, SupervisorError> {
+        let status = self
+            .child
+            .try_wait()
+            .map_err(|source| SupervisorError::ProcessIo {
+                operation: "query status",
+                source,
+            })?;
+        if status.is_some() {
+            self.state = ProcessState::Exited;
+        }
+        Ok(status)
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
