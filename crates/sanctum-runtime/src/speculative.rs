@@ -3,6 +3,7 @@
 use std::fmt;
 use std::sync::{Arc,atomic::{AtomicBool,Ordering}};
 use std::collections::VecDeque;
+use serde::{Deserialize,Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SpeculativeError {
@@ -133,4 +134,6 @@ impl Lifecycle{pub fn can_transition(self,next:Self)->bool{matches!((self,next),
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum DecoderHealth{Healthy,LowAcceptance,BandwidthSaturated}
 pub fn assess_health(acceptance:f64,bandwidth:BandwidthObservation)->DecoderHealth{if bandwidth.utilization()>=0.9{DecoderHealth::BandwidthSaturated}else if acceptance<0.5{DecoderHealth::LowAcceptance}else{DecoderHealth::Healthy}}
+#[derive(Debug,Clone,PartialEq,Serialize,Deserialize)]
+pub struct TelemetryDto{pub tokens_per_second:f64,pub acceptance_rate:f64,pub verify_width:u8,pub context_pressure:f32,pub bandwidth_utilization:f32}
 // NEXT
