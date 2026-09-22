@@ -18,5 +18,12 @@ test = false
 doc = false
 bench = false
 
+[[bin]]
+name = "telemetry"
+path = "fuzz_targets/telemetry.rs"
+test = false
+doc = false
+bench = false
+
 [workspace]
 members = ["."]
