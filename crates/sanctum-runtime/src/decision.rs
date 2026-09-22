@@ -232,4 +232,15 @@ pub enum LatencyClass {
     AboveBudget,
 }
 
+#[must_use]
+pub fn classify_latency(elapsed: std::time::Duration, budget: LatencyBudget) -> LatencyClass {
+    if elapsed < budget.minimum {
+        LatencyClass::BelowBudget
+    } else if elapsed > budget.maximum {
+        LatencyClass::AboveBudget
+    } else {
+        LatencyClass::WithinBudget
+    }
+}
+
 pub struct DecisionMarker;
