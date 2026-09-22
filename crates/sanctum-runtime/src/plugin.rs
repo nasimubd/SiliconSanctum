@@ -230,4 +230,12 @@ impl PluginCatalog {
     }
 }
 
+pub trait PluginTransport {
+    fn invoke(
+        &self,
+        endpoint: &PluginEndpoint,
+        request: &PluginRequest,
+    ) -> Result<PluginResponse, PluginError>;
+}
+
 pub struct PluginMarker;
