@@ -104,6 +104,12 @@ pub struct ProcessSpec {
 
 impl ProcessSpec {
     #[must_use]
+    pub fn with_working_directory(mut self, path: std::path::PathBuf) -> Self {
+        self.working_directory = Some(path);
+        self
+    }
+
+    #[must_use]
     pub fn with_environment(mut self, entry: EnvironmentEntry) -> Self {
         self.environment.push(entry);
         self
