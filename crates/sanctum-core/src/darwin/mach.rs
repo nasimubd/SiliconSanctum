@@ -22,6 +22,22 @@ pub struct VmPageCounters {
     pub compressed: u64,
 }
 
+pub trait MachHost {
+    /// Returns the VM page size in bytes.
+    ///
+    /// # Errors
+    ///
+    /// Returns a kernel status when the host query fails.
+    fn page_size(&self) -> Result<u64, MachTelemetryError>;
+
+    /// Returns an atomic snapshot of the host VM counters.
+    ///
+    /// # Errors
+    ///
+    /// Returns a kernel status when the statistics query fails.
+    fn vm_counters(&self) -> Result<VmPageCounters, MachTelemetryError>;
+}
+
 #[cfg(test)]
 mod tests {
     use super::MachTelemetryError;
