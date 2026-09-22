@@ -266,4 +266,11 @@ impl FanoutResult {
     }
 }
 
+impl FanoutResult {
+    #[must_use]
+    pub fn route(&self, p: RouterPolicy) -> RouteDecision {
+        p.select(self.minimum_confidence())
+    }
+}
+
 pub struct RouterMarker;
