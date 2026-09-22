@@ -24,7 +24,9 @@ pub const fn decode_pressure(flags: usize) -> MemoryPressure {
 
 #[cfg(test)]
 mod tests {
-    use super::{MemoryPressure, PRESSURE_NORMAL, PRESSURE_WARNING, decode_pressure};
+    use super::{
+        MemoryPressure, PRESSURE_CRITICAL, PRESSURE_NORMAL, PRESSURE_WARNING, decode_pressure,
+    };
 
     #[test]
     fn decodes_normal_event() {
@@ -34,5 +36,10 @@ mod tests {
     #[test]
     fn decodes_warning_event() {
         assert_eq!(decode_pressure(PRESSURE_WARNING), MemoryPressure::Warning);
+    }
+
+    #[test]
+    fn decodes_critical_event() {
+        assert_eq!(decode_pressure(PRESSURE_CRITICAL), MemoryPressure::Critical);
     }
 }
