@@ -453,6 +453,12 @@ impl MemoryTelemetrySource for StaticTelemetry {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DaemonConfig {
+    pub sample_interval: std::time::Duration,
+    pub event_capacity: usize,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
