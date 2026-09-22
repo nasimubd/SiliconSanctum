@@ -173,4 +173,18 @@ pub struct CountingDetector {
     patterns: PatternSet,
 }
 
+impl Default for CountingDetector {
+    fn default() -> Self {
+        Self {
+            patterns: PatternSet::new(vec![
+                "count".into(),
+                "how many".into(),
+                "number of".into(),
+                "enumerate".into(),
+            ])
+            .expect("static patterns"),
+        }
+    }
+}
+
 pub struct GatewayMarker;
