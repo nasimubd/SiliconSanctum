@@ -42,4 +42,10 @@ pub enum JaggednessKind {
     RelativeTemporal,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EscalationTarget {
+    DeterministicInterpreter,
+    HeavyReasoningModel,
+}
+
 pub struct GatewayMarker;
