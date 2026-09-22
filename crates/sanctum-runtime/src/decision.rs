@@ -317,4 +317,6 @@ impl Noul {
     }
 }
 
+pub const LOG_SCORE_EPSILON: f64 = 1.0e-12;
+
 pub struct DecisionMarker;
