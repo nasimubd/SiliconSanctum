@@ -267,4 +267,9 @@ impl PrefillScheduler {
     pub const fn new(policy: TuningPolicy) -> Self {
         Self { policy }
     }
+
+    #[must_use]
+    pub const fn constrained_step(&self) -> PrefillStep {
+        PrefillStep::Tokens512
+    }
 }
