@@ -21,9 +21,6 @@ mod tests {
             platform: "linux",
         };
 
-        assert_eq!(
-            error.to_string(),
-            "memory pressure is unsupported on linux"
-        );
+        assert_eq!(error.to_string(), "memory pressure is unsupported on linux");
     }
 }
