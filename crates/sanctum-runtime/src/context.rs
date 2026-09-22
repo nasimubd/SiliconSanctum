@@ -142,4 +142,11 @@ impl ParsedDocument {
     }
 }
 
+impl ParsedDocument {
+    #[must_use]
+    pub fn source(&self) -> &[u8] {
+        self.document.source()
+    }
+}
+
 pub struct ContextMarker;
