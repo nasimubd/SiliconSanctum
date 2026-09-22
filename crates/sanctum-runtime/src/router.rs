@@ -155,4 +155,9 @@ impl RouteDecision {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct RouterPolicy {
+    thresholds: RouteThresholds,
+}
+
 pub struct RouterMarker;
