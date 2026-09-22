@@ -26,6 +26,10 @@ pub trait PressureHandler: Send + Sync + 'static {
     fn on_pressure(&self, pressure: MemoryPressure);
 }
 
+pub fn dispatch_pressure(handler: &impl PressureHandler, flags: usize) {
+    handler.on_pressure(decode_pressure(flags));
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
