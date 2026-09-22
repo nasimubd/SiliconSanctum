@@ -11,3 +11,4 @@ pub mod registry;
 pub mod router;
 pub mod speculative;
 pub mod supervisor;
+pub mod tui;
