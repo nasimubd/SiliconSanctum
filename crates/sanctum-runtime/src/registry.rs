@@ -14,4 +14,14 @@ pub enum RegistryError {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RegistryModelId(String);
 
+impl RegistryModelId {
+    pub fn new(value: impl Into<String>) -> Result<Self, RegistryError> {
+        let value = value.into();
+        if value.trim().is_empty() {
+            return Err(RegistryError::EmptyField { field: "model_id" });
+        }
+        Ok(Self(value))
+    }
+}
+
 pub struct RegistryMarker;
