@@ -163,6 +163,14 @@ mod tests {
     }
 
     #[test]
+    fn missing_model_reports_open_error() {
+        assert!(matches!(
+            super::DirectModelFile::open("/definitely/missing/model.gguf"),
+            Err(DirectIoError::Open { .. })
+        ));
+    }
+
+    #[test]
     fn rejects_non_power_of_two_alignment() {
         assert!(matches!(
             validate_layout(4096, 12),
