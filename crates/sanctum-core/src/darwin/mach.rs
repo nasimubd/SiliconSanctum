@@ -127,7 +127,12 @@ impl MachHost for NativeMachHost {
 
 #[cfg(test)]
 mod tests {
-    use super::MachTelemetryError;
+    use super::{MachTelemetryError, pages_to_bytes};
+
+    #[test]
+    fn page_conversion_multiplies_by_page_size() {
+        assert_eq!(pages_to_bytes("free", 3, 16_384).unwrap(), 49_152);
+    }
 
     #[test]
     fn kernel_error_display_names_operation_and_status() {
