@@ -155,6 +155,9 @@ pub fn build_command(spec: &ProcessSpec) -> tokio::process::Command {
             .iter()
             .map(|entry| (entry.key(), entry.value())),
     );
+    if let Some(directory) = &spec.working_directory {
+        command.current_dir(directory);
+    }
     command
 }
 
