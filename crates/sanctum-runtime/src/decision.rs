@@ -141,4 +141,16 @@ impl TensorShape {
 #[derive(Debug, Clone, PartialEq)]
 pub struct InferenceInput(Vec<f32>);
 
+impl InferenceInput {
+    pub fn new(values: Vec<f32>) -> Result<Self, DecisionError> {
+        if values.is_empty() {
+            return Err(DecisionError::EmptyInput);
+        }
+        if !values.iter().all(|value| value.is_finite()) {
+            return Err(DecisionError::NonFiniteInput);
+        }
+        Ok(Self(values))
+    }
+}
+
 pub struct DecisionMarker;
