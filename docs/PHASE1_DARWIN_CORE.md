@@ -36,3 +36,15 @@ Inference workers call `pthread_set_qos_class_self_np` with
 `QOS_CLASS_USER_INTERACTIVE` and zero relative priority. This is Darwin's strongest
 latency scheduling hint; it is not a hard CPU-affinity API and does not guarantee
 that every scheduling quantum runs on a performance core.
+
+## Direct model I/O
+
+Model descriptors are opened read-only and configured with `F_NOCACHE` before
+streaming. Buffers come from `posix_memalign` at a 16,384-byte boundary and remain
+uniquely owned until release. `pread` preserves descriptor position, retries
+interruptions, and reports short reads without fabricating bytes.
+
+The `SharedMetalBuffer` boundary represents writable bytes from a
+`MTLResourceStorageModeShared` resource. Transfers reject undersized or misaligned
+storage. Bounded scoped workers issue concurrent positional reads while retaining
+request order and limiting the number of live worker threads.
