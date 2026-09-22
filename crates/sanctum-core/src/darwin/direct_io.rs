@@ -40,3 +40,16 @@ pub fn validate_layout(size: usize, alignment: usize) -> Result<(), DirectIoErro
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{DirectIoError, validate_layout};
+
+    #[test]
+    fn rejects_non_power_of_two_alignment() {
+        assert!(matches!(
+            validate_layout(4096, 12),
+            Err(DirectIoError::InvalidLayout { alignment: 12, .. })
+        ));
+    }
+}
