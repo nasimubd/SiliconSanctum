@@ -32,4 +32,22 @@ pub struct LatencyBudget {
     pub maximum: std::time::Duration,
 }
 
+impl LatencyBudget {
+    pub fn new(
+        minimum: std::time::Duration,
+        maximum: std::time::Duration,
+    ) -> Result<Self, DecisionError> {
+        if minimum < MIN_DECISION_LATENCY {
+            return Err(DecisionError::LatencyBelowMinimum);
+        }
+        if maximum > MAX_DECISION_LATENCY {
+            return Err(DecisionError::LatencyAboveMaximum);
+        }
+        if minimum > maximum {
+            return Err(DecisionError::InvertedLatencyRange);
+        }
+        Ok(Self { minimum, maximum })
+    }
+}
+
 pub struct DecisionMarker;
