@@ -179,6 +179,12 @@ pub enum ProcessState {
     Failed,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessSignal {
+    Terminate,
+    Kill,
+}
+
 #[derive(Debug)]
 pub struct SupervisedChild {
     child: tokio::process::Child,
