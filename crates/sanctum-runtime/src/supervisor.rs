@@ -300,6 +300,15 @@ impl CacheMarker {
         }
         Ok(Self(path))
     }
+
+    pub async fn is_complete(&self) -> Result<bool, SupervisorError> {
+        tokio::fs::try_exists(&self.0)
+            .await
+            .map_err(|source| SupervisorError::ProcessIo {
+                operation: "inspect cache marker",
+                source,
+            })
+    }
 }
 
 impl ShutdownPolicy {
