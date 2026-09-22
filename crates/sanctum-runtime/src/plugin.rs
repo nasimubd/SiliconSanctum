@@ -41,4 +41,20 @@ pub struct PluginEndpoint {
     pub authority: String,
 }
 
+impl PluginEndpoint {
+    pub fn new(
+        protocol: PluginProtocol,
+        authority: impl Into<String>,
+    ) -> Result<Self, PluginError> {
+        let authority = authority.into();
+        if authority.trim().is_empty() || authority.chars().any(char::is_whitespace) {
+            return Err(PluginError::InvalidEndpoint);
+        }
+        Ok(Self {
+            protocol,
+            authority,
+        })
+    }
+}
+
 pub struct PluginMarker;
