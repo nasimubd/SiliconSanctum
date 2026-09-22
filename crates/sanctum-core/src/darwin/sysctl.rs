@@ -190,7 +190,7 @@ mod tests {
 
     use super::{
         IOGPU_WIRED_LIMIT_KEY, SysctlError, SysctlRead, SysctlWrite, decode_u64,
-        set_wired_limit_mb, wired_limit_mb,
+        WiredLimitGuard, set_wired_limit_mb, wired_limit_mb,
     };
 
     struct FakeRead {
@@ -211,6 +211,26 @@ mod tests {
     impl SysctlWrite for FakeWrite {
         fn write(&self, key: &str, value: &[u8]) -> Result<(), SysctlError> {
             self.0.borrow_mut().push((key.into(), value.into()));
+            Ok(())
+        }
+    }
+
+    struct FakeBackend {
+        current: u64,
+        writes: RefCell<Vec<u64>>,
+    }
+
+    impl SysctlRead for FakeBackend {
+        fn read(&self, _key: &str) -> Result<Vec<u8>, SysctlError> {
+            Ok(self.current.to_ne_bytes().into())
+        }
+    }
+
+    impl SysctlWrite for FakeBackend {
+        fn write(&self, _key: &str, value: &[u8]) -> Result<(), SysctlError> {
+            self.writes
+                .borrow_mut()
+                .push(u64::from_ne_bytes(value.try_into().unwrap()));
             Ok(())
         }
     }
@@ -254,6 +274,18 @@ mod tests {
             backend.0.into_inner(),
             [(IOGPU_WIRED_LIMIT_KEY.into(), 10_400_u64.to_ne_bytes().into())]
         );
+    }
+
+    #[test]
+    fn wired_limit_guard_captures_limit_before_apply() {
+        let backend = FakeBackend {
+            current: 8192,
+            writes: RefCell::default(),
+        };
+
+        let guard = WiredLimitGuard::apply(&backend, 10_400).unwrap();
+        assert_eq!(guard.previous_mb, 8192);
+        assert_eq!(backend.writes.borrow().as_slice(), [10_400]);
     }
 
     #[test]
