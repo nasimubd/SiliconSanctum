@@ -110,6 +110,13 @@ pub struct CancellationToken {
     cancelled: std::sync::Arc<std::sync::atomic::AtomicBool>,
 }
 
+impl CancellationToken {
+    pub fn cancel(&self) {
+        self.cancelled
+            .store(true, std::sync::atomic::Ordering::Release);
+    }
+}
+
 impl TuningThresholds {
     #[must_use]
     pub const fn pressure(self, memory: MemorySnapshot) -> MemoryPressure {
