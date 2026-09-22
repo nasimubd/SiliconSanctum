@@ -363,4 +363,20 @@ pub enum ArchitectureFamily {
     Unknown,
 }
 
+#[must_use]
+pub fn infer_architecture_family(name: &str) -> ArchitectureFamily {
+    let n = name.to_ascii_lowercase();
+    if n.contains("gemma") {
+        ArchitectureFamily::Gemma
+    } else if n.contains("qwen") && n.contains("ssm") {
+        ArchitectureFamily::QwenSsm
+    } else if n.contains("mamba") {
+        ArchitectureFamily::Mamba
+    } else if n.contains("llama") || n.contains("qwen") {
+        ArchitectureFamily::Transformer
+    } else {
+        ArchitectureFamily::Unknown
+    }
+}
+
 pub struct RadixMarker;
