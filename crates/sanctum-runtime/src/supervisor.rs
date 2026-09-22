@@ -196,6 +196,11 @@ impl SupervisedChild {
     pub const fn state(&self) -> ProcessState {
         self.state
     }
+
+    #[must_use]
+    pub const fn backend(&self) -> BackendKind {
+        self.backend
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
