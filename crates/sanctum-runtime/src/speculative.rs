@@ -95,4 +95,7 @@ pub struct DecoderConfig{pub draft:DraftModel,pub target:TargetModel,pub capacit
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub struct SessionState{pub position:ContextPosition,pub emitted:u64}
 impl SessionState{pub fn new(capacity:ContextCapacity)->Self{Self{position:ContextPosition::new(0,capacity).expect("zero position"),emitted:0}}pub fn advance(&mut self,tokens:u32,capacity:ContextCapacity)->Result<(),SpeculativeError>{let next=self.position.get().checked_add(tokens).ok_or(SpeculativeError::ContextExhausted)?;self.position=ContextPosition::new(next,capacity).map_err(|_|SpeculativeError::ContextExhausted)?;self.emitted+=u64::from(tokens);Ok(())}}
+#[derive(Debug,Clone,Copy,Default,PartialEq,Eq)]
+pub struct AcceptanceMetrics{pub proposed:u64,pub accepted:u64}
+impl AcceptanceMetrics{pub fn rate(self)->f64{if self.proposed==0{0.0}else{self.accepted as f64/self.proposed as f64}}pub fn record(&mut self,proposed:usize,accepted:usize){self.proposed+=proposed as u64;self.accepted+=accepted as u64;}}
 // NEXT
