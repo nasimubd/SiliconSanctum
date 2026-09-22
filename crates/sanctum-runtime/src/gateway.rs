@@ -121,4 +121,13 @@ impl PatternSet {
     }
 }
 
+impl PatternSet {
+    pub fn matching<'a>(&'a self, text: &'a str) -> impl Iterator<Item = &'a str> {
+        self.patterns
+            .iter()
+            .map(String::as_str)
+            .filter(|pattern| text.contains(pattern))
+    }
+}
+
 pub struct GatewayMarker;
