@@ -171,4 +171,11 @@ impl SourceRange {
     }
 }
 
+impl SourceRange {
+    #[must_use]
+    pub const fn len(self) -> usize {
+        self.end - self.start
+    }
+}
+
 pub struct ContextMarker;
