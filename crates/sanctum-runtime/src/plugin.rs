@@ -213,4 +213,11 @@ impl PluginCatalog {
     }
 }
 
+impl PluginCatalog {
+    #[must_use]
+    pub fn get(&self, id: &str) -> Option<&PluginManifest> {
+        self.entries.get(id)
+    }
+}
+
 pub struct PluginMarker;
