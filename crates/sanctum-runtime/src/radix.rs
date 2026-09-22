@@ -12,4 +12,7 @@ pub enum RadixError {
 
 pub type TokenId = u32;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TokenSequence(Vec<TokenId>);
+
 pub struct RadixMarker;
