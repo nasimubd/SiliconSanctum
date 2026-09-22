@@ -182,4 +182,8 @@ impl InferenceLogits {
     }
 }
 
+pub trait DecisionExecutor {
+    fn execute(&mut self, input: &InferenceInput) -> Result<InferenceLogits, DecisionError>;
+}
+
 pub struct DecisionMarker;
