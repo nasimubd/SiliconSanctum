@@ -81,4 +81,11 @@ impl SourceDocument {
     }
 }
 
+impl SourceDocument {
+    #[must_use]
+    pub fn path(&self) -> &std::path::Path {
+        &self.path
+    }
+}
+
 pub struct ContextMarker;
