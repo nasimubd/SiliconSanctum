@@ -83,4 +83,7 @@ impl AdaptationPolicy{
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct DraftProposal(Vec<u32>);
 impl DraftProposal{pub fn new(tokens:Vec<u32>)->Result<Self,SpeculativeError>{(!tokens.is_empty()).then_some(Self(tokens)).ok_or(SpeculativeError::EmptyProposal)}pub fn tokens(&self)->&[u32]{&self.0}}
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct Verification{pub accepted:usize,pub fallback_token:Option<u32>}
+impl Verification{pub fn emitted_tokens(&self)->usize{self.accepted+usize::from(self.fallback_token.is_some())}}
 // NEXT
