@@ -122,6 +122,25 @@ impl Default for ArbiterPolicy {
     }
 }
 
+impl ArbiterPolicy {
+    pub fn new(
+        wired_limit_bytes: u64,
+        recovery_bytes: u64,
+        pressure_reserve_bytes: u64,
+    ) -> Result<Self, ArbiterError> {
+        if wired_limit_bytes == 0 {
+            return Err(ArbiterError::ZeroValue {
+                field: "wired_limit_bytes",
+            });
+        }
+        Ok(Self {
+            wired_limit_bytes,
+            recovery_bytes,
+            pressure_reserve_bytes,
+        })
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
