@@ -243,4 +243,11 @@ pub fn classify_latency(elapsed: std::time::Duration, budget: LatencyBudget) -> 
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExecutionMeasurement {
+    pub logits: InferenceLogits,
+    pub elapsed: std::time::Duration,
+    pub class: LatencyClass,
+}
+
 pub struct DecisionMarker;
