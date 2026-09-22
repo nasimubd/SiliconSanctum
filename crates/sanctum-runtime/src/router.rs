@@ -58,4 +58,10 @@ impl AxisEvaluation {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct RouteThresholds {
+    moderate: f64,
+    high: f64,
+}
+
 pub struct RouterMarker;
