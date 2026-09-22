@@ -238,4 +238,11 @@ pub struct FanoutResult {
     pub complexity: AxisEvaluation,
 }
 
+impl FanoutResult {
+    #[must_use]
+    pub fn evaluations(&self) -> [&AxisEvaluation; 3] {
+        [&self.intent, &self.tooling, &self.complexity]
+    }
+}
+
 pub struct RouterMarker;
