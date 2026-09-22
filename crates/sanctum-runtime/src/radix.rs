@@ -416,4 +416,10 @@ pub struct CacheEvent {
     pub token_count: usize,
 }
 
+#[derive(Debug, Clone)]
+pub struct CacheEventLog {
+    capacity: usize,
+    entries: std::collections::VecDeque<CacheEvent>,
+}
+
 pub struct RadixMarker;
