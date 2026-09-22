@@ -18,7 +18,7 @@ impl EnvironmentEntry {
     pub fn new(key: impl Into<String>, value: impl Into<String>) -> Result<Self, SupervisorError> {
         let key = key.into();
         let value = value.into();
-        if key.contains('=') { return Err(SupervisorError::InvalidEnvironment { field: "key" }); }
+        if key.contains('=') || key.contains('\0') { return Err(SupervisorError::InvalidEnvironment { field: "key" }); }
         Ok(Self { key, value })
     }
 }
