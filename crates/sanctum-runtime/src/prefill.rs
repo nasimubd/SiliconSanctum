@@ -272,4 +272,9 @@ impl PrefillScheduler {
     pub const fn constrained_step(&self) -> PrefillStep {
         PrefillStep::Tokens512
     }
+
+    #[must_use]
+    pub const fn comfortable_step(&self) -> PrefillStep {
+        PrefillStep::Tokens1024
+    }
 }
