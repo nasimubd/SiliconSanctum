@@ -179,6 +179,13 @@ pub enum ProcessState {
     Failed,
 }
 
+#[derive(Debug)]
+pub struct SupervisedChild {
+    child: tokio::process::Child,
+    backend: BackendKind,
+    state: ProcessState,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ShutdownPolicy {
     pub graceful: std::time::Duration,
