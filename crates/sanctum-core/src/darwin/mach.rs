@@ -2,6 +2,11 @@
 
 use thiserror::Error;
 
+#[cfg(target_os = "macos")]
+unsafe extern "C" {
+    fn mach_host_self() -> libc::mach_port_t;
+}
+
 #[derive(Debug, Error, Clone, Copy, PartialEq, Eq)]
 pub enum MachTelemetryError {
     #[error("Mach {operation} failed with kernel status {status}")]
@@ -46,6 +51,42 @@ pub struct NativeMachHost;
 pub fn native_page_size() -> u64 {
     // SAFETY: libSystem initializes the read-only Mach page-size global before main.
     u64::try_from(unsafe { mach2::vm_page_size::vm_page_size }).unwrap_or(u64::MAX)
+}
+
+#[cfg(target_os = "macos")]
+/// Reads VM counters from `host_statistics64`.
+///
+/// # Errors
+///
+/// Returns the Mach kernel status when the host statistics call fails.
+pub fn native_vm_counters() -> Result<VmPageCounters, MachTelemetryError> {
+    let mut statistics = std::mem::MaybeUninit::<libc::vm_statistics64>::zeroed();
+    let mut count = libc::HOST_VM_INFO64_COUNT;
+    // SAFETY: the output points to a correctly sized zeroed statistics object and
+    // `count` is initialized with the ABI-provided element count.
+    let status = unsafe {
+        libc::host_statistics64(
+            mach_host_self(),
+            libc::HOST_VM_INFO64,
+            statistics.as_mut_ptr().cast(),
+            &raw mut count,
+        )
+    };
+    if status != libc::KERN_SUCCESS {
+        return Err(MachTelemetryError::Kernel {
+            operation: "host_statistics64",
+            status,
+        });
+    }
+    // SAFETY: a successful kernel call initialized the complete output structure.
+    let statistics = unsafe { statistics.assume_init() };
+    Ok(VmPageCounters {
+        free: u64::from(statistics.free_count),
+        active: u64::from(statistics.active_count),
+        inactive: u64::from(statistics.inactive_count),
+        wired: u64::from(statistics.wire_count),
+        compressed: u64::from(statistics.compressor_page_count),
+    })
 }
 
 #[cfg(test)]
