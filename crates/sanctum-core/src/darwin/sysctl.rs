@@ -71,6 +71,16 @@ impl SysctlRead for NativeSysctl {
     }
 }
 
+fn decode_u64(key: &str, bytes: &[u8]) -> Result<u64, SysctlError> {
+    let value: [u8; size_of::<u64>()] =
+        bytes.try_into().map_err(|_| SysctlError::InvalidWidth {
+            key: key.into(),
+            expected: size_of::<u64>(),
+            actual: bytes.len(),
+        })?;
+    Ok(u64::from_ne_bytes(value))
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
