@@ -35,7 +35,12 @@ pub enum DirectIoError {
     WorkerPanic,
     #[error("direct-read worker limit must be greater than zero")]
     InvalidWorkerLimit,
+    #[error("requested storage exceeds the {limit} byte budget")]
+    BudgetExceeded { limit: usize },
 }
+
+/// Default cap for the convenience API that retains every completed chunk.
+pub const DEFAULT_READ_BUDGET: usize = 256 * 1024 * 1024;
 
 /// Validates the alignment accepted by `posix_memalign`.
 ///
@@ -188,8 +193,44 @@ pub fn read_chunks_bounded(
     ranges: &[ChunkRange],
     worker_limit: usize,
 ) -> Result<Vec<AlignedBuffer>, DirectIoError> {
+    read_chunks_with_budget(model, ranges, worker_limit, DEFAULT_READ_BUDGET)
+}
+
+/// Reads ordered chunks while bounding the total retained buffer allocation.
+///
+/// # Errors
+///
+/// Rejects invalid ranges, memory-budget overflow, worker limits, and read failures.
+pub fn read_chunks_with_budget(
+    model: &DirectModelFile,
+    ranges: &[ChunkRange],
+    worker_limit: usize,
+    budget_bytes: usize,
+) -> Result<Vec<AlignedBuffer>, DirectIoError> {
     if worker_limit == 0 {
         return Err(DirectIoError::InvalidWorkerLimit);
+    }
+    let mut required = 0_usize;
+    for range in ranges {
+        if range.end().is_none_or(|end| i64::try_from(end).is_err()) {
+            return Err(DirectIoError::OffsetOverflow {
+                offset: range.offset,
+            });
+        }
+        let padded = range
+            .length
+            .max(1)
+            .checked_add(super::APPLE_SILICON_PAGE_SIZE - 1)
+            .map(|n| n & !(super::APPLE_SILICON_PAGE_SIZE - 1))
+            .ok_or(DirectIoError::BudgetExceeded {
+                limit: budget_bytes,
+            })?;
+        required = required
+            .checked_add(padded)
+            .filter(|n| *n <= budget_bytes)
+            .ok_or(DirectIoError::BudgetExceeded {
+                limit: budget_bytes,
+            })?;
     }
     let mut output = Vec::with_capacity(ranges.len());
     for batch in ranges.chunks(worker_limit) {
@@ -381,6 +422,20 @@ mod tests {
         );
         assert!(matches!(result, Err(DirectIoError::Read { source, .. })
             if source.kind() == std::io::ErrorKind::UnexpectedEof));
+    }
+
+    #[test]
+    fn retained_chunk_budget_includes_all_results_and_page_rounding() {
+        let fixture = model_fixture(b"ab");
+        let model = DirectModelFile::open(fixture.path()).unwrap();
+        let ranges = [super::ChunkRange {
+            offset: 0,
+            length: 1,
+        }; 2];
+        assert!(matches!(
+            super::read_chunks_with_budget(&model, &ranges, 1, 16_384),
+            Err(DirectIoError::BudgetExceeded { .. })
+        ));
     }
 
     #[test]
