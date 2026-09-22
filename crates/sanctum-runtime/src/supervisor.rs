@@ -19,6 +19,7 @@ impl EnvironmentEntry {
         let key = key.into();
         let value = value.into();
         if key.contains('=') || key.contains('\0') { return Err(SupervisorError::InvalidEnvironment { field: "key" }); }
+        if value.contains('\0') { return Err(SupervisorError::InvalidEnvironment { field: "value" }); }
         Ok(Self { key, value })
     }
 }
