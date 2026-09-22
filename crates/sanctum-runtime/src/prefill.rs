@@ -74,6 +74,18 @@ pub struct PrefillEventLog {
     events: std::collections::VecDeque<PrefillEvent>,
 }
 
+impl PrefillEventLog {
+    pub fn new(capacity: usize) -> Result<Self, PrefillError> {
+        if capacity == 0 {
+            return Err(PrefillError::ZeroBudget);
+        }
+        Ok(Self {
+            capacity,
+            events: std::collections::VecDeque::with_capacity(capacity),
+        })
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TokenCount(usize);
 
