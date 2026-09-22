@@ -441,4 +441,13 @@ impl RouterEventLog {
     }
 }
 
+impl RouterEventLog {
+    pub fn push(&mut self, event: RouterEvent) {
+        if self.entries.len() == self.capacity {
+            self.entries.pop_front();
+        }
+        self.entries.push_back(event);
+    }
+}
+
 pub struct RouterMarker;
