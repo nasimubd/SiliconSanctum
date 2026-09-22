@@ -1,5 +1,5 @@
 module.exports = {
-  repositoryUrl: "https://github.com/nasimubd/local-ai-workstation.git",
+  repositoryUrl: "https://github.com/nasimubd/SiliconSanctum.git",
   branches: ["main"],
   tagFormat: "v${version}",
   plugins: [

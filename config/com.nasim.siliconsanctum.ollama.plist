@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>com.nasim.local-ai.ollama</string>
+  <string>com.nasim.siliconsanctum.ollama</string>
   <key>ProgramArguments</key>
   <array>
     <string>/bin/zsh</string>
@@ -32,9 +32,9 @@
   <key>RunAtLoad</key>
   <true/>
   <key>StandardErrorPath</key>
-  <string>__USER_HOME__/Library/Logs/local-ai/ollama-server.error.log</string>
+  <string>__USER_HOME__/Library/Logs/silicon-sanctum/ollama-server.error.log</string>
   <key>StandardOutPath</key>
-  <string>__USER_HOME__/Library/Logs/local-ai/ollama-server.log</string>
+  <string>__USER_HOME__/Library/Logs/silicon-sanctum/ollama-server.log</string>
   <key>ThrottleInterval</key>
   <integer>5</integer>
 </dict>

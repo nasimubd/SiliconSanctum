@@ -21,7 +21,7 @@ server_ready() {
 }
 
 managed_pid() {
-  local pid service_target="gui/$(id -u)/com.nasim.local-ai.ollama"
+  local pid service_target="gui/$(id -u)/com.nasim.siliconsanctum.ollama"
   pid="$(launchctl print "$service_target" 2>/dev/null | awk '/pid =/ {print $3; exit}')"
   [[ "$pid" == <-> ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
