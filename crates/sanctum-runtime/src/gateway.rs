@@ -273,4 +273,11 @@ pub struct BypassDecision {
     pub reason: BypassReason,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct EscalationPolicy {
+    counting: EscalationTarget,
+    arithmetic: EscalationTarget,
+    temporal: EscalationTarget,
+}
+
 pub struct GatewayMarker;
