@@ -115,6 +115,11 @@ impl CancellationToken {
         self.cancelled
             .store(true, std::sync::atomic::Ordering::Release);
     }
+
+    #[must_use]
+    pub fn is_cancelled(&self) -> bool {
+        self.cancelled.load(std::sync::atomic::Ordering::Acquire)
+    }
 }
 
 impl TuningThresholds {
