@@ -54,4 +54,14 @@ pub struct Evidence {
     pub marker: String,
 }
 
+impl Evidence {
+    pub fn new(kind: JaggednessKind, marker: impl Into<String>) -> Result<Self, GatewayError> {
+        let marker = marker.into();
+        if marker.is_empty() {
+            return Err(GatewayError::EmptyPattern);
+        }
+        Ok(Self { kind, marker })
+    }
+}
+
 pub struct GatewayMarker;
