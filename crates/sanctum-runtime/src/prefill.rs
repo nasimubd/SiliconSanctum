@@ -43,4 +43,13 @@ impl PrefillStep {
             Self::Tokens1024 => 1024,
         }
     }
+
+    #[must_use]
+    pub const fn for_tokens(tokens: TokenCount) -> Self {
+        if tokens.get() <= 512 {
+            Self::Tokens512
+        } else {
+            Self::Tokens1024
+        }
+    }
 }
