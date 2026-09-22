@@ -53,4 +53,17 @@ pub enum Quantization {
     Q4,
 }
 
+impl Quantization {
+    #[must_use]
+    pub const fn bits(self) -> u8 {
+        match self {
+            Self::F16 => 16,
+            Self::Q8 => 8,
+            Self::Q6 => 6,
+            Self::Q5 => 5,
+            Self::Q4 => 4,
+        }
+    }
+}
+
 pub struct RegistryMarker;
