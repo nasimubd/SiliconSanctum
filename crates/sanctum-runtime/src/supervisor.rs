@@ -150,6 +150,11 @@ impl ProcessSpec {
 pub fn build_command(spec: &ProcessSpec) -> tokio::process::Command {
     let mut command = tokio::process::Command::new(spec.executable.as_path());
     command.args(&spec.arguments);
+    command.envs(
+        spec.environment
+            .iter()
+            .map(|entry| (entry.key(), entry.value())),
+    );
     command
 }
 
