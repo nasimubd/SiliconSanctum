@@ -209,4 +209,11 @@ pub struct FixedAxisEvaluator {
     delay: std::time::Duration,
 }
 
+impl FixedAxisEvaluator {
+    pub fn new(confidence: f64, delay: std::time::Duration) -> Result<Self, RouterError> {
+        AxisEvaluation::new(EvaluationAxis::Intent, confidence)?;
+        Ok(Self { confidence, delay })
+    }
+}
+
 pub struct RouterMarker;
