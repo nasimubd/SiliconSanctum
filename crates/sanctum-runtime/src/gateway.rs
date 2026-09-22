@@ -168,4 +168,9 @@ impl ArithmeticDetector {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct CountingDetector {
+    patterns: PatternSet,
+}
+
 pub struct GatewayMarker;
