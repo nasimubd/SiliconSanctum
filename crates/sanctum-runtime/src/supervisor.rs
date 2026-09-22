@@ -87,6 +87,11 @@ pub enum BackendKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState { Starting, Running, Stopping, Exited, Failed }
 
+impl ProcessState {
+    #[must_use]
+    pub const fn is_terminal(self) -> bool { matches!(self, Self::Exited | Self::Failed) }
+}
+
 impl std::fmt::Display for BackendKind {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         formatter.write_str(match self {
