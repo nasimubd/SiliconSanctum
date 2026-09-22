@@ -123,4 +123,15 @@ impl ContextLadder {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelEntry {
+    pub id: RegistryModelId,
+    pub backend: ModelBackend,
+    pub format: ModelFormat,
+    pub quantization: Quantization,
+    pub weights_bytes: u64,
+    pub bytes_per_kv_token: u64,
+    pub contexts: ContextLadder,
+}
+
 pub struct RegistryMarker;
