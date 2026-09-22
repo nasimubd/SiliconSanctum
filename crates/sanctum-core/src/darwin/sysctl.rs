@@ -8,10 +8,20 @@ use std::ffi::CString;
 pub const IOGPU_WIRED_LIMIT_KEY: &str = "iogpu.wired_limit_mb";
 
 pub trait SysctlRead {
+    /// Reads the raw bytes exported by `key`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the key is invalid or the kernel rejects the read.
     fn read(&self, key: &str) -> Result<Vec<u8>, SysctlError>;
 }
 
 pub trait SysctlWrite {
+    /// Replaces the raw bytes exported by `key`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the key is invalid or the kernel rejects the write.
     fn write(&self, key: &str, value: &[u8]) -> Result<(), SysctlError>;
 }
 
@@ -31,7 +41,7 @@ fn query_size(key: &str, native_key: &CString) -> Result<usize, SysctlError> {
         libc::sysctlbyname(
             native_key.as_ptr(),
             std::ptr::null_mut(),
-            &mut size,
+            &raw mut size,
             std::ptr::null_mut(),
             0,
         )
@@ -58,7 +68,7 @@ impl SysctlRead for NativeSysctl {
             libc::sysctlbyname(
                 native_key.as_ptr(),
                 value.as_mut_ptr().cast(),
-                &mut size,
+                &raw mut size,
                 std::ptr::null_mut(),
                 0,
             )
@@ -110,10 +120,20 @@ fn decode_u64(key: &str, bytes: &[u8]) -> Result<u64, SysctlError> {
     Ok(u64::from_ne_bytes(value))
 }
 
+/// Reads the current IOGPU wired-memory ceiling in mebibytes.
+///
+/// # Errors
+///
+/// Returns an error when the kernel read fails or returns an unexpected width.
 pub fn wired_limit_mb(backend: &impl SysctlRead) -> Result<u64, SysctlError> {
     decode_u64(IOGPU_WIRED_LIMIT_KEY, &backend.read(IOGPU_WIRED_LIMIT_KEY)?)
 }
 
+/// Sets the IOGPU wired-memory ceiling in mebibytes.
+///
+/// # Errors
+///
+/// Returns an error when the kernel rejects the write, commonly for lack of privilege.
 pub fn set_wired_limit_mb(backend: &impl SysctlWrite, limit_mb: u64) -> Result<(), SysctlError> {
     backend.write(IOGPU_WIRED_LIMIT_KEY, &limit_mb.to_ne_bytes())
 }
@@ -135,6 +155,11 @@ impl<B: SysctlWrite> std::fmt::Debug for WiredLimitGuard<'_, B> {
 }
 
 impl<'a, B: SysctlRead + SysctlWrite> WiredLimitGuard<'a, B> {
+    /// Captures the current ceiling and applies a replacement.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when either the initial read or replacement write fails.
     pub fn apply(backend: &'a B, limit_mb: u64) -> Result<Self, SysctlError> {
         let previous_mb = wired_limit_mb(backend)?;
         set_wired_limit_mb(backend, limit_mb)?;
@@ -147,6 +172,11 @@ impl<'a, B: SysctlRead + SysctlWrite> WiredLimitGuard<'a, B> {
 }
 
 impl<B: SysctlWrite> WiredLimitGuard<'_, B> {
+    /// Restores the captured ceiling and disarms drop restoration.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the kernel rejects the restoration write.
     pub fn restore(mut self) -> Result<(), SysctlError> {
         set_wired_limit_mb(self.backend, self.previous_mb)?;
         self.armed = false;
