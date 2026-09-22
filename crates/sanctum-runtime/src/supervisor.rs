@@ -54,6 +54,11 @@ impl ProcessSpec {
     pub fn llama_server(executable: ExecutablePath, model: ModelPath) -> Self {
         Self { backend: BackendKind::LlamaServer, executable, model, arguments: Vec::new() }
     }
+
+    #[must_use]
+    pub fn mlx_lm(executable: ExecutablePath, model: ModelPath) -> Self {
+        Self { backend: BackendKind::MlxLm, executable, model, arguments: Vec::new() }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
