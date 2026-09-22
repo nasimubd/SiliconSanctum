@@ -90,4 +90,6 @@ pub fn compare_proposal(proposal:&DraftProposal,target:&[u32])->Verification{let
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct CycleOutcome{pub proposal:DraftProposal,pub verification:Verification}
 impl CycleOutcome{pub fn emitted_tokens(&self)->usize{self.verification.emitted_tokens()}}
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct DecoderConfig{pub draft:DraftModel,pub target:TargetModel,pub capacity:ContextCapacity}
 // NEXT
