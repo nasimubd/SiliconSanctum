@@ -23,6 +23,27 @@ pub trait QosSetter {
     fn set_current(&self, class: QosClass, relative_priority: i32) -> Result<(), QosError>;
 }
 
+#[derive(Debug, Default, Clone, Copy)]
+pub struct NativeQosSetter;
+
+#[cfg(target_os = "macos")]
+unsafe extern "C" {
+    fn pthread_set_qos_class_self_np(qos_class: u32, relative_priority: i32) -> i32;
+}
+
+#[cfg(target_os = "macos")]
+impl QosSetter for NativeQosSetter {
+    fn set_current(&self, class: QosClass, relative_priority: i32) -> Result<(), QosError> {
+        // SAFETY: the function affects only the calling thread and accepts scalar values.
+        let code = unsafe { pthread_set_qos_class_self_np(class.0, relative_priority) };
+        if code == 0 {
+            Ok(())
+        } else {
+            Err(QosError { code })
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{QOS_CLASS_USER_INTERACTIVE, QosError};
