@@ -143,6 +143,31 @@ impl ChunkRange {
     }
 }
 
+/// Streams one file range into shared Metal-visible storage.
+///
+/// # Errors
+///
+/// Returns an error for insufficient or misaligned storage, or a failed read.
+pub fn stream_chunk(
+    model: &DirectModelFile,
+    range: ChunkRange,
+    sink: &mut impl SharedMetalBuffer,
+) -> Result<usize, DirectIoError> {
+    let bytes = sink.writable_bytes();
+    if bytes.len() < range.length {
+        return Err(DirectIoError::SharedBufferTooSmall {
+            required: range.length,
+            available: bytes.len(),
+        });
+    }
+    if bytes.as_ptr().addr() % super::APPLE_SILICON_PAGE_SIZE != 0 {
+        return Err(DirectIoError::SharedBufferMisaligned {
+            required: super::APPLE_SILICON_PAGE_SIZE,
+        });
+    }
+    model.read_at(&mut bytes[..range.length], range.offset)
+}
+
 impl DirectModelFile {
     /// Opens a model file read-only.
     ///
