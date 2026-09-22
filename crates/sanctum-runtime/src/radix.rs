@@ -126,4 +126,11 @@ impl Default for CacheCapacity {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CacheHandle(pub u64);
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PrefixMatch {
+    pub handle: Option<CacheHandle>,
+    pub matched_tokens: usize,
+    pub remaining_tokens: usize,
+}
+
 pub struct RadixMarker;
