@@ -102,4 +102,8 @@ impl AcceptanceMetrics{pub fn rate(self)->f64{if self.proposed==0{0.0}else{self.
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub struct BandwidthObservation(f32);
 impl BandwidthObservation{pub fn new(value:f32)->Result<Self,SpeculativeError>{(value.is_finite()&&(0.0..=1.0).contains(&value)).then_some(Self(value)).ok_or(SpeculativeError::ZeroValue("bandwidth utilization range"))}pub const fn utilization(self)->f32{self.0}}
+pub trait DecoderBackend{
+ fn propose(&mut self,width:VerifyWidth)->Result<DraftProposal,SpeculativeError>;
+ fn verify(&mut self,proposal:&DraftProposal)->Result<Vec<u32>,SpeculativeError>;
+}
 // NEXT
