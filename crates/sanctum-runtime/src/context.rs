@@ -455,4 +455,14 @@ impl StructuralSummarizer {
     }
 }
 
+#[must_use]
+pub fn normalize_whitespace(value: &str) -> String {
+    value
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 pub struct ContextMarker;
