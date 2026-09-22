@@ -12,6 +12,13 @@ pub enum PrefillError {
     CriticalPressure,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedulingDecision {
+    Conservative,
+    Throughput,
+    Rejected,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TokenCount(usize);
 
