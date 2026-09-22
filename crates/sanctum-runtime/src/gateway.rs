@@ -451,4 +451,13 @@ impl DetectionLimits {
     }
 }
 
+impl Default for DetectionLimits {
+    fn default() -> Self {
+        Self {
+            max_prompt_bytes: 64 * 1024,
+            max_evidence: 32,
+        }
+    }
+}
+
 pub struct GatewayMarker;
