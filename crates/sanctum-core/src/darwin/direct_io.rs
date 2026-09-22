@@ -175,6 +175,46 @@ pub fn stream_chunk(
     model.read_at(&mut bytes[..range.length], range.offset)
 }
 
+/// Reads model chunks on a bounded set of scoped worker threads.
+///
+/// Results retain the same order as the requested ranges.
+///
+/// # Errors
+///
+/// Returns an error for an invalid worker limit, allocation, read, or worker panic.
+pub fn read_chunks_bounded(
+    model: &DirectModelFile,
+    ranges: &[ChunkRange],
+    worker_limit: usize,
+) -> Result<Vec<AlignedBuffer>, DirectIoError> {
+    if worker_limit == 0 {
+        return Err(DirectIoError::InvalidWorkerLimit);
+    }
+    let mut output = Vec::with_capacity(ranges.len());
+    for batch in ranges.chunks(worker_limit) {
+        let buffers = std::thread::scope(|scope| {
+            let handles: Vec<_> = batch
+                .iter()
+                .copied()
+                .map(|range| {
+                    scope.spawn(move || {
+                        let mut buffer =
+                            AlignedBuffer::new(range.length, super::APPLE_SILICON_PAGE_SIZE)?;
+                        let _ = model.read_at(buffer.as_mut_slice(), range.offset)?;
+                        Ok::<_, DirectIoError>(buffer)
+                    })
+                })
+                .collect();
+            handles
+                .into_iter()
+                .map(|handle| handle.join().map_err(|_| DirectIoError::WorkerPanic)?)
+                .collect::<Result<Vec<_>, DirectIoError>>()
+        })?;
+        output.extend(buffers);
+    }
+    Ok(output)
+}
+
 impl DirectModelFile {
     /// Opens a model file read-only.
     ///
