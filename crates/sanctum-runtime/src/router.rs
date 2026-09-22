@@ -394,4 +394,11 @@ pub enum RoutePlan {
     Heavy(HeavyModelTarget),
 }
 
+#[derive(Debug, Clone)]
+pub struct RouteTargets {
+    pub deterministic: DeterministicTarget,
+    pub speculative: ModelPair,
+    pub heavy: HeavyModelTarget,
+}
+
 pub struct RouterMarker;
