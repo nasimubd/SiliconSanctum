@@ -11,6 +11,8 @@ use super::{
     direct_io::{AlignedBuffer, DirectIoError, SharedMetalBuffer},
 };
 
+use super::direct_io::{ChunkRange, DirectModelFile};
+
 #[derive(Debug, Error)]
 pub enum MetalBufferError {
     #[error("shared buffer size exceeds the allocation budget or device limit")]
@@ -19,6 +21,8 @@ pub enum MetalBufferError {
     Unavailable,
     #[error(transparent)]
     Allocation(#[from] DirectIoError),
+    #[error("failed to start storage worker: {0}")]
+    WorkerStart(#[source] std::io::Error),
 }
 
 /// Owns a Metal object and its no-copy CPU backing.
@@ -94,4 +98,82 @@ impl SharedMetalBuffer for NativeSharedBuffer {
     fn writable_bytes(&mut self) -> &mut [u8] {
         &mut self.backing.as_mut_slice()[..self.logical_length]
     }
+}
+
+/// Loads file ranges directly into native shared Metal allocations on workers.
+///
+/// Includes page padding in the total budget; preserves range order. The caller
+/// must subtract existing model, KV, scratch, and OS residency from this budget.
+///
+/// # Errors
+///
+/// Rejects invalid ranges, zero worker count, insufficient budget, or worker/I/O failures.
+pub fn load_shared_chunks(
+    device: &ProtocolObject<dyn MTLDevice>,
+    model: &DirectModelFile,
+    ranges: &[ChunkRange],
+    worker_limit: usize,
+    budget_bytes: usize,
+) -> Result<Vec<NativeSharedBuffer>, MetalBufferError> {
+    if worker_limit == 0 {
+        return Err(DirectIoError::InvalidWorkerLimit.into());
+    }
+    let mut remaining = budget_bytes;
+    // Preflight the entire request before any allocation.
+    for range in ranges {
+        if range.end().is_none_or(|end| i64::try_from(end).is_err()) {
+            return Err(DirectIoError::OffsetOverflow {
+                offset: range.offset,
+            }
+            .into());
+        }
+        let padded = range
+            .length
+            .max(1)
+            .checked_add(APPLE_SILICON_PAGE_SIZE - 1)
+            .map(|n| n & !(APPLE_SILICON_PAGE_SIZE - 1))
+            .ok_or(MetalBufferError::Capacity)?;
+        remaining = remaining
+            .checked_sub(padded)
+            .ok_or(MetalBufferError::Capacity)?;
+    }
+    let mut output = ranges
+        .iter()
+        .map(|range| NativeSharedBuffer::new(device, range.length, budget_bytes))
+        .collect::<Result<Vec<_>, _>>()?;
+    for (sinks, ranges) in output
+        .chunks_mut(worker_limit)
+        .zip(ranges.chunks(worker_limit))
+    {
+        std::thread::scope(|scope| {
+            let mut handles = Vec::new();
+            let mut first_error = None;
+            for (sink, range) in sinks.iter_mut().zip(ranges.iter().copied()) {
+                // Only the exclusive CPU slice crosses the thread boundary.
+                // The Metal object stays here and outlives every scoped worker.
+                let bytes = sink.writable_bytes();
+                match std::thread::Builder::new()
+                    .name("sanctum-read".into())
+                    .spawn_scoped(scope, move || model.read_exact_at(bytes, range.offset))
+                {
+                    Ok(handle) => handles.push(handle),
+                    Err(error) => {
+                        first_error = Some(MetalBufferError::WorkerStart(error));
+                        break;
+                    }
+                }
+            }
+            for handle in handles {
+                let result = handle
+                    .join()
+                    .map_err(|_| DirectIoError::WorkerPanic)
+                    .and_then(std::convert::identity);
+                if let Err(error) = result {
+                    first_error.get_or_insert(error.into());
+                }
+            }
+            first_error.map_or(Ok(()), Err)
+        })?;
+    }
+    Ok(output)
 }
