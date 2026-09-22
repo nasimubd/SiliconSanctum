@@ -551,4 +551,11 @@ impl ScoreRubric {
     }
 }
 
+impl ScoreRubric {
+    #[must_use]
+    pub fn maximum(&self) -> RubricPoint {
+        self.points[self.points.len() - 1]
+    }
+}
+
 pub struct DecisionMarker;
