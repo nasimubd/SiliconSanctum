@@ -29,4 +29,11 @@ impl RoutingPrompt {
     }
 }
 
+impl RoutingPrompt {
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
 pub struct RouterMarker;
