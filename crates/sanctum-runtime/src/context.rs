@@ -365,4 +365,28 @@ pub fn signature_text(
         .to_owned()
 }
 
+fn collect_nodes(
+    node: tree_sitter::Node<'_>,
+    language: SourceLanguage,
+    source: &[u8],
+    output: &mut Vec<StructuralSymbol>,
+) {
+    if let Some(kind) = symbol_kind(language, node.kind()) {
+        if let Ok(range) = node_range(node) {
+            output.push(StructuralSymbol {
+                kind,
+                name: node_name(node, source),
+                signature: signature_text(node, language, source),
+                return_type: None,
+                documentation: None,
+                range,
+            });
+        }
+    }
+    let mut cursor = node.walk();
+    for child in node.children(&mut cursor) {
+        collect_nodes(child, language, source, output);
+    }
+}
+
 pub struct ContextMarker;
