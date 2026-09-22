@@ -504,6 +504,25 @@ impl<T: MemoryTelemetrySource> MemoryArbiter<T> {
     }
 }
 
+impl<T: MemoryTelemetrySource> MemoryArbiter<T> {
+    pub fn tick(&mut self) -> Result<ArbiterDecision, ArbiterError> {
+        let snapshot = self.telemetry.sample()?;
+        self.state.update_snapshot(snapshot);
+        self.events.push(ArbiterEvent::Sampled(snapshot));
+        let decision = self.engine.evaluate(
+            snapshot,
+            self.state.pressure,
+            self.state
+                .models
+                .iter()
+                .any(|item| item.model.residency == ModelResidency::Evicted),
+        );
+        self.state.record_decision(decision);
+        self.events.push(ArbiterEvent::Decision(decision));
+        Ok(decision)
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
