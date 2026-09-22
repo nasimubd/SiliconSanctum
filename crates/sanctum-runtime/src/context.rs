@@ -443,4 +443,9 @@ pub struct StructuralSummary {
     pub metrics: CompressionMetrics,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct StructuralSummarizer {
+    policy: PruningPolicy,
+}
+
 pub struct ContextMarker;
