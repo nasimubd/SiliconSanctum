@@ -90,4 +90,11 @@ impl ContextLadder {
     }
 }
 
+impl ContextLadder {
+    #[must_use]
+    pub fn levels(&self) -> &[u32] {
+        &self.levels
+    }
+}
+
 pub struct RegistryMarker;
