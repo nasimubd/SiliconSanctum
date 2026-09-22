@@ -345,6 +345,12 @@ pub enum ArbiterEvent {
     ReloadRequested(ModelId),
 }
 
+#[derive(Debug, Clone)]
+pub struct EventLog {
+    capacity: usize,
+    entries: std::collections::VecDeque<ArbiterEvent>,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
