@@ -108,4 +108,14 @@ impl PluginManifest {
     }
 }
 
+impl PluginManifest {
+    pub fn add_capability(&mut self, capability: Capability) -> Result<(), PluginError> {
+        let value = capability.0;
+        if !self.capabilities.insert(value.clone()) {
+            return Err(PluginError::DuplicateCapability(value));
+        }
+        Ok(())
+    }
+}
+
 pub struct PluginMarker;
