@@ -203,4 +203,12 @@ impl ModelRegistry {
     }
 }
 
+impl ModelRegistry {
+    pub fn get(&self, id: &str) -> Result<&ModelEntry, RegistryError> {
+        self.entries
+            .get(id)
+            .ok_or_else(|| RegistryError::UnknownModel(id.to_owned()))
+    }
+}
+
 pub struct RegistryMarker;
