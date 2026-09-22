@@ -98,6 +98,13 @@ impl ModelFootprint {
     }
 }
 
+impl ModelFootprint {
+    #[must_use]
+    pub const fn total_bytes(&self) -> u64 {
+        self.weights_bytes.saturating_add(self.kv_bytes)
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
