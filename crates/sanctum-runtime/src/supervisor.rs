@@ -402,6 +402,15 @@ mod tests {
         assert!(!marker.is_complete().await.unwrap());
     }
 
+    #[tokio::test]
+    async fn reports_completed_cache_marker() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("complete");
+        tokio::fs::write(&path, []).await.unwrap();
+        let marker = super::CacheMarker::new(path).unwrap();
+        assert!(marker.is_complete().await.unwrap());
+    }
+
     #[test]
     fn formats_llama_server_backend() {
         assert_eq!(BackendKind::LlamaServer.to_string(), "llama-server");
