@@ -401,4 +401,11 @@ pub fn extract_symbols(parsed: &ParsedDocument) -> Vec<StructuralSymbol> {
     output
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PruningPolicy {
+    pub remove_bodies: bool,
+    pub remove_boilerplate: bool,
+    pub retain_documentation: bool,
+}
+
 pub struct ContextMarker;
