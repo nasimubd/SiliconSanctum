@@ -1,7 +1,7 @@
 {
-  "name": "local-ai-workstation-release-tooling",
+  "name": "silicon-sanctum-release-tooling",
   "private": true,
-  "description": "Release automation for local-ai-workstation.",
+  "description": "Release automation for Silicon Sanctum.",
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.0",

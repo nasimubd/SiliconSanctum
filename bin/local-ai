@@ -5,7 +5,7 @@ repo_dir="${0:A:h:h}"
 source "$repo_dir/scripts/lib.sh"
 
 usage() {
-  print -- "Local AI workstation"
+  print -- "Silicon Sanctum"
   print -- ""
   print -- "Usage: local-ai COMMAND [ARGUMENTS]"
   print -- ""

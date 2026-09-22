@@ -1,4 +1,4 @@
-# Local AI Workstation
+# Silicon Sanctum
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Conventional Commits](https://img.shields.io/badge/commits-Conventional%20Commits-fe5196.svg)](https://www.conventionalcommits.org/)
@@ -29,8 +29,8 @@ coding, research review, and backtest experimentation.
 ### Install
 
 ```bash
-git clone https://github.com/nasimubd/local-ai-workstation.git
-cd local-ai-workstation
+git clone https://github.com/nasimubd/SiliconSanctum.git
+cd SiliconSanctum
 cp .env.example .env
 # Edit .env: replace YOUR_NVME_NAME with the exact name shown by `ls /Volumes`.
 ./scripts/bootstrap.sh
@@ -215,9 +215,9 @@ Licensed under the [MIT License](LICENSE).
 ## Citation
 
 ```bibtex
-@software{local-ai-workstation,
-  title = {local-ai-workstation: Reproducible local inference and quantitative-development workstation},
+@software{silicon_sanctum,
+  title = {Silicon Sanctum: Reproducible local inference and quantitative-development workstation},
   author = {MD NASIM},
-  url = {https://github.com/nasimubd/local-ai-workstation}
+  url = {https://github.com/nasimubd/SiliconSanctum}
 }
 ```

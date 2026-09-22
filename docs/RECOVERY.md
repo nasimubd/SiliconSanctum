@@ -3,8 +3,8 @@
 If the working copy is lost but the configured AI volume survives:
 
 ```bash
-git clone "$AI_ROOT/manifests/local-ai-workstation.bundle" local-ai-workstation
-cd local-ai-workstation
+git clone "$AI_ROOT/manifests/SiliconSanctum.bundle" SiliconSanctum
+cd SiliconSanctum
 ./scripts/bootstrap.sh
 ```
 
