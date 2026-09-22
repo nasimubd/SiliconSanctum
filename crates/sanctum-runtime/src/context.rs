@@ -193,4 +193,14 @@ pub enum SymbolKind {
     Type,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StructuralSymbol {
+    pub kind: SymbolKind,
+    pub name: String,
+    pub signature: String,
+    pub return_type: Option<String>,
+    pub documentation: Option<String>,
+    pub range: SourceRange,
+}
+
 pub struct ContextMarker;
