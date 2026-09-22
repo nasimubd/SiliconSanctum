@@ -250,4 +250,9 @@ impl PrefillPlan {
     pub fn planned_tokens(&self) -> usize {
         self.chunks.iter().map(|chunk| chunk.len()).sum()
     }
+
+    #[must_use]
+    pub const fn peak_scratch_bytes(&self) -> u64 {
+        self.scratch_bytes
+    }
 }
