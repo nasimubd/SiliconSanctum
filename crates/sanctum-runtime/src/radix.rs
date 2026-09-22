@@ -474,4 +474,10 @@ impl EvictionPolicy {
     }
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct EvictionOutcome {
+    pub entries_removed: usize,
+    pub bytes_reclaimed: usize,
+}
+
 pub struct RadixMarker;
