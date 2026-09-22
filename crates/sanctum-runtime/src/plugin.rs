@@ -118,4 +118,11 @@ impl PluginManifest {
     }
 }
 
+impl PluginManifest {
+    #[must_use]
+    pub fn supports(&self, capability: &str) -> bool {
+        self.capabilities.contains(capability)
+    }
+}
+
 pub struct PluginMarker;
