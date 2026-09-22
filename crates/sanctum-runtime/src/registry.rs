@@ -24,4 +24,11 @@ impl RegistryModelId {
     }
 }
 
+impl RegistryModelId {
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
 pub struct RegistryMarker;
