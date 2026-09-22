@@ -94,4 +94,11 @@ impl RouteThresholds {
     }
 }
 
+impl RouteThresholds {
+    #[must_use]
+    pub const fn high(self) -> f64 {
+        self.high
+    }
+}
+
 pub struct RouterMarker;
