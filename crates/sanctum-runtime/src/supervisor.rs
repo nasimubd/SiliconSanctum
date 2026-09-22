@@ -395,6 +395,13 @@ mod tests {
         assert_eq!(super::ProcessSignal::Terminate.number(), libc::SIGTERM);
     }
 
+    #[tokio::test]
+    async fn reports_missing_cache_marker() {
+        let directory = tempfile::tempdir().unwrap();
+        let marker = super::CacheMarker::new(directory.path().join("missing")).unwrap();
+        assert!(!marker.is_complete().await.unwrap());
+    }
+
     #[test]
     fn formats_llama_server_backend() {
         assert_eq!(BackendKind::LlamaServer.to_string(), "llama-server");
