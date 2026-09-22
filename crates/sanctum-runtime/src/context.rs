@@ -271,4 +271,13 @@ pub fn rust_query() -> QuerySpec {
     QuerySpec { source: "[(struct_item name: (type_identifier) @name) (enum_item name: (type_identifier) @name) (function_item name: (identifier) @name)] @definition".to_owned() }
 }
 
+#[must_use]
+pub fn cpp_query() -> QuerySpec {
+    QuerySpec {
+        source:
+            "[(class_specifier name: (type_identifier) @name) (function_definition) @definition]"
+                .to_owned(),
+    }
+}
+
 pub struct ContextMarker;
