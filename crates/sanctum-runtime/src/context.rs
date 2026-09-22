@@ -295,4 +295,11 @@ pub fn query_for(language: SourceLanguage) -> QuerySpec {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QueryCapture {
+    pub name: String,
+    pub range: SourceRange,
+    pub text: String,
+}
+
 pub struct ContextMarker;
