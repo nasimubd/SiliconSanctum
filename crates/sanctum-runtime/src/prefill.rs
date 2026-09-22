@@ -111,3 +111,16 @@ pub struct ModelGeometry {
     pub kv_heads: u32,
     pub head_dim: u32,
 }
+
+impl ModelGeometry {
+    pub const fn new(layers: u32, kv_heads: u32, head_dim: u32) -> Result<Self, PrefillError> {
+        if layers == 0 || kv_heads == 0 || head_dim == 0 {
+            return Err(PrefillError::InvalidGeometry);
+        }
+        Ok(Self {
+            layers,
+            kv_heads,
+            head_dim,
+        })
+    }
+}
