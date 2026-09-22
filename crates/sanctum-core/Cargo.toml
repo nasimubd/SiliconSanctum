@@ -12,3 +12,6 @@ workspace = true
 
 [dependencies]
 libc = "0.2.176"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+mach2 = "0.4.3"
