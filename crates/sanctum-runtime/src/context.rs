@@ -478,4 +478,27 @@ pub fn deduplicate_symbols(symbols: &mut Vec<StructuralSymbol>) {
     symbols.dedup_by(|a, b| a.range == b.range && a.kind == b.kind);
 }
 
+impl StructuralSummarizer {
+    pub fn summarize(&self, parsed: &ParsedDocument) -> StructuralSummary {
+        let mut symbols = extract_symbols(parsed);
+        sort_symbols(&mut symbols);
+        deduplicate_symbols(&mut symbols);
+        let text = symbols
+            .iter()
+            .map(render_symbol)
+            .filter(|v| !v.is_empty())
+            .collect::<Vec<_>>()
+            .join("\n");
+        let _ = self.policy;
+        StructuralSummary {
+            text: text.clone(),
+            metrics: CompressionMetrics {
+                original_bytes: parsed.source().len(),
+                summary_bytes: text.len(),
+            },
+            symbols,
+        }
+    }
+}
+
 pub struct ContextMarker;
