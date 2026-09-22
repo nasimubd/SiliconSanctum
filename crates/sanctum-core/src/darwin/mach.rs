@@ -13,6 +13,15 @@ pub enum MachTelemetryError {
     CounterOverflow { counter: &'static str },
 }
 
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct VmPageCounters {
+    pub free: u64,
+    pub active: u64,
+    pub inactive: u64,
+    pub wired: u64,
+    pub compressed: u64,
+}
+
 #[cfg(test)]
 mod tests {
     use super::MachTelemetryError;
