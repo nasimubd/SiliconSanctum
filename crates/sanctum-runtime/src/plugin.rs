@@ -206,4 +206,11 @@ pub struct PluginCatalog {
     entries: std::collections::BTreeMap<String, PluginManifest>,
 }
 
+impl PluginCatalog {
+    pub fn register(&mut self, manifest: PluginManifest) -> Option<PluginManifest> {
+        self.entries
+            .insert(manifest.id.as_str().to_owned(), manifest)
+    }
+}
+
 pub struct PluginMarker;
