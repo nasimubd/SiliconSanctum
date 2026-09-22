@@ -2,6 +2,7 @@
 
 use std::fmt;
 use std::sync::{Arc,atomic::{AtomicBool,Ordering}};
+use std::collections::VecDeque;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SpeculativeError {
@@ -122,4 +123,7 @@ pub struct ModelProfile{pub draft:String,pub target:String}
 impl ModelProfile{pub fn label(&self)->String{format!("{} -> {}",self.draft,self.target)}}
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub enum DecoderEvent{Started,CycleCompleted{accepted:usize,proposed:usize},WidthChanged{from:u8,to:u8},Stopped}
+#[derive(Debug,Clone)]
+pub struct EventLog{capacity:usize,events:VecDeque<DecoderEvent>}
+impl EventLog{pub fn new(capacity:usize)->Result<Self,SpeculativeError>{if capacity==0{return Err(SpeculativeError::ZeroValue("event capacity"));}Ok(Self{capacity,events:VecDeque::new()})}pub fn push(&mut self,event:DecoderEvent){if self.events.len()==self.capacity{self.events.pop_front();}self.events.push_back(event)}pub fn events(&self)->&VecDeque<DecoderEvent>{&self.events}}
 // NEXT
