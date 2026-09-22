@@ -128,4 +128,5 @@ pub struct EventLog{capacity:usize,events:VecDeque<DecoderEvent>}
 impl EventLog{pub fn new(capacity:usize)->Result<Self,SpeculativeError>{if capacity==0{return Err(SpeculativeError::ZeroValue("event capacity"));}Ok(Self{capacity,events:VecDeque::new()})}pub fn push(&mut self,event:DecoderEvent){if self.events.len()==self.capacity{self.events.pop_front();}self.events.push_back(event)}pub fn events(&self)->&VecDeque<DecoderEvent>{&self.events}}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum Lifecycle{Idle,Loading,Ready,Generating,Stopping,Stopped,Failed}
+impl Lifecycle{pub fn can_transition(self,next:Self)->bool{matches!((self,next),(Self::Idle,Self::Loading)|(Self::Loading,Self::Ready)|(Self::Ready,Self::Generating)|(Self::Generating,Self::Ready)|(Self::Generating,Self::Stopping)|(Self::Ready,Self::Stopping)|(Self::Stopping,Self::Stopped)|(_,Self::Failed))}}
 // NEXT
