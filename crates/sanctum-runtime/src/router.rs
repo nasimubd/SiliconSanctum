@@ -122,4 +122,15 @@ pub struct RouteDecision {
     pub confidence: f64,
 }
 
+impl RouteDecision {
+    #[must_use]
+    pub const fn deterministic(c: f64) -> Self {
+        Self {
+            destination: RouteDestination::DeterministicTool,
+            reason: RouteReason::HighCertainty,
+            confidence: c,
+        }
+    }
+}
+
 pub struct RouterMarker;
