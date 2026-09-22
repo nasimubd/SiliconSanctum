@@ -284,4 +284,11 @@ impl Noul {
     }
 }
 
+impl Noul {
+    #[must_use]
+    pub fn is_positive(self) -> bool {
+        self.0 >= 0.5
+    }
+}
+
 pub struct DecisionMarker;
