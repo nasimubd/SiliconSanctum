@@ -59,4 +59,7 @@ impl Default for LatencyBudget {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DecisionModelId(String);
+
 pub struct DecisionMarker;
