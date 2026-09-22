@@ -373,4 +373,11 @@ impl SystemOneGateway {
     }
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct GatewayMetrics {
+    pub system_one: u64,
+    pub deterministic: u64,
+    pub heavy: u64,
+}
+
 pub struct GatewayMarker;
