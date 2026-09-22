@@ -26,4 +26,8 @@ impl MemorySnapshot {
     pub const fn wired_bytes(self) -> u64 {
         self.wired_bytes
     }
+    #[must_use]
+    pub const fn available_bytes(self) -> u64 {
+        self.available_bytes
+    }
 }
