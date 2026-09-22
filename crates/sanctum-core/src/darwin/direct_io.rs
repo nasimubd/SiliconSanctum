@@ -386,6 +386,16 @@ mod tests {
             prop_assert_eq!(buffer.as_slice().as_ptr().addr() % 16_384, 0);
             prop_assert_eq!(buffer.len(), length);
         }
+
+
+        #[test]
+        fn chunk_end_matches_checked_arithmetic(offset: u64, length: u16) {
+            let range = super::ChunkRange {
+                offset,
+                length: usize::from(length),
+            };
+            prop_assert_eq!(range.end(), offset.checked_add(u64::from(length)));
+        }
     }
 
     #[test]
