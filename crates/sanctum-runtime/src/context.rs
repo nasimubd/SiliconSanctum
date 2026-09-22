@@ -330,4 +330,9 @@ pub fn body_field(_language: SourceLanguage) -> &'static str {
     "body"
 }
 
+#[must_use]
+pub fn node_text<'a>(node: tree_sitter::Node<'_>, source: &'a [u8]) -> Option<&'a str> {
+    node.utf8_text(source).ok()
+}
+
 pub struct ContextMarker;
