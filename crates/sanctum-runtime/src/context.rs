@@ -501,4 +501,10 @@ impl StructuralSummarizer {
     }
 }
 
-pub struct ContextMarker;
+pub fn summarize_document(
+    document: SourceDocument,
+    policy: PruningPolicy,
+) -> Result<StructuralSummary, ContextError> {
+    let parsed = ParsedDocument::parse(document)?;
+    Ok(StructuralSummarizer::new(policy).summarize(&parsed))
+}
