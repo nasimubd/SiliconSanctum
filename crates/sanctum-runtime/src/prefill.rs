@@ -30,6 +30,15 @@ impl SchedulingDecision {
     }
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct SchedulerMetrics {
+    pub requests: u64,
+    pub chunks: u64,
+    pub rejected: u64,
+    pub selected_512: u64,
+    pub selected_1024: u64,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TokenCount(usize);
 
