@@ -27,4 +27,13 @@ impl ParameterCount {
     pub fn new(value: u64) -> Result<Self, SpeculativeError> { (value > 0).then_some(Self(value)).ok_or(SpeculativeError::ZeroValue("parameter count")) }
     pub const fn get(self) -> u64 { self.0 }
 }
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DraftModel { pub name: String, pub parameters: ParameterCount }
+impl DraftModel {
+ pub const MAX_PARAMETERS:u64=2_000_000_000;
+ pub fn new(name:impl Into<String>,parameters:ParameterCount)->Result<Self,SpeculativeError>{
+  if parameters.get()>=Self::MAX_PARAMETERS{return Err(SpeculativeError::DraftModelTooLarge(parameters.get()));}
+  Ok(Self{name:name.into(),parameters})
+ }
+}
 // NEXT
