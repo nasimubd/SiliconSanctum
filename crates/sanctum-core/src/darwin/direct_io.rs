@@ -55,6 +55,9 @@ pub struct AlignedBuffer {
     alignment: usize,
 }
 
+// SAFETY: the allocation is uniquely owned and moving it transfers exclusive ownership.
+unsafe impl Send for AlignedBuffer {}
+
 impl AlignedBuffer {
     /// Allocates a zeroed buffer with the requested alignment.
     ///
