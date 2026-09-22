@@ -135,6 +135,14 @@ mod tests {
     }
 
     #[test]
+    fn page_conversion_rejects_overflow() {
+        assert_eq!(
+            pages_to_bytes("wired", u64::MAX, 16_384).unwrap_err(),
+            MachTelemetryError::CounterOverflow { counter: "wired" }
+        );
+    }
+
+    #[test]
     fn kernel_error_display_names_operation_and_status() {
         let error = MachTelemetryError::Kernel {
             operation: "host_statistics64",
