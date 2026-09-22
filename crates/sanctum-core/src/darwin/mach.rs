@@ -38,6 +38,9 @@ pub trait MachHost {
     fn vm_counters(&self) -> Result<VmPageCounters, MachTelemetryError>;
 }
 
+#[derive(Debug, Default, Clone, Copy)]
+pub struct NativeMachHost;
+
 #[cfg(test)]
 mod tests {
     use super::MachTelemetryError;
