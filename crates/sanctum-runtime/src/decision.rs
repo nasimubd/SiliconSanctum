@@ -386,4 +386,10 @@ impl ChoiceId {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct ChoiceItem {
+    pub id: ChoiceId,
+    pub probability: f64,
+}
+
 pub struct DecisionMarker;
