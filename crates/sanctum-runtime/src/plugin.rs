@@ -9,4 +9,7 @@ pub enum PluginError {
     UnsupportedProtocol,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PluginId(String);
+
 pub struct PluginMarker;
