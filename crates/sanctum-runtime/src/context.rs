@@ -353,4 +353,16 @@ pub fn signature_end(node: tree_sitter::Node<'_>, language: SourceLanguage) -> u
         .map_or(node.end_byte(), |body| body.start_byte())
 }
 
+#[must_use]
+pub fn signature_text(
+    node: tree_sitter::Node<'_>,
+    language: SourceLanguage,
+    source: &[u8],
+) -> String {
+    let end = signature_end(node, language).min(source.len());
+    String::from_utf8_lossy(&source[node.start_byte()..end])
+        .trim()
+        .to_owned()
+}
+
 pub struct ContextMarker;
