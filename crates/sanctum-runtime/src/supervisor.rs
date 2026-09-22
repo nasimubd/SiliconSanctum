@@ -146,6 +146,11 @@ impl ProcessSpec {
     }
 }
 
+#[must_use]
+pub fn build_command(spec: &ProcessSpec) -> tokio::process::Command {
+    tokio::process::Command::new(spec.executable.as_path())
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BackendKind {
     LlamaServer,
