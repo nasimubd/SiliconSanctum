@@ -22,6 +22,10 @@ pub const fn decode_pressure(flags: usize) -> MemoryPressure {
     }
 }
 
+pub trait PressureHandler: Send + Sync + 'static {
+    fn on_pressure(&self, pressure: MemoryPressure);
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
