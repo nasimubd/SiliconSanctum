@@ -481,4 +481,13 @@ impl RouteMetrics {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FanoutDeadline(std::time::Duration);
 
+impl FanoutDeadline {
+    pub fn new(v: std::time::Duration) -> Result<Self, RouterError> {
+        if v.is_zero() {
+            return Err(RouterError::InvalidThresholds);
+        }
+        Ok(Self(v))
+    }
+}
+
 pub struct RouterMarker;
