@@ -79,3 +79,20 @@ fn workers_preserve_range_order_in_native_buffers() {
     assert_eq!(buffers[1].as_bytes(), b"first");
     assert_eq!(buffers[2].as_bytes(), b"second");
 }
+
+#[test]
+fn worker_failures_never_return_partial_model_buffers() {
+    use sanctum_core::darwin::direct_io::DirectIoError;
+    let device = MTLCreateSystemDefaultDevice().expect("Metal device required");
+    let fixture = tempfile::NamedTempFile::new().unwrap();
+    let model = DirectModelFile::open(fixture.path()).unwrap();
+    let ranges = [ChunkRange {
+        offset: 0,
+        length: 1,
+    }; 3];
+    assert!(matches!(
+        load_shared_chunks(&device, &model, &ranges, 2, 3 * 16_384),
+        Err(MetalBufferError::Allocation(DirectIoError::Read { source, .. }))
+            if source.kind() == std::io::ErrorKind::UnexpectedEof
+    ));
+}
