@@ -348,4 +348,10 @@ pub fn common_prefix_len(left: &[TokenId], right: &[TokenId]) -> usize {
     left.iter().zip(right).take_while(|(a, b)| a == b).count()
 }
 
+#[must_use]
+pub fn shared_prefix(left: &TokenSequence, right: &TokenSequence) -> Option<TokenSequence> {
+    let len = common_prefix_len(left.tokens(), right.tokens());
+    (len > 0).then(|| TokenSequence(left.tokens()[..len].to_vec()))
+}
+
 pub struct RadixMarker;
