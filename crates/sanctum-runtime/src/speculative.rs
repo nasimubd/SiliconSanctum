@@ -106,4 +106,5 @@ pub trait DecoderBackend{
  fn propose(&mut self,width:VerifyWidth)->Result<DraftProposal,SpeculativeError>;
  fn verify(&mut self,proposal:&DraftProposal)->Result<Vec<u32>,SpeculativeError>;
 }
+pub fn run_cycle<B:DecoderBackend>(backend:&mut B,width:VerifyWidth)->Result<CycleOutcome,SpeculativeError>{let proposal=backend.propose(width)?;let target=backend.verify(&proposal)?;let verification=compare_proposal(&proposal,&target);Ok(CycleOutcome{proposal,verification})}
 // NEXT
