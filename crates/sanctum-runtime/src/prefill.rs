@@ -180,3 +180,12 @@ impl TuningPolicy {
         })
     }
 }
+
+impl Default for TuningPolicy {
+    fn default() -> Self {
+        Self {
+            thresholds: TuningThresholds::default(),
+            scratch_budget: ScratchBudget(512 * 1024 * 1024),
+        }
+    }
+}
