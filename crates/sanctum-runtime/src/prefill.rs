@@ -28,3 +28,9 @@ impl TokenCount {
         self.0
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrefillStep {
+    Tokens512,
+    Tokens1024,
+}
