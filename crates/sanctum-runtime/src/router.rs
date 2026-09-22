@@ -73,4 +73,18 @@ impl Default for RouteThresholds {
     }
 }
 
+impl RouteThresholds {
+    pub fn new(moderate: f64, high: f64) -> Result<Self, RouterError> {
+        if !moderate.is_finite()
+            || !high.is_finite()
+            || moderate < 0.0
+            || high > 1.0
+            || moderate >= high
+        {
+            return Err(RouterError::InvalidThresholds);
+        }
+        Ok(Self { moderate, high })
+    }
+}
+
 pub struct RouterMarker;
