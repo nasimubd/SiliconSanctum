@@ -380,4 +380,16 @@ pub struct GatewayMetrics {
     pub heavy: u64,
 }
 
+impl GatewayMetrics {
+    pub fn record(&mut self, path: GatewayPath) {
+        match path {
+            GatewayPath::SystemOne => self.system_one = self.system_one.saturating_add(1),
+            GatewayPath::DeterministicInterpreter => {
+                self.deterministic = self.deterministic.saturating_add(1);
+            }
+            GatewayPath::HeavyReasoningModel => self.heavy = self.heavy.saturating_add(1),
+        }
+    }
+}
+
 pub struct GatewayMarker;
