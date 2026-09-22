@@ -191,6 +191,11 @@ impl SupervisedChild {
     pub fn id(&self) -> Option<u32> {
         self.child.id()
     }
+
+    #[must_use]
+    pub const fn state(&self) -> ProcessState {
+        self.state
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
