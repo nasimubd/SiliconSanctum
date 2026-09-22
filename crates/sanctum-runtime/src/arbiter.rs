@@ -174,6 +174,12 @@ pub enum DecisionReason {
     SwapDetected,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ArbiterDecision {
+    pub action: ArbiterAction,
+    pub reason: DecisionReason,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
