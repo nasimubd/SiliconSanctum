@@ -260,4 +260,14 @@ pub struct RegistryStats {
     pub total_weight_bytes: u64,
 }
 
+impl ModelRegistry {
+    #[must_use]
+    pub fn stats(&self) -> RegistryStats {
+        RegistryStats {
+            models: self.entries.len(),
+            total_weight_bytes: self.entries.values().map(|entry| entry.weights_bytes).sum(),
+        }
+    }
+}
+
 pub struct RegistryMarker;
