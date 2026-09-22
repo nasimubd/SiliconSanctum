@@ -52,4 +52,26 @@ pub struct SourceDocument {
     source: Vec<u8>,
 }
 
+impl SourceDocument {
+    pub fn new(path: impl Into<std::path::PathBuf>, source: Vec<u8>) -> Result<Self, ContextError> {
+        let path = path.into();
+        if path.as_os_str().is_empty() {
+            return Err(ContextError::EmptyPath);
+        }
+        if source.is_empty() {
+            return Err(ContextError::EmptySource);
+        }
+        let ext = path
+            .extension()
+            .and_then(std::ffi::OsStr::to_str)
+            .ok_or_else(|| ContextError::UnsupportedExtension(String::new()))?;
+        let language = SourceLanguage::from_extension(ext)?;
+        Ok(Self {
+            path,
+            language,
+            source,
+        })
+    }
+}
+
 pub struct ContextMarker;
