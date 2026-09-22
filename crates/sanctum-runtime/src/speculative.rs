@@ -83,6 +83,7 @@ impl AdaptationPolicy{
  }
  pub fn select_with_bandwidth(&self,pressure:f32,bandwidth:BandwidthObservation)->VerifyWidth{if bandwidth.utilization()>=0.9{self.widths.minimum}else{self.select(pressure)}}
 }
+impl Default for AdaptationPolicy{fn default()->Self{Self{widths:VerifyWidthBounds::new(VerifyWidth::new(1).expect("one"),VerifyWidth::new(8).expect("eight")).expect("ordered"),medium_pressure:0.65,high_pressure:0.85}}}
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct DraftProposal(Vec<u32>);
 impl DraftProposal{pub fn new(tokens:Vec<u32>)->Result<Self,SpeculativeError>{(!tokens.is_empty()).then_some(Self(tokens)).ok_or(SpeculativeError::EmptyProposal)}pub fn tokens(&self)->&[u32]{&self.0}}
