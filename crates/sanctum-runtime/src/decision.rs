@@ -5,4 +5,25 @@ pub const MIN_DECISION_LATENCY: std::time::Duration = std::time::Duration::from_
 
 pub const MAX_DECISION_LATENCY: std::time::Duration = std::time::Duration::from_millis(500);
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum DecisionError {
+    LatencyBelowMinimum,
+    LatencyAboveMaximum,
+    InvertedLatencyRange,
+    EmptyField { field: &'static str },
+    ZeroParameterCount,
+    ParameterLimitExceeded { parameters: u64 },
+    ZeroDimension,
+    TensorSizeOverflow,
+    EmptyInput,
+    NonFiniteInput,
+    EmptyLogits,
+    NonFiniteLogit,
+    ProbabilityOutOfRange,
+    EmptyChoices,
+    TooManyChoices,
+    DuplicateChoice(String),
+    InvalidRubric,
+}
+
 pub struct DecisionMarker;
