@@ -181,6 +181,11 @@ mod tests {
     }
 
     #[test]
+    fn telemetry_converts_wired_pages() {
+        assert_eq!(memory_telemetry(&FakeHost).unwrap().wired_bytes, 400);
+    }
+
+    #[test]
     fn page_conversion_multiplies_by_page_size() {
         assert_eq!(pages_to_bytes("free", 3, 16_384).unwrap(), 49_152);
     }
