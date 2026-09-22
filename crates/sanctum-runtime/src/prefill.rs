@@ -159,3 +159,9 @@ impl Default for TuningThresholds {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TuningPolicy {
+    pub thresholds: TuningThresholds,
+    pub scratch_budget: ScratchBudget,
+}
