@@ -544,4 +544,11 @@ impl ScoreRubric {
     }
 }
 
+impl ScoreRubric {
+    #[must_use]
+    pub fn minimum(&self) -> RubricPoint {
+        self.points[0]
+    }
+}
+
 pub struct DecisionMarker;
