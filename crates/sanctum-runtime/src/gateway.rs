@@ -433,4 +433,10 @@ impl GatewayEventLog {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DetectionLimits {
+    pub max_prompt_bytes: usize,
+    pub max_evidence: usize,
+}
+
 pub struct GatewayMarker;
