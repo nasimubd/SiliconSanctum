@@ -280,4 +280,9 @@ pub fn cpp_query() -> QuerySpec {
     }
 }
 
+#[must_use]
+pub fn typescript_query() -> QuerySpec {
+    QuerySpec { source: "[(class_declaration name: (type_identifier) @name) (function_declaration name: (identifier) @name) (interface_declaration name: (type_identifier) @name)] @definition".to_owned() }
+}
+
 pub struct ContextMarker;
