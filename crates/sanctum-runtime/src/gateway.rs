@@ -490,4 +490,9 @@ pub fn counting_marker_count(text: &str) -> usize {
         .count()
 }
 
+#[must_use]
+pub fn requires_arithmetic_bypass(text: &str) -> bool {
+    contains_digit(text) && arithmetic_operator_count(text) >= 2
+}
+
 pub struct GatewayMarker;
