@@ -31,4 +31,10 @@ impl RegistryModelId {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModelBackend {
+    LlamaServer,
+    MlxLm,
+}
+
 pub struct RegistryMarker;
