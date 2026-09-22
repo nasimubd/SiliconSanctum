@@ -58,7 +58,7 @@ impl std::fmt::Display for BackendKind {
 
 #[cfg(test)]
 mod tests {
-    use super::{BackendKind, ExecutablePath, SupervisorError};
+    use super::{BackendKind, ExecutablePath, ModelPath, SupervisorError};
 
     #[test]
     fn formats_llama_server_backend() {
@@ -79,5 +79,10 @@ mod tests {
     fn accepts_absolute_executable_path() {
         let path = ExecutablePath::new("/usr/bin/true").unwrap();
         assert_eq!(path.as_path(), std::path::Path::new("/usr/bin/true"));
+    }
+
+    #[test]
+    fn rejects_relative_model_path() {
+        assert!(matches!(ModelPath::new("models/model.gguf"), Err(SupervisorError::RelativePath { field: "model", .. })));
     }
 }
