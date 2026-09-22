@@ -405,4 +405,16 @@ pub struct GatewayEventLog {
     entries: std::collections::VecDeque<GatewayEvent>,
 }
 
+impl GatewayEventLog {
+    pub fn new(capacity: usize) -> Result<Self, GatewayError> {
+        if capacity == 0 {
+            return Err(GatewayError::InvalidLimit);
+        }
+        Ok(Self {
+            capacity,
+            entries: std::collections::VecDeque::with_capacity(capacity),
+        })
+    }
+}
+
 pub struct GatewayMarker;
