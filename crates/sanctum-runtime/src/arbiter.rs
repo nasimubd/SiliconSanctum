@@ -488,6 +488,22 @@ pub struct MemoryArbiter<T> {
     events: EventLog,
 }
 
+impl<T: MemoryTelemetrySource> MemoryArbiter<T> {
+    pub fn new(
+        telemetry: T,
+        engine: DecisionEngine,
+        initial: MemorySnapshot,
+        event_capacity: usize,
+    ) -> Result<Self, ArbiterError> {
+        Ok(Self {
+            telemetry,
+            engine,
+            state: ArbiterState::new(initial),
+            events: EventLog::new(event_capacity)?,
+        })
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
