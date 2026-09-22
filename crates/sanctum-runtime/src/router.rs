@@ -280,4 +280,16 @@ pub struct FanoutRouter<I, T, C> {
     policy: RouterPolicy,
 }
 
+impl<I, T, C> FanoutRouter<I, T, C> {
+    #[must_use]
+    pub const fn new(intent: I, tooling: T, complexity: C, policy: RouterPolicy) -> Self {
+        Self {
+            intent,
+            tooling,
+            complexity,
+            policy,
+        }
+    }
+}
+
 pub struct RouterMarker;
