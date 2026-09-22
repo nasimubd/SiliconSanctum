@@ -37,4 +37,11 @@ pub enum ModelBackend {
     MlxLm,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModelFormat {
+    Gguf,
+    Mlx,
+    Safetensors,
+}
+
 pub struct RegistryMarker;
