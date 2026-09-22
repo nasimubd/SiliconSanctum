@@ -22,6 +22,8 @@ impl EnvironmentEntry {
         if value.contains('\0') { return Err(SupervisorError::InvalidEnvironment { field: "value" }); }
         Ok(Self { key, value })
     }
+    #[must_use] pub fn key(&self) -> &str { &self.key }
+    #[must_use] pub fn value(&self) -> &str { &self.value }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
