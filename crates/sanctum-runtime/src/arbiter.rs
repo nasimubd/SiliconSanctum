@@ -67,6 +67,15 @@ impl ModelResidency {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelFootprint {
+    pub id: ModelId,
+    pub weights_bytes: u64,
+    pub kv_bytes: u64,
+    pub priority: u8,
+    pub residency: ModelResidency,
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
