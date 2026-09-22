@@ -180,4 +180,9 @@ impl ModelEntry {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ModelRegistry {
+    entries: std::collections::BTreeMap<String, ModelEntry>,
+}
+
 pub struct RegistryMarker;
