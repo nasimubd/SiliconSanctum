@@ -33,6 +33,7 @@ pub struct ActiveProfile(String);
 impl ActiveProfile{pub fn new(value:impl Into<String>)->Result<Self,DashboardError>{let value=value.into();if value.trim().is_empty(){return Err(DashboardError::EmptyProfile);}Ok(Self(value))}pub fn as_str(&self)->&str{&self.0}}
 #[derive(Debug,Clone,PartialEq)]
 pub struct DashboardSnapshot{pub token_rate:TokenRate,pub memory:MemoryTelemetry,pub cpu:CpuTelemetry,pub kv:KvResidency,pub profile:ActiveProfile}
+impl DashboardSnapshot{pub fn new(token_rate:TokenRate,memory:MemoryTelemetry,cpu:CpuTelemetry,kv:KvResidency,profile:ActiveProfile)->Self{Self{token_rate,memory,cpu,kv,profile}}}
 pub trait TelemetrySource{fn snapshot(&mut self)->Result<DashboardSnapshot,DashboardError>;}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum DashboardTab{Overview,Memory,Compute}
