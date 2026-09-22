@@ -78,4 +78,11 @@ impl JaggednessReport {
     }
 }
 
+impl JaggednessReport {
+    #[must_use]
+    pub fn is_jagged(&self) -> bool {
+        !self.evidence.is_empty()
+    }
+}
+
 pub struct GatewayMarker;
