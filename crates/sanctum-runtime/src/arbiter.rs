@@ -401,6 +401,12 @@ impl ArbiterState {
     }
 }
 
+impl ArbiterState {
+    pub fn update_snapshot(&mut self, snapshot: MemorySnapshot) {
+        self.snapshot = snapshot;
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
