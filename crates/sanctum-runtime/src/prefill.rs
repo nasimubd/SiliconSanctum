@@ -11,3 +11,6 @@ pub enum PrefillError {
     InsufficientMemory,
     CriticalPressure,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct TokenCount(usize);
