@@ -124,6 +124,10 @@ pub struct ChunkRange {
     pub length: usize,
 }
 
+pub trait SharedMetalBuffer {
+    fn writable_bytes(&mut self) -> &mut [u8];
+}
+
 impl ChunkRange {
     #[must_use]
     pub fn end(self) -> Option<u64> {
