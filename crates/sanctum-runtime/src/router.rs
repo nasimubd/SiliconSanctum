@@ -160,4 +160,11 @@ pub struct RouterPolicy {
     thresholds: RouteThresholds,
 }
 
+impl RouterPolicy {
+    #[must_use]
+    pub const fn new(thresholds: RouteThresholds) -> Self {
+        Self { thresholds }
+    }
+}
+
 pub struct RouterMarker;
