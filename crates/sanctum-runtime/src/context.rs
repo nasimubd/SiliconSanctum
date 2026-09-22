@@ -33,4 +33,16 @@ impl SourceLanguage {
     }
 }
 
+impl SourceLanguage {
+    #[must_use]
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Python => "python",
+            Self::Rust => "rust",
+            Self::Cpp => "cpp",
+            Self::TypeScript => "typescript",
+        }
+    }
+}
+
 pub struct ContextMarker;
