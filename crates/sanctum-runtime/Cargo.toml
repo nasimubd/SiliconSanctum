@@ -12,3 +12,4 @@ workspace = true
 
 [dependencies]
 tokio = { version = "1.47", features = ["fs", "macros", "process", "rt-multi-thread", "signal", "sync", "time"] }
+thiserror = "2.0"
