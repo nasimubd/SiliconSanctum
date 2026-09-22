@@ -53,3 +53,6 @@ impl PrefillStep {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ScratchBudget(u64);
