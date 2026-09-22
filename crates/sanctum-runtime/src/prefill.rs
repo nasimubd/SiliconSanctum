@@ -305,3 +305,10 @@ pub fn partition_tokens(tokens: TokenCount, step: PrefillStep) -> Vec<PrefillChu
     }
     chunks
 }
+
+#[must_use]
+pub const fn estimate_scratch_bytes(step: PrefillStep, geometry: ModelGeometry) -> u64 {
+    geometry
+        .kv_bytes_per_token(KvQuantization::Bits16)
+        .saturating_mul(step.tokens() as u64)
+}
