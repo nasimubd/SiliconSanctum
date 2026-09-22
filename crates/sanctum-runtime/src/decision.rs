@@ -81,4 +81,10 @@ impl DecisionModelId {
 
 pub const MAX_DECISION_PARAMETERS: u64 = 200_000_000;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DecisionModelMetadata {
+    pub id: DecisionModelId,
+    parameters: u64,
+}
+
 pub struct DecisionMarker;
