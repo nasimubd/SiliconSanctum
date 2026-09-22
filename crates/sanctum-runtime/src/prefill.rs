@@ -19,6 +19,17 @@ pub enum SchedulingDecision {
     Rejected,
 }
 
+impl SchedulingDecision {
+    #[must_use]
+    pub const fn reason(self) -> &'static str {
+        match self {
+            Self::Conservative => "memory headroom requires 512-token chunks",
+            Self::Throughput => "memory headroom permits 1024-token chunks",
+            Self::Rejected => "prefill exceeds memory safety limits",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TokenCount(usize);
 
