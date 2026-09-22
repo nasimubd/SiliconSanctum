@@ -16,3 +16,13 @@ impl std::fmt::Display for BackendKind {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::BackendKind;
+
+    #[test]
+    fn formats_llama_server_backend() {
+        assert_eq!(BackendKind::LlamaServer.to_string(), "llama-server");
+    }
+}
