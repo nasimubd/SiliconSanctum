@@ -368,6 +368,16 @@ mod tests {
     }
 
     #[test]
+    fn bounded_workers_reject_zero_limit() {
+        let fixture = model_fixture(b"abc");
+        let model = DirectModelFile::open(fixture.path()).unwrap();
+        assert!(matches!(
+            super::read_chunks_bounded(&model, &[], 0),
+            Err(DirectIoError::InvalidWorkerLimit)
+        ));
+    }
+
+    #[test]
     fn allocation_honors_sixteen_kibibyte_alignment() {
         let buffer = AlignedBuffer::new(16_384, 16_384).unwrap();
         assert_eq!(buffer.as_slice().as_ptr().addr() % 16_384, 0);
