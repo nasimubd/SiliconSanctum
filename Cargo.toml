@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/sanctum-core"]
+members = ["crates/sanctum-core", "crates/sanctum-runtime"]
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "deny"
