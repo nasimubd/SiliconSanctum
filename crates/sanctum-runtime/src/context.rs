@@ -470,4 +470,8 @@ pub fn render_symbol(symbol: &StructuralSymbol) -> String {
     normalize_whitespace(symbol.signature())
 }
 
+pub fn sort_symbols(symbols: &mut [StructuralSymbol]) {
+    symbols.sort_by_key(|symbol| symbol.range.start);
+}
+
 pub struct ContextMarker;
