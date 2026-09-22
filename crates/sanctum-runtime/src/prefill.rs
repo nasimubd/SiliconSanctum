@@ -136,6 +136,14 @@ impl ChunkCursor {
             position: 0,
         }
     }
+
+    pub fn advance(&mut self) -> Option<PrefillChunk> {
+        let chunk = self.chunks.get(self.position).copied();
+        if chunk.is_some() {
+            self.position = self.position.saturating_add(1);
+        }
+        chunk
+    }
 }
 
 impl TuningThresholds {
