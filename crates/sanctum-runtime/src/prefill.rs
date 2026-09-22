@@ -300,6 +300,9 @@ impl PrefillScheduler {
     ) -> Result<PrefillPlan, PrefillError> {
         let step = self.select_step(request, memory);
         let scratch_bytes = estimate_scratch_bytes(step, request.geometry);
+        if scratch_bytes > self.policy.scratch_budget.bytes() {
+            return Err(PrefillError::UnsafeScratch);
+        }
         let kv_bytes = request
             .geometry
             .kv_bytes_per_token(request.quantization)
