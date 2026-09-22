@@ -106,7 +106,21 @@ pub enum SysctlError {
 
 #[cfg(test)]
 mod tests {
-    use super::{SysctlError, decode_u64};
+    use std::cell::RefCell;
+
+    use super::{IOGPU_WIRED_LIMIT_KEY, SysctlError, SysctlRead, decode_u64, wired_limit_mb};
+
+    struct FakeRead {
+        keys: RefCell<Vec<String>>,
+        value: u64,
+    }
+
+    impl SysctlRead for FakeRead {
+        fn read(&self, key: &str) -> Result<Vec<u8>, SysctlError> {
+            self.keys.borrow_mut().push(key.into());
+            Ok(self.value.to_ne_bytes().to_vec())
+        }
+    }
 
     #[test]
     fn unsigned_values_use_native_byte_order() {
@@ -124,6 +138,17 @@ mod tests {
                 ..
             }
         ));
+    }
+
+    #[test]
+    fn wired_limit_reader_selects_iogpu_key() {
+        let backend = FakeRead {
+            keys: RefCell::default(),
+            value: 10_240,
+        };
+
+        assert_eq!(wired_limit_mb(&backend).unwrap(), 10_240);
+        assert_eq!(backend.keys.into_inner(), [IOGPU_WIRED_LIMIT_KEY]);
     }
 
     #[test]
