@@ -450,4 +450,10 @@ impl CacheEventLog {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EvictionStrategy {
+    LeastRecentlyUsed,
+    ClearAll,
+}
+
 pub struct RadixMarker;
