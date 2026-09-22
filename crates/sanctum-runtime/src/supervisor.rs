@@ -1,4 +1,5 @@
 //! Asynchronous model-process supervision.
+#![allow(clippy::missing_errors_doc)]
 
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -198,7 +199,8 @@ impl ProcessSignal {
 }
 
 fn send_signal(pid: u32, signal: ProcessSignal) -> Result<(), SupervisorError> {
-    let result = unsafe { libc::kill(pid as libc::pid_t, signal.number()) };
+    let pid = libc::pid_t::try_from(pid).map_err(|_| SupervisorError::MissingProcessId)?;
+    let result = unsafe { libc::kill(pid, signal.number()) };
     if result == 0 {
         return Ok(());
     }
@@ -216,11 +218,11 @@ pub struct SupervisedChild {
 }
 
 impl SupervisedChild {
-    pub async fn terminate(&mut self) -> Result<(), SupervisorError> {
+    pub fn terminate(&mut self) -> Result<(), SupervisorError> {
         self.signal(ProcessSignal::Terminate)
     }
 
-    pub async fn force_kill(&mut self) -> Result<(), SupervisorError> {
+    pub fn force_kill(&mut self) -> Result<(), SupervisorError> {
         self.signal(ProcessSignal::Kill)
     }
 
@@ -231,17 +233,14 @@ impl SupervisedChild {
         if self.try_status()?.is_some() {
             return Ok(ShutdownOutcome::AlreadyExited);
         }
-        self.terminate().await?;
-        match tokio::time::timeout(policy.graceful, self.wait()).await {
-            Ok(result) => {
-                result?;
-                Ok(ShutdownOutcome::Graceful)
-            }
-            Err(_) => {
-                self.force_kill().await?;
-                self.wait().await?;
-                Ok(ShutdownOutcome::Forced)
-            }
+        self.terminate()?;
+        if let Ok(result) = tokio::time::timeout(policy.graceful, self.wait()).await {
+            result?;
+            Ok(ShutdownOutcome::Graceful)
+        } else {
+            self.force_kill()?;
+            self.wait().await?;
+            Ok(ShutdownOutcome::Forced)
         }
     }
 
@@ -427,6 +426,25 @@ mod tests {
         let mut child = super::SupervisedChild::spawn(&spec).unwrap();
         assert!(child.wait().await.unwrap().success());
         assert_eq!(child.state(), ProcessState::Exited);
+    }
+
+    #[tokio::test]
+    async fn preserves_already_exited_shutdown_outcome() {
+        let spec = super::ProcessSpec::llama_server(
+            ExecutablePath::new("/usr/bin/true").unwrap(),
+            ModelPath::new("/tmp/model").unwrap(),
+        );
+        let mut child = super::SupervisedChild::spawn(&spec).unwrap();
+        child.wait().await.unwrap();
+        let policy = ShutdownPolicy::new(
+            std::time::Duration::from_millis(50),
+            std::time::Duration::from_millis(50),
+        )
+        .unwrap();
+        assert_eq!(
+            child.shutdown(policy).await.unwrap(),
+            super::ShutdownOutcome::AlreadyExited
+        );
     }
 
     #[test]
