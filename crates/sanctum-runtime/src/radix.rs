@@ -86,4 +86,14 @@ pub struct ModelArchitecture {
     pub attention: AttentionArchitecture,
 }
 
+impl ModelArchitecture {
+    pub fn validate_prefix_cache(&self) -> Result<(), RadixError> {
+        if self.attention.supports_prefix_cache() {
+            Ok(())
+        } else {
+            Err(RadixError::UnsupportedAttention)
+        }
+    }
+}
+
 pub struct RadixMarker;
