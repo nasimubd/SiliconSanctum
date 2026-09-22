@@ -5,6 +5,8 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum SupervisorError {
+    #[error("subprocess identifier is unavailable")]
+    MissingProcessId,
     #[error("{field} path must be absolute: {path}")]
     RelativePath {
         field: &'static str,
