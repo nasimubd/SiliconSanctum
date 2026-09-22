@@ -8,4 +8,7 @@ pub enum GatewayError {
     InvalidLimit,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GatewayPrompt(String);
+
 pub struct GatewayMarker;
