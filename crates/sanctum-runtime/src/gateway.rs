@@ -512,4 +512,13 @@ pub enum InterpreterKind {
     Calendar,
 }
 
-pub struct GatewayMarker;
+impl BypassReason {
+    #[must_use]
+    pub const fn interpreter(self) -> Option<InterpreterKind> {
+        match self {
+            Self::Arithmetic => Some(InterpreterKind::Arithmetic),
+            Self::Counting => Some(InterpreterKind::Counting),
+            Self::Temporal => None,
+        }
+    }
+}
