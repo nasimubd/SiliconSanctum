@@ -456,4 +456,10 @@ pub enum EvictionStrategy {
     ClearAll,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct EvictionPolicy {
+    pub strategy: EvictionStrategy,
+    pub target_bytes: usize,
+}
+
 pub struct RadixMarker;
