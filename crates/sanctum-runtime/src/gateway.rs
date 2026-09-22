@@ -301,4 +301,28 @@ impl EscalationPolicy {
     }
 }
 
+impl EscalationPolicy {
+    #[must_use]
+    pub fn decide(self, r: &JaggednessReport) -> Option<BypassDecision> {
+        if r.contains(JaggednessKind::MultiHopArithmetic) {
+            Some(BypassDecision {
+                target: self.arithmetic,
+                reason: BypassReason::Arithmetic,
+            })
+        } else if r.contains(JaggednessKind::Counting) {
+            Some(BypassDecision {
+                target: self.counting,
+                reason: BypassReason::Counting,
+            })
+        } else if r.contains(JaggednessKind::RelativeTemporal) {
+            Some(BypassDecision {
+                target: self.temporal,
+                reason: BypassReason::Temporal,
+            })
+        } else {
+            None
+        }
+    }
+}
+
 pub struct GatewayMarker;
