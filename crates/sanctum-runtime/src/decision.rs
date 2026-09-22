@@ -193,4 +193,15 @@ pub struct FixtureExecutor {
     invocations: u64,
 }
 
+impl FixtureExecutor {
+    #[must_use]
+    pub const fn new(logits: InferenceLogits, latency: std::time::Duration) -> Self {
+        Self {
+            logits,
+            latency,
+            invocations: 0,
+        }
+    }
+}
+
 pub struct DecisionMarker;
