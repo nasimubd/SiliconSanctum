@@ -90,4 +90,11 @@ impl Capability {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PluginManifest {
+    pub id: PluginId,
+    pub endpoint: PluginEndpoint,
+    capabilities: std::collections::BTreeSet<String>,
+}
+
 pub struct PluginMarker;
