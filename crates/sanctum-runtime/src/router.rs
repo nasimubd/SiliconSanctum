@@ -347,4 +347,7 @@ impl ModelPair {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DeterministicTarget(String);
+
 pub struct RouterMarker;
