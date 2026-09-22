@@ -71,4 +71,16 @@ impl PluginEndpoint {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Capability(String);
 
+impl Capability {
+    pub fn new(value: impl Into<String>) -> Result<Self, PluginError> {
+        let value = value.into();
+        if value.trim().is_empty() {
+            return Err(PluginError::EmptyField {
+                field: "capability",
+            });
+        }
+        Ok(Self(value))
+    }
+}
+
 pub struct PluginMarker;
