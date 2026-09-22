@@ -210,4 +210,11 @@ impl StructuralSymbol {
     }
 }
 
+impl StructuralSymbol {
+    #[must_use]
+    pub fn signature(&self) -> &str {
+        &self.signature
+    }
+}
+
 pub struct ContextMarker;
