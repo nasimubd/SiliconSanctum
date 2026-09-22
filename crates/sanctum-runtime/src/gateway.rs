@@ -135,4 +135,19 @@ pub struct ArithmeticDetector {
     patterns: PatternSet,
 }
 
+impl Default for ArithmeticDetector {
+    fn default() -> Self {
+        Self {
+            patterns: PatternSet::new(vec![
+                "calculate".into(),
+                "sum".into(),
+                "multiply".into(),
+                "percent".into(),
+                "then".into(),
+            ])
+            .expect("static patterns"),
+        }
+    }
+}
+
 pub struct GatewayMarker;
