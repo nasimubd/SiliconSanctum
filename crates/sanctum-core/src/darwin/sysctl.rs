@@ -110,6 +110,19 @@ mod tests {
     }
 
     #[test]
+    fn unsigned_values_reject_invalid_width() {
+        let error = decode_u64("example", &[0; 4]).unwrap_err();
+        assert!(matches!(
+            error,
+            SysctlError::InvalidWidth {
+                expected: 8,
+                actual: 4,
+                ..
+            }
+        ));
+    }
+
+    #[test]
     fn invalid_width_display_includes_key_and_sizes() {
         let error = SysctlError::InvalidWidth {
             key: "example".into(),
