@@ -203,4 +203,11 @@ pub struct StructuralSymbol {
     pub range: SourceRange,
 }
 
+impl StructuralSymbol {
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+}
+
 pub struct ContextMarker;
