@@ -354,4 +354,10 @@ impl From<Noul> for f64 {
     }
 }
 
+impl Default for Noul {
+    fn default() -> Self {
+        Self(0.5)
+    }
+}
+
 pub struct DecisionMarker;
