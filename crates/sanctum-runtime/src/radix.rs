@@ -335,4 +335,12 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    pub fn enforce_capacity(&mut self) {
+        if !self.within_capacity() {
+            self.clear();
+        }
+    }
+}
+
 pub struct RadixMarker;
