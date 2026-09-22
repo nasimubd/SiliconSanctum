@@ -481,4 +481,13 @@ pub fn temporal_marker_count(text: &str) -> usize {
         .count()
 }
 
+#[must_use]
+pub fn counting_marker_count(text: &str) -> usize {
+    let t = text.to_lowercase();
+    ["count", "how many", "number of", "enumerate"]
+        .iter()
+        .filter(|m| t.contains(**m))
+        .count()
+}
+
 pub struct GatewayMarker;
