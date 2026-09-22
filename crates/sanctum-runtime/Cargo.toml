@@ -9,3 +9,6 @@ path = "src/lib.rs"
 
 [lints]
 workspace = true
+
+[dependencies]
+tokio = { version = "1.47", features = ["fs", "macros", "process", "rt-multi-thread", "signal", "sync", "time"] }
