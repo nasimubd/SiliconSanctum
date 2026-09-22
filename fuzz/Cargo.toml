@@ -25,5 +25,12 @@ test = false
 doc = false
 bench = false
 
+[[bin]]
+name = "sysctl_payload"
+path = "fuzz_targets/sysctl_payload.rs"
+test = false
+doc = false
+bench = false
+
 [workspace]
 members = ["."]
