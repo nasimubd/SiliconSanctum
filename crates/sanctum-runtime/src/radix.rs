@@ -409,4 +409,11 @@ pub enum CacheEventKind {
     SessionRemoved,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CacheEvent {
+    pub kind: CacheEventKind,
+    pub handle: Option<CacheHandle>,
+    pub token_count: usize,
+}
+
 pub struct RadixMarker;
