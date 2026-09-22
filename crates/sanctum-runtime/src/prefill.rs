@@ -144,6 +144,11 @@ impl ChunkCursor {
         }
         chunk
     }
+
+    #[must_use]
+    pub fn remaining(&self) -> usize {
+        self.chunks.len().saturating_sub(self.position)
+    }
 }
 
 impl TuningThresholds {
