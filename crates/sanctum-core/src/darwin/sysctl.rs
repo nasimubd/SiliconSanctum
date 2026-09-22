@@ -19,6 +19,29 @@ fn key_c_string(key: &str) -> Result<CString, SysctlError> {
     CString::new(key).map_err(|_| SysctlError::InvalidKey(key.into()))
 }
 
+#[cfg(target_os = "macos")]
+fn query_size(key: &str, native_key: &CString) -> Result<usize, SysctlError> {
+    let mut size = 0_usize;
+    // SAFETY: `native_key` is NUL terminated and `size` points to writable memory.
+    let result = unsafe {
+        libc::sysctlbyname(
+            native_key.as_ptr(),
+            std::ptr::null_mut(),
+            &mut size,
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+    if result == -1 {
+        return Err(SysctlError::Operation {
+            operation: "size query",
+            key: key.into(),
+            source: std::io::Error::last_os_error(),
+        });
+    }
+    Ok(size)
+}
+
 #[derive(Debug, Error)]
 pub enum SysctlError {
     #[error("sysctl key contains an interior NUL byte: {0}")]
