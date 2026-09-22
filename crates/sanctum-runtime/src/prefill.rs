@@ -401,6 +401,9 @@ impl PrefillScheduler {
         request: PrefillRequest,
         memory: MemorySnapshot,
     ) -> Result<PrefillPlan, PrefillError> {
+        if self.policy.thresholds.pressure(memory) == MemoryPressure::Critical {
+            return Err(PrefillError::CriticalPressure);
+        }
         let step = self.select_step(request, memory);
         let scratch_bytes = estimate_scratch_bytes(step, request.geometry);
         if scratch_bytes > self.policy.scratch_budget.bytes() {
