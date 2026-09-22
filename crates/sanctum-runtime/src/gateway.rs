@@ -417,4 +417,13 @@ impl GatewayEventLog {
     }
 }
 
+impl GatewayEventLog {
+    pub fn push(&mut self, event: GatewayEvent) {
+        if self.entries.len() == self.capacity {
+            self.entries.pop_front();
+        }
+        self.entries.push_back(event);
+    }
+}
+
 pub struct GatewayMarker;
