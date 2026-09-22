@@ -280,4 +280,11 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    #[must_use]
+    pub fn session(&self, id: &SessionId) -> Option<&TokenSequence> {
+        self.sessions.get(id)
+    }
+}
+
 pub struct RadixMarker;
