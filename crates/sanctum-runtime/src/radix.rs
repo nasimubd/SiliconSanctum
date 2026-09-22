@@ -155,4 +155,11 @@ impl RadixNode {
     }
 }
 
+impl RadixNode {
+    #[must_use]
+    pub const fn handle(&self) -> Option<CacheHandle> {
+        self.handle
+    }
+}
+
 pub struct RadixMarker;
