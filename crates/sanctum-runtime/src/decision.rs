@@ -441,4 +441,11 @@ impl Choice {
     }
 }
 
+impl Choice {
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.items.is_empty()
+    }
+}
+
 pub struct DecisionMarker;
