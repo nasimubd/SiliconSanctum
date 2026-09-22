@@ -19,8 +19,8 @@ pub enum MachTelemetryError {
     #[error("Mach {operation} returned {actual} integers; expected at least {expected}")]
     ShortCount {
         operation: &'static str,
-        expected: u32,
-        actual: u32,
+        expected: usize,
+        actual: usize,
     },
 }
 
@@ -91,6 +91,10 @@ pub fn native_page_size() -> u64 {
 ///
 /// Returns the Mach kernel status when the host statistics call fails.
 pub fn native_vm_counters() -> Result<VmPageCounters, MachTelemetryError> {
+    const REQUIRED_COUNT: usize =
+        (std::mem::offset_of!(libc::vm_statistics64, compressor_page_count)
+            + size_of::<libc::natural_t>())
+            / size_of::<libc::integer_t>();
     let mut statistics = std::mem::MaybeUninit::<libc::vm_statistics64>::zeroed();
     let mut count = libc::HOST_VM_INFO64_COUNT;
     // SAFETY: the output points to a correctly sized zeroed statistics object and
@@ -113,6 +117,13 @@ pub fn native_vm_counters() -> Result<VmPageCounters, MachTelemetryError> {
         return Err(MachTelemetryError::Kernel {
             operation: "host_statistics64",
             status,
+        });
+    }
+    if usize::try_from(count).unwrap_or(0) < REQUIRED_COUNT {
+        return Err(MachTelemetryError::ShortCount {
+            operation: "host_statistics64",
+            expected: REQUIRED_COUNT,
+            actual: usize::try_from(count).unwrap_or(0),
         });
     }
     // SAFETY: the entire structure was zero-initialized, including fields absent
