@@ -292,6 +292,25 @@ impl PrefillScheduler {
             self.comfortable_step()
         }
     }
+
+    pub fn build_plan(
+        &self,
+        request: PrefillRequest,
+        memory: MemorySnapshot,
+    ) -> Result<PrefillPlan, PrefillError> {
+        let step = self.select_step(request, memory);
+        let scratch_bytes = estimate_scratch_bytes(step, request.geometry);
+        let kv_bytes = request
+            .geometry
+            .kv_bytes_per_token(request.quantization)
+            .saturating_mul(request.tokens.get() as u64);
+        Ok(PrefillPlan {
+            step,
+            chunks: partition_tokens(request.tokens, step),
+            scratch_bytes,
+            kv_bytes,
+        })
+    }
 }
 
 #[must_use]
