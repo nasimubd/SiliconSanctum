@@ -416,4 +416,11 @@ impl RouteTargets {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum RouterEvent {
+    FanoutStarted,
+    AxisCompleted(AxisEvaluation),
+    RouteSelected(RouteDecision),
+}
+
 pub struct RouterMarker;
