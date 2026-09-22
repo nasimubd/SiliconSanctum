@@ -44,6 +44,17 @@ impl QosSetter for NativeQosSetter {
     }
 }
 
+/// Marks the calling inference thread as latency-sensitive.
+///
+/// This is a scheduler hint; Darwin does not expose hard P-core affinity.
+///
+/// # Errors
+///
+/// Returns an error when pthread rejects the `QoS` class.
+pub fn bind_inference_thread(setter: &impl QosSetter) -> Result<(), QosError> {
+    setter.set_current(QOS_CLASS_USER_INTERACTIVE, 0)
+}
+
 #[cfg(test)]
 mod tests {
     use super::{QOS_CLASS_USER_INTERACTIVE, QosError};
