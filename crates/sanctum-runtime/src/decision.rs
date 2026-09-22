@@ -160,4 +160,7 @@ impl InferenceInput {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct InferenceLogits(Vec<f32>);
+
 pub struct DecisionMarker;
