@@ -465,4 +465,11 @@ pub fn contains_digit(text: &str) -> bool {
     text.bytes().any(|v| v.is_ascii_digit())
 }
 
+#[must_use]
+pub fn arithmetic_operator_count(text: &str) -> usize {
+    text.chars()
+        .filter(|v| matches!(v, '+' | '-' | '*' | '/' | '%'))
+        .count()
+}
+
 pub struct GatewayMarker;
