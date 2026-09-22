@@ -178,7 +178,8 @@ pub fn stream_chunk(
             required: super::APPLE_SILICON_PAGE_SIZE,
         });
     }
-    model.read_at(&mut bytes[..range.length], range.offset)
+    model.read_exact_at(&mut bytes[..range.length], range.offset)?;
+    Ok(range.length)
 }
 
 /// Reads model chunks on a bounded set of scoped worker threads.
