@@ -179,4 +179,15 @@ pub struct PluginResponse {
     pub payload: Vec<u8>,
 }
 
+impl PluginResponse {
+    #[must_use]
+    pub fn success(request_id: impl Into<String>, payload: Vec<u8>) -> Self {
+        Self {
+            request_id: request_id.into(),
+            status: PluginStatus::Ok,
+            payload,
+        }
+    }
+}
+
 pub struct PluginMarker;
