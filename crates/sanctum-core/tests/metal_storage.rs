@@ -96,3 +96,40 @@ fn worker_failures_never_return_partial_model_buffers() {
             if source.kind() == std::io::ErrorKind::UnexpectedEof
     ));
 }
+
+#[test]
+fn worker_preflight_counts_padding_before_reading() {
+    use sanctum_core::darwin::direct_io::DirectIoError;
+    let device = MTLCreateSystemDefaultDevice().expect("Metal device required");
+    let fixture = tempfile::NamedTempFile::new().unwrap();
+    let model = DirectModelFile::open(fixture.path()).unwrap();
+    let ranges = [ChunkRange {
+        offset: 0,
+        length: 1,
+    }; 2];
+    assert!(matches!(
+        load_shared_chunks(&device, &model, &ranges, 2, 16_384),
+        Err(MetalBufferError::Capacity)
+    ));
+    assert!(matches!(
+        load_shared_chunks(&device, &model, &ranges, 0, 32_768),
+        Err(MetalBufferError::Allocation(
+            DirectIoError::InvalidWorkerLimit
+        ))
+    ));
+    assert!(matches!(
+        load_shared_chunks(
+            &device,
+            &model,
+            &[ChunkRange {
+                offset: u64::MAX,
+                length: 1
+            }],
+            1,
+            16_384
+        ),
+        Err(MetalBufferError::Allocation(
+            DirectIoError::OffsetOverflow { .. }
+        ))
+    ));
+}
