@@ -93,3 +93,14 @@ pub enum KvQuantization {
     Bits8,
     Bits16,
 }
+
+impl KvQuantization {
+    #[must_use]
+    pub const fn bits(self) -> u8 {
+        match self {
+            Self::Bits4 => 4,
+            Self::Bits8 => 8,
+            Self::Bits16 => 16,
+        }
+    }
+}
