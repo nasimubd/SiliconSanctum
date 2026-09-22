@@ -10,4 +10,6 @@ pub enum RadixError {
     MissingSession,
 }
 
+pub type TokenId = u32;
+
 pub struct RadixMarker;
