@@ -386,13 +386,9 @@ impl PrefillScheduler {
     }
 
     #[must_use]
-    pub const fn select_step(
-        &self,
-        request: PrefillRequest,
-        memory: MemorySnapshot,
-    ) -> PrefillStep {
+    pub fn select_step(&self, request: PrefillRequest, memory: MemorySnapshot) -> PrefillStep {
         if request.tokens.get() <= 512
-            || memory.available_bytes() < self.policy.thresholds.comfortable_bytes
+            || self.policy.thresholds.pressure(memory) == MemoryPressure::Warning
         {
             self.constrained_step()
         } else {
