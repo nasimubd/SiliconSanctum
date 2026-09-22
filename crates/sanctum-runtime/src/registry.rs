@@ -97,4 +97,11 @@ impl ContextLadder {
     }
 }
 
+impl ContextLadder {
+    #[must_use]
+    pub fn smallest(&self) -> u32 {
+        self.levels[0]
+    }
+}
+
 pub struct RegistryMarker;
