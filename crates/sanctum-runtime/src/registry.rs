@@ -185,4 +185,11 @@ pub struct ModelRegistry {
     entries: std::collections::BTreeMap<String, ModelEntry>,
 }
 
+impl ModelRegistry {
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
 pub struct RegistryMarker;
