@@ -478,4 +478,10 @@ impl Choice {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct RubricPoint {
+    pub position: f64,
+    pub value: f64,
+}
+
 pub struct DecisionMarker;
