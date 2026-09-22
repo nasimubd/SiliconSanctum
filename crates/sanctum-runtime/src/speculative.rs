@@ -72,4 +72,5 @@ impl VerifyWidthBounds{
   if minimum>maximum{return Err(SpeculativeError::InvalidWidthBounds{minimum:minimum.get(),maximum:maximum.get()});} Ok(Self{minimum,maximum})
  }
 }
+pub fn context_pressure(position:ContextPosition,capacity:ContextCapacity)->f32{position.get() as f32/capacity.get() as f32}
 // NEXT
