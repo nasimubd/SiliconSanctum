@@ -4,4 +4,5 @@ pub mod arbiter;
 pub mod decision;
 pub mod plugin;
 pub mod registry;
+pub mod router;
 pub mod supervisor;
