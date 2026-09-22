@@ -65,7 +65,10 @@ against the caller's memory budget.
 | Dispatch pressure | Flag/callback unit tests and live source lifecycle test |
 | Thread QoS | Parameter unit test and live pthread binding test |
 | Direct I/O | Alignment, boundary, concurrency, property, and live F_NOCACHE tests |
+| Native Metal storage | Shared pointer, order, truncation, and budget integration tests |
+| Fuzzing | libFuzzer targets for layouts, telemetry arithmetic, and sysctl payloads |
 | Toolchain | rustfmt, Cargo check, Clippy with warnings denied, and Cargo test |
 
 The live tests are compiled only for macOS. CI runs the complete suite on an
 Apple Silicon `macos-14` runner so the Darwin FFI paths are compiled and invoked.
+CI also performs a bounded smoke run of every fuzz target under nightly Rust.
