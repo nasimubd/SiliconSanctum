@@ -216,6 +216,13 @@ pub struct SupervisedChild {
 }
 
 impl SupervisedChild {
+    pub fn signal(&mut self, signal: ProcessSignal) -> Result<(), SupervisorError> {
+        let pid = self.id().ok_or(SupervisorError::MissingProcessId)?;
+        send_signal(pid, signal)?;
+        self.state = ProcessState::Stopping;
+        Ok(())
+    }
+
     pub fn spawn(spec: &ProcessSpec) -> Result<Self, SupervisorError> {
         let child = build_command(spec)
             .spawn()
