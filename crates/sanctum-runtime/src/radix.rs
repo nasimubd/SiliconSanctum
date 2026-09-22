@@ -219,4 +219,29 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    pub fn insert(&mut self, sequence: &TokenSequence, bytes: usize) -> CacheHandle {
+        self.clock = self.clock.saturating_add(1);
+        let mut node = &mut self.root;
+        for token in sequence.tokens() {
+            node = node.children.entry(*token).or_insert_with(|| {
+                self.stats.nodes = self.stats.nodes.saturating_add(1);
+                RadixNode::default()
+            });
+        }
+        if let Some(handle) = node.handle {
+            node.last_used = self.clock;
+            return handle;
+        }
+        let handle = CacheHandle(self.next_handle);
+        self.next_handle = self.next_handle.saturating_add(1);
+        node.handle = Some(handle);
+        node.bytes = bytes;
+        node.last_used = self.clock;
+        self.stats.entries = self.stats.entries.saturating_add(1);
+        self.stats.bytes = self.stats.bytes.saturating_add(bytes);
+        handle
+    }
+}
+
 pub struct RadixMarker;
