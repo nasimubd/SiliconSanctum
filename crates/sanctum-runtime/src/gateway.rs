@@ -290,4 +290,15 @@ impl Default for EscalationPolicy {
     }
 }
 
+impl EscalationPolicy {
+    #[must_use]
+    pub const fn for_kind(self, kind: JaggednessKind) -> EscalationTarget {
+        match kind {
+            JaggednessKind::Counting => self.counting,
+            JaggednessKind::MultiHopArithmetic => self.arithmetic,
+            JaggednessKind::RelativeTemporal => self.temporal,
+        }
+    }
+}
+
 pub struct GatewayMarker;
