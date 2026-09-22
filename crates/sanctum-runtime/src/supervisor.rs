@@ -104,6 +104,12 @@ pub struct ProcessSpec {
 
 impl ProcessSpec {
     #[must_use]
+    pub fn with_argument(mut self, argument: impl Into<String>) -> Self {
+        self.arguments.push(argument.into());
+        self
+    }
+
+    #[must_use]
     pub fn llama_server(executable: ExecutablePath, model: ModelPath) -> Self {
         Self {
             backend: BackendKind::LlamaServer,
