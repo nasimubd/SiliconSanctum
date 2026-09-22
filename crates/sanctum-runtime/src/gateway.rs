@@ -351,4 +351,11 @@ pub struct SystemOneGateway {
     policy: EscalationPolicy,
 }
 
+impl SystemOneGateway {
+    #[must_use]
+    pub const fn new(filter: JaggednessFilter, policy: EscalationPolicy) -> Self {
+        Self { filter, policy }
+    }
+}
+
 pub struct GatewayMarker;
