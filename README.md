@@ -1,5 +1,19 @@
 # Silicon Sanctum
 
+## Rust core development
+
+The Darwin systems foundation requires an Apple Silicon host for native kernel,
+dispatch, and QoS integration checks.
+
+```bash
+make core-check
+make core-test
+make core-lint
+```
+
+See [Phase 1 Darwin Core](docs/PHASE1_DARWIN_CORE.md) for safety invariants and
+the kernel/storage contracts.
+
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Conventional Commits](https://img.shields.io/badge/commits-Conventional%20Commits-fe5196.svg)](https://www.conventionalcommits.org/)
 [![macOS](https://img.shields.io/badge/platform-macOS-000000.svg?logo=apple)](https://www.apple.com/macos/)
