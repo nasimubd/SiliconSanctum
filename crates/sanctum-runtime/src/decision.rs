@@ -399,4 +399,12 @@ pub struct Choice {
 
 pub const MAX_CHOICE_ITEMS: usize = 255;
 
+#[must_use]
+pub fn stable_softmax(logits: &[f64]) -> Vec<f64> {
+    let max = logits.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+    let values: Vec<f64> = logits.iter().map(|value| (value - max).exp()).collect();
+    let total: f64 = values.iter().sum();
+    values.into_iter().map(|value| value / total).collect()
+}
+
 pub struct DecisionMarker;
