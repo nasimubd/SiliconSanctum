@@ -189,3 +189,10 @@ impl Default for TuningPolicy {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PrefillRequest {
+    pub tokens: TokenCount,
+    pub geometry: ModelGeometry,
+    pub quantization: KvQuantization,
+}
