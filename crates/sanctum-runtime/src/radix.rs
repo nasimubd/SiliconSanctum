@@ -80,4 +80,10 @@ impl AttentionArchitecture {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelArchitecture {
+    pub name: String,
+    pub attention: AttentionArchitecture,
+}
+
 pub struct RadixMarker;
