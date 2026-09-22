@@ -144,7 +144,10 @@ pub enum SysctlError {
 mod tests {
     use std::cell::RefCell;
 
-    use super::{IOGPU_WIRED_LIMIT_KEY, SysctlError, SysctlRead, decode_u64, wired_limit_mb};
+    use super::{
+        IOGPU_WIRED_LIMIT_KEY, SysctlError, SysctlRead, SysctlWrite, decode_u64,
+        set_wired_limit_mb, wired_limit_mb,
+    };
 
     struct FakeRead {
         keys: RefCell<Vec<String>>,
@@ -155,6 +158,16 @@ mod tests {
         fn read(&self, key: &str) -> Result<Vec<u8>, SysctlError> {
             self.keys.borrow_mut().push(key.into());
             Ok(self.value.to_ne_bytes().to_vec())
+        }
+    }
+
+    #[derive(Default)]
+    struct FakeWrite(RefCell<Vec<(String, Vec<u8>)>>);
+
+    impl SysctlWrite for FakeWrite {
+        fn write(&self, key: &str, value: &[u8]) -> Result<(), SysctlError> {
+            self.0.borrow_mut().push((key.into(), value.into()));
+            Ok(())
         }
     }
 
@@ -185,6 +198,18 @@ mod tests {
 
         assert_eq!(wired_limit_mb(&backend).unwrap(), 10_240);
         assert_eq!(backend.keys.into_inner(), [IOGPU_WIRED_LIMIT_KEY]);
+    }
+
+    #[test]
+    fn wired_limit_writer_uses_native_payload() {
+        let backend = FakeWrite::default();
+
+        set_wired_limit_mb(&backend, 10_400).unwrap();
+
+        assert_eq!(
+            backend.0.into_inner(),
+            [(IOGPU_WIRED_LIMIT_KEY.into(), 10_400_u64.to_ne_bytes().into())]
+        );
     }
 
     #[test]
