@@ -426,4 +426,11 @@ impl GatewayEventLog {
     }
 }
 
+impl GatewayEventLog {
+    #[must_use]
+    pub fn entries(&self) -> &std::collections::VecDeque<GatewayEvent> {
+        &self.entries
+    }
+}
+
 pub struct GatewayMarker;
