@@ -14,6 +14,12 @@ pub enum SupervisorError {
     InvalidEnvironment { field: &'static str },
     #[error("{field} timeout must be nonzero")]
     ZeroTimeout { field: &'static str },
+    #[error("subprocess {operation} failed: {source}")]
+    ProcessIo {
+        operation: &'static str,
+        #[source]
+        source: std::io::Error,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
