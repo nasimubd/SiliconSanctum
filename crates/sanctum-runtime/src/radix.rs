@@ -148,4 +148,11 @@ pub struct RadixNode {
     last_used: u64,
 }
 
+impl RadixNode {
+    #[must_use]
+    pub fn child_count(&self) -> usize {
+        self.children.len()
+    }
+}
+
 pub struct RadixMarker;
