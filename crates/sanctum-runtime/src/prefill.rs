@@ -104,3 +104,10 @@ impl KvQuantization {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ModelGeometry {
+    pub layers: u32,
+    pub kv_heads: u32,
+    pub head_dim: u32,
+}
