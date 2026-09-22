@@ -158,6 +158,7 @@ pub fn build_command(spec: &ProcessSpec) -> tokio::process::Command {
     if let Some(directory) = &spec.working_directory {
         command.current_dir(directory);
     }
+    command.stdin(std::process::Stdio::null());
     command
 }
 
