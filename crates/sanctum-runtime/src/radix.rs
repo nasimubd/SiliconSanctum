@@ -307,4 +307,14 @@ impl RadixCache {
     }
 }
 
+impl RadixCache {
+    #[must_use]
+    pub fn contains_handle(&self, handle: CacheHandle) -> bool {
+        fn walk(n: &RadixNode, h: CacheHandle) -> bool {
+            n.handle == Some(h) || n.children.values().any(|v| walk(v, h))
+        }
+        walk(&self.root, handle)
+    }
+}
+
 pub struct RadixMarker;
