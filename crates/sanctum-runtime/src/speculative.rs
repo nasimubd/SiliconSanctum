@@ -129,4 +129,7 @@ impl EventLog{pub fn new(capacity:usize)->Result<Self,SpeculativeError>{if capac
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum Lifecycle{Idle,Loading,Ready,Generating,Stopping,Stopped,Failed}
 impl Lifecycle{pub fn can_transition(self,next:Self)->bool{matches!((self,next),(Self::Idle,Self::Loading)|(Self::Loading,Self::Ready)|(Self::Ready,Self::Generating)|(Self::Generating,Self::Ready)|(Self::Generating,Self::Stopping)|(Self::Ready,Self::Stopping)|(Self::Stopping,Self::Stopped)|(_,Self::Failed))}pub fn transition(&mut self,next:Self)->Result<(),SpeculativeError>{if !self.can_transition(next){return Err(SpeculativeError::IllegalTransition);}*self=next;Ok(())}}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub enum DecoderHealth{Healthy,LowAcceptance,BandwidthSaturated}
+pub fn assess_health(acceptance:f64,bandwidth:BandwidthObservation)->DecoderHealth{if bandwidth.utilization()>=0.9{DecoderHealth::BandwidthSaturated}else if acceptance<0.5{DecoderHealth::LowAcceptance}else{DecoderHealth::Healthy}}
 // NEXT
