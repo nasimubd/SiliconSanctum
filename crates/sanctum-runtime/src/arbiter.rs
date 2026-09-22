@@ -365,6 +365,15 @@ impl EventLog {
     }
 }
 
+impl EventLog {
+    pub fn push(&mut self, event: ArbiterEvent) {
+        if self.entries.len() == self.capacity {
+            self.entries.pop_front();
+        }
+        self.entries.push_back(event);
+    }
+}
+
 impl MemorySnapshot {
     #[must_use]
     pub const fn new(wired_bytes: u64, available_bytes: u64, swap_used_bytes: u64) -> Self {
