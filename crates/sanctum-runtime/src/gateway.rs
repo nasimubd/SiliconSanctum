@@ -236,4 +236,11 @@ impl TemporalDetector {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct JaggednessFilter {
+    arithmetic: ArithmeticDetector,
+    counting: CountingDetector,
+    temporal: TemporalDetector,
+}
+
 pub struct GatewayMarker;
