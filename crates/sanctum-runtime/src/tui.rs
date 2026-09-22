@@ -40,3 +40,4 @@ impl DashboardTab{pub const fn next(self)->Self{match self{Self::Overview=>Self:
 pub enum DashboardFocus{Metrics,History,Help}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum DashboardCommand{Quit,TogglePause,NextTab,Refresh,Ignore}
+pub fn map_key(key:crossterm::event::KeyCode)->DashboardCommand{use crossterm::event::KeyCode;match key{KeyCode::Char('q')|KeyCode::Esc=>DashboardCommand::Quit,KeyCode::Char(' ')=>DashboardCommand::TogglePause,KeyCode::Tab=>DashboardCommand::NextTab,KeyCode::Char('r')=>DashboardCommand::Refresh,_=>DashboardCommand::Ignore}}
