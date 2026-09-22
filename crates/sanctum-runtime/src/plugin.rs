@@ -190,4 +190,15 @@ impl PluginResponse {
     }
 }
 
+impl PluginResponse {
+    #[must_use]
+    pub fn failure(request_id: impl Into<String>, status: PluginStatus) -> Self {
+        Self {
+            request_id: request_id.into(),
+            status,
+            payload: Vec::new(),
+        }
+    }
+}
+
 pub struct PluginMarker;
