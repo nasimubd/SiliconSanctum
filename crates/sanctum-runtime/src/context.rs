@@ -465,4 +465,9 @@ pub fn normalize_whitespace(value: &str) -> String {
         .join(" ")
 }
 
+#[must_use]
+pub fn render_symbol(symbol: &StructuralSymbol) -> String {
+    normalize_whitespace(symbol.signature())
+}
+
 pub struct ContextMarker;
