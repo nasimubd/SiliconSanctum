@@ -118,4 +118,14 @@ pub struct ParsedDocument {
     tree: tree_sitter::Tree,
 }
 
+impl ParsedDocument {
+    pub fn parse(document: SourceDocument) -> Result<Self, ContextError> {
+        let mut parser = parser_for(document.language())?;
+        let tree = parser
+            .parse(document.source(), None)
+            .ok_or(ContextError::ParseFailed)?;
+        Ok(Self { document, tree })
+    }
+}
+
 pub struct ContextMarker;
