@@ -436,4 +436,11 @@ impl CompressionMetrics {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct StructuralSummary {
+    pub text: String,
+    pub symbols: Vec<StructuralSymbol>,
+    pub metrics: CompressionMetrics,
+}
+
 pub struct ContextMarker;
