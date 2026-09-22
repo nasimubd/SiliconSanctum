@@ -125,6 +125,24 @@ impl MachHost for NativeMachHost {
     }
 }
 
+/// Collects a byte-denominated host memory snapshot.
+///
+/// # Errors
+///
+/// Returns an error when a host query fails or a page counter overflows bytes.
+pub fn memory_telemetry(host: &impl MachHost) -> Result<MemoryTelemetry, MachTelemetryError> {
+    let page_size = host.page_size()?;
+    let counters = host.vm_counters()?;
+    Ok(MemoryTelemetry {
+        page_size,
+        free_bytes: pages_to_bytes("free", counters.free, page_size)?,
+        active_bytes: pages_to_bytes("active", counters.active, page_size)?,
+        inactive_bytes: pages_to_bytes("inactive", counters.inactive, page_size)?,
+        wired_bytes: pages_to_bytes("wired", counters.wired, page_size)?,
+        compressed_bytes: pages_to_bytes("compressed", counters.compressed, page_size)?,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::{MachTelemetryError, pages_to_bytes};
