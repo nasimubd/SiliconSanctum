@@ -107,4 +107,9 @@ impl JaggednessReport {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PatternSet {
+    patterns: Vec<String>,
+}
+
 pub struct GatewayMarker;
