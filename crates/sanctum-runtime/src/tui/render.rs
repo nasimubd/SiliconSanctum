@@ -10,3 +10,4 @@ pub fn regions(area:Rect)->DashboardRegions{let chunks=Layout::default().directi
 pub fn body_area(area:Rect)->Rect{regions(area).body}
 pub fn render_header(frame:&mut Frame<'_>,area:Rect,state:&DashboardState){let status=if state.paused{"PAUSED"}else{"LIVE"};let title=format!("Silicon Sanctum  |  {}  |  {}",state.snapshot.profile.as_str(),status);frame.render_widget(Paragraph::new(title).block(Block::default().borders(Borders::ALL)),area);}
 pub fn render_footer(frame:&mut Frame<'_>,area:Rect){frame.render_widget(Paragraph::new("q quit  |  space pause  |  tab view  |  r refresh"),area);}
+pub fn render_token_rate(frame:&mut Frame<'_>,area:Rect,state:&DashboardState){frame.render_widget(Paragraph::new(format!("Generation: {:.1} tok/s",state.snapshot.token_rate.get())),area);}
