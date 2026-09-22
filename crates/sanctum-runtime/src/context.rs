@@ -149,4 +149,11 @@ impl ParsedDocument {
     }
 }
 
+impl ParsedDocument {
+    #[must_use]
+    pub const fn language(&self) -> SourceLanguage {
+        self.document.language
+    }
+}
+
 pub struct ContextMarker;
