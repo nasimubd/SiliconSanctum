@@ -225,4 +225,11 @@ impl DecisionExecutor for FixtureExecutor {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LatencyClass {
+    BelowBudget,
+    WithinBudget,
+    AboveBudget,
+}
+
 pub struct DecisionMarker;
