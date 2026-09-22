@@ -298,4 +298,14 @@ impl Noul {
     }
 }
 
+#[must_use]
+pub fn stable_sigmoid(logit: f64) -> f64 {
+    if logit >= 0.0 {
+        1.0 / (1.0 + (-logit).exp())
+    } else {
+        let exp = logit.exp();
+        exp / (1.0 + exp)
+    }
+}
+
 pub struct DecisionMarker;
