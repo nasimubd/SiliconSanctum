@@ -505,4 +505,11 @@ pub fn requires_temporal_bypass(text: &str) -> bool {
     temporal_marker_count(text) > 0
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InterpreterKind {
+    Arithmetic,
+    Counting,
+    Calendar,
+}
+
 pub struct GatewayMarker;
