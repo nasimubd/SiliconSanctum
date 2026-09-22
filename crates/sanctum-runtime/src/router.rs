@@ -16,4 +16,7 @@ pub enum EvaluationAxis {
     Complexity,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RoutingPrompt(String);
+
 pub struct RouterMarker;
