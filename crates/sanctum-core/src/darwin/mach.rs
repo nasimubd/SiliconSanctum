@@ -89,21 +89,28 @@ pub fn native_vm_counters() -> Result<VmPageCounters, MachTelemetryError> {
     let mut count = libc::HOST_VM_INFO64_COUNT;
     // SAFETY: the output points to a correctly sized zeroed statistics object and
     // `count` is initialized with the ABI-provided element count.
+    let host = unsafe { mach_host_self() };
     let status = unsafe {
         libc::host_statistics64(
-            mach_host_self(),
+            host,
             libc::HOST_VM_INFO64,
             statistics.as_mut_ptr().cast(),
             &raw mut count,
         )
     };
+    // SAFETY: mach_host_self creates a send-right reference owned by this call.
+    // Release that reference on both successful and failed queries.
+    unsafe {
+        mach2::mach_port::mach_port_deallocate(mach2::traps::mach_task_self(), host);
+    }
     if status != libc::KERN_SUCCESS {
         return Err(MachTelemetryError::Kernel {
             operation: "host_statistics64",
             status,
         });
     }
-    // SAFETY: a successful kernel call initialized the complete output structure.
+    // SAFETY: the entire structure was zero-initialized, including fields absent
+    // from older kernel revisions, and the call wrote within its supplied size.
     let statistics = unsafe { statistics.assume_init() };
     Ok(VmPageCounters {
         free: u64::from(statistics.free_count),
