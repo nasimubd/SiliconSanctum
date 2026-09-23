@@ -12,4 +12,5 @@ impl LinkWidth{pub fn parse(value:&str)->Result<Self,MigrationError>{let lanes=v
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum LinkSpeed{Gt8,Gt16}
 impl LinkSpeed{pub const fn gt_per_second(self)->u8{match self{Self::Gt8=>8,Self::Gt16=>16}}}
+impl LinkSpeed{pub fn parse(value:&str)->Result<Self,MigrationError>{match value.trim(){ "8.0 GT/s"=>Ok(Self::Gt8),"16.0 GT/s"=>Ok(Self::Gt16),_=>Err(MigrationError::InvalidInput("link speed"))}}}
 // Migration extensions.
