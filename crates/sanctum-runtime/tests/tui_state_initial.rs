@@ -1,2 +1,19 @@
-use sanctum_runtime::tui::{ActiveProfile,CpuTelemetry,DashboardSnapshot,DashboardState,DashboardTab,KvResidency,MemoryBytes,MemoryTelemetry,TokenRate,Utilization};
-#[test] fn starts_on_overview(){let s=DashboardState::new(DashboardSnapshot::new(TokenRate::new(0.0).unwrap(),MemoryTelemetry::new(MemoryBytes(0),MemoryBytes(0),MemoryBytes(1)).unwrap(),CpuTelemetry{performance:Utilization::new(0.0).unwrap(),efficiency:Utilization::new(0.0).unwrap()},KvResidency::new(0,1).unwrap(),ActiveProfile::new("idle").unwrap()));assert_eq!(s.tab,DashboardTab::Overview);assert!(!s.paused);}
+use sanctum_runtime::tui::{
+    ActiveProfile, CpuTelemetry, DashboardSnapshot, DashboardState, DashboardTab, KvResidency,
+    MemoryBytes, MemoryTelemetry, TokenRate, Utilization,
+};
+#[test]
+fn starts_on_overview() {
+    let s = DashboardState::new(DashboardSnapshot::new(
+        TokenRate::new(0.0).unwrap(),
+        MemoryTelemetry::new(MemoryBytes(0), MemoryBytes(0), MemoryBytes(1)).unwrap(),
+        CpuTelemetry {
+            performance: Utilization::new(0.0).unwrap(),
+            efficiency: Utilization::new(0.0).unwrap(),
+        },
+        KvResidency::new(0, 1).unwrap(),
+        ActiveProfile::new("idle").unwrap(),
+    ));
+    assert_eq!(s.tab, DashboardTab::Overview);
+    assert!(!s.paused);
+}

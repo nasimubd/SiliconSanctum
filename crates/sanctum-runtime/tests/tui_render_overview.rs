@@ -1,3 +1,23 @@
-use ratatui::{backend::TestBackend,Terminal};
-use sanctum_runtime::tui::{render::render_dashboard,*};
-#[test]fn renders_overview(){let snapshot=DashboardSnapshot::new(TokenRate::new(12.5).unwrap(),MemoryTelemetry::new(MemoryBytes(4),MemoryBytes(2),MemoryBytes(16)).unwrap(),CpuTelemetry{performance:Utilization::new(0.5).unwrap(),efficiency:Utilization::new(0.2).unwrap()},KvResidency::new(1,4).unwrap(),ActiveProfile::new("focused").unwrap());let state=DashboardState::new(snapshot);let history=MetricHistory::new(8).unwrap();let mut terminal=Terminal::new(TestBackend::new(80,28)).unwrap();terminal.draw(|frame|render_dashboard(frame,&state,&history)).unwrap();let text=format!("{:?}",terminal.backend().buffer());assert!(text.contains("Silicon Sanctum"));}
+use ratatui::{Terminal, backend::TestBackend};
+use sanctum_runtime::tui::{render::render_dashboard, *};
+#[test]
+fn renders_overview() {
+    let snapshot = DashboardSnapshot::new(
+        TokenRate::new(12.5).unwrap(),
+        MemoryTelemetry::new(MemoryBytes(4), MemoryBytes(2), MemoryBytes(16)).unwrap(),
+        CpuTelemetry {
+            performance: Utilization::new(0.5).unwrap(),
+            efficiency: Utilization::new(0.2).unwrap(),
+        },
+        KvResidency::new(1, 4).unwrap(),
+        ActiveProfile::new("focused").unwrap(),
+    );
+    let state = DashboardState::new(snapshot);
+    let history = MetricHistory::new(8).unwrap();
+    let mut terminal = Terminal::new(TestBackend::new(80, 28)).unwrap();
+    terminal
+        .draw(|frame| render_dashboard(frame, &state, &history))
+        .unwrap();
+    let text = format!("{:?}", terminal.backend().buffer());
+    assert!(text.contains("Silicon Sanctum"));
+}
