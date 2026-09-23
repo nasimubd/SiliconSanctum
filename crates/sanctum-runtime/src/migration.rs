@@ -70,4 +70,5 @@ pub fn load_record(path:&std::path::Path)->Result<CutoverRecord,MigrationError>{
 pub fn rollback(record_path:&std::path::Path,pointer:&std::path::Path)->Result<CutoverRecord,MigrationError>{let mut record=load_record(record_path)?;if record.stage!=MigrationStage::Activated{return Err(MigrationError::InvalidInput("rollback stage"));}if !record.paths.origin.is_dir(){return Err(MigrationError::InvalidInput("origin unavailable"));}write_ai_root(pointer,&record.paths.origin)?;record.stage.transition(MigrationStage::RolledBack)?;save_record(record_path,&record)?;Ok(record)}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum FailoverCause{LinkDropped,KernelPanic,TargetUnavailable}
+pub fn assess_failover(report:&str,panic_log:&str,target_available:bool)->Option<FailoverCause>{if !target_available{return Some(FailoverCause::TargetUnavailable);}if BusInspection::parse(report).map_or(true,|link|!link.qualifies()){return Some(FailoverCause::LinkDropped);}if panic_log.lines().any(|line|{let lower=line.to_ascii_lowercase();lower.contains("kernel")&&lower.contains("panic")}){return Some(FailoverCause::KernelPanic);}None}
 // Migration extensions.
