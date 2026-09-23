@@ -1,3 +1,25 @@
+# [1.14.0](https://github.com/nasimubd/SiliconSanctum/compare/v1.13.0...v1.14.0) (2026-09-23)
+
+
+### Features
+
+* **migration:** activate launchd monitor at cutover ([cf0b5e5](https://github.com/nasimubd/SiliconSanctum/commit/cf0b5e570006aa2656adfdeeef17179059173e96))
+* **migration:** bind live trim query to destination ([ab37526](https://github.com/nasimubd/SiliconSanctum/commit/ab37526938aad1580e1b66d7111364288fae41a1))
+* **migration:** bootstrap persistent monitor service ([6ab139f](https://github.com/nasimubd/SiliconSanctum/commit/6ab139f4a0984e11df710785c865bac125cc07e3))
+* **migration:** construct launchctl bootstrap arguments ([e17e461](https://github.com/nasimubd/SiliconSanctum/commit/e17e4614accc97e1581a455f52627aa0c9942c21))
+* **migration:** define exact quiescence confirmation ([def4f54](https://github.com/nasimubd/SiliconSanctum/commit/def4f541de6525001aa4840c084efce256c48117))
+* **migration:** define target volume identity ([ce29173](https://github.com/nasimubd/SiliconSanctum/commit/ce29173d3c83458726029a2e3d22dbed6e9f1f0d))
+* **migration:** escape monitor plist XML values ([d065f17](https://github.com/nasimubd/SiliconSanctum/commit/d065f17c034d1df15b654559c8f0e5cce75435f4))
+* **migration:** gate final sync on operator quiescence ([be5001e](https://github.com/nasimubd/SiliconSanctum/commit/be5001e0c5895f9247f18138b111713b99b4560c))
+* **migration:** inspect live destination volume identity ([c060159](https://github.com/nasimubd/SiliconSanctum/commit/c060159d16bd0fd255429c19610fc301689aa23b))
+* **migration:** match trim evidence to destination volume ([41811af](https://github.com/nasimubd/SiliconSanctum/commit/41811af02788e77fb8a3b94af0b89efc0a81dbc6))
+* **migration:** parse target disk metadata ([498a1af](https://github.com/nasimubd/SiliconSanctum/commit/498a1afbcaad1a3e6a9e8432bacfffb474c95301))
+* **migration:** persist monitor in LaunchAgents directory ([e8372b6](https://github.com/nasimubd/SiliconSanctum/commit/e8372b60296551aa8de87f2913562b4d66fb399f))
+* **migration:** reject source mutations during final sync ([1379589](https://github.com/nasimubd/SiliconSanctum/commit/13795898ac0898a2edd2d439f491bb68b47e5bde))
+* **migration:** render restartable native monitor service ([5f70d89](https://github.com/nasimubd/SiliconSanctum/commit/5f70d898380189950334653f1cf594408d415949))
+* **migration:** require destination apfs filesystem ([070907f](https://github.com/nasimubd/SiliconSanctum/commit/070907f9fed92049f3f83b56abd3e35c90c0ada4))
+* **migration:** require target specific trim preflight ([159ee19](https://github.com/nasimubd/SiliconSanctum/commit/159ee19d6a6a881ee75dcfa5218365673bd6459d))
+
 # [1.13.0](https://github.com/nasimubd/SiliconSanctum/compare/v1.12.0...v1.13.0) (2026-09-23)
 
 
