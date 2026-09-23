@@ -29,3 +29,28 @@ These are storage-throughput measurements, not cold model-load measurements.
 Run `local-ai migrate-thunderbolt` after future hardware changes; it records
 the detected transport in each result and retains two benchmark JSON records.
 It does not unmount the drive or stop workloads automatically.
+
+## Verified Rust migration
+
+The `sanctum-migrate` binary provides the transfer and rollback workflow. Build
+it with `cargo build --release -p sanctum-runtime --bin sanctum-migrate`, then
+run `inspect` and `dry-run ORIGIN TARGET RSYNC` before `execute ORIGIN TARGET
+RSYNC RECORD POINTER`. Use absolute paths. `TARGET` must be an empty directory
+on a different mounted volume. Set `POINTER` to this repository's
+`.state/ai-root` and keep `RECORD` in persistent storage.
+
+`execute` requires a connected Thunderbolt/USB4 port with a reported PCIe x4
+link at 8.0 or 16.0 GT/s, recent positive APFS spaceman TRIM evidence, and an
+rsync binary supporting `-avXHE`. The system `/usr/bin/rsync` on the reference
+host does not advertise `-X`; use a compatible rsync installation. The command
+runs two passes, compares SHA-256 manifests, then switches `AI_ROOT`. It does
+not remove the origin. Pause writers before the final transfer to prevent a
+file from changing during verification.
+
+After cutover, the native monitor checks the link, target mount, and recent
+kernel panic logs every ten seconds for 72 hours. If one fails, it restores
+the origin pointer. Keep the origin volume mounted and retain the monitor
+binary for the entire window. A power loss or monitor process failure requires
+restarting `sanctum-migrate monitor RECORD POINTER`; inspect the record before
+removing the origin volume. The legacy launcher reads the pointer unless
+`AI_ROOT` was explicitly set in the process environment.
