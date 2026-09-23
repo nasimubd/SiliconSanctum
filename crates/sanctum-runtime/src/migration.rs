@@ -469,6 +469,21 @@ impl MonitorService<'_> {
         Ok(format!("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>Label</key><string>{MONITOR_SERVICE_LABEL}</string><key>ProgramArguments</key><array>{}<string>monitor</string>{}{}</array><key>RunAtLoad</key><true/><key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict></dict></plist>", arguments[0], arguments[1], arguments[2]))
     }
 }
+pub fn persist_monitor_service(
+    service: &MonitorService<'_>,
+    plist_path: &std::path::Path,
+) -> Result<(), MigrationError> {
+    if !plist_path.is_absolute()
+        || plist_path.parent().and_then(std::path::Path::file_name) != Some(std::ffi::OsStr::new("LaunchAgents"))
+        || plist_path.file_name() != Some(std::ffi::OsStr::new("com.siliconsanctum.migration-monitor.plist"))
+    {
+        return Err(MigrationError::InvalidInput("monitor LaunchAgents path"));
+    }
+    if plist_path.exists() {
+        return Err(MigrationError::InvalidInput("monitor service already exists"));
+    }
+    write_atomic(plist_path, service.render_plist()?.as_bytes())
+}
 pub fn ensure_source_stable(
     before: &MigrationManifest,
     after: &MigrationManifest,
