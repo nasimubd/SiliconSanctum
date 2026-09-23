@@ -28,4 +28,6 @@ pub fn parse_trim_log(log:&str)->TrimStatus{let mut observed=false;for line in l
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub struct TrimEvidence{pub status:TrimStatus,pub observed_at:std::time::SystemTime}
 impl TrimEvidence{pub fn is_fresh(self,now:std::time::SystemTime)->bool{now.duration_since(self.observed_at).is_ok_and(|age|age<=std::time::Duration::from_secs(3600))}}
+pub fn trim_log_arguments()->[&'static str;6]{["show","--last","1h","--style","compact","--predicate"]}
+pub const TRIM_LOG_PREDICATE:&str="process == \"kernel\" AND eventMessage CONTAINS[c] \"spaceman\"";
 // Migration extensions.
