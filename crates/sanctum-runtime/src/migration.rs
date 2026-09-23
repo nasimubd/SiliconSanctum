@@ -433,6 +433,13 @@ pub fn verify_roots(paths: &MigrationPaths) -> Result<(), MigrationError> {
         })
     })
 }
+pub fn confirm_quiescence(input: &str) -> Result<(), MigrationError> {
+    if input.trim_end_matches(['\r', '\n']) == "QUIESCED" {
+        Ok(())
+    } else {
+        Err(MigrationError::InvalidInput("quiescence confirmation"))
+    }
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum MigrationStage {
     Prepared,
