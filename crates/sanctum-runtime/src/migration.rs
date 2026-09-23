@@ -153,6 +153,8 @@ pub enum TrimStatus {
     Absent,
     Unsupported,
 }
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct TargetVolumeIdentity{pub volume_uuid:String,pub device_identifier:String}
 pub fn parse_trim_log(log: &str) -> TrimStatus {
     let mut observed = false;
     for line in log.lines() {
