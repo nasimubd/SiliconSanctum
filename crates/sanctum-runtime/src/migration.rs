@@ -440,6 +440,13 @@ pub fn confirm_quiescence(input: &str) -> Result<(), MigrationError> {
         Err(MigrationError::InvalidInput("quiescence confirmation"))
     }
 }
+pub fn ensure_source_stable(
+    before: &MigrationManifest,
+    after: &MigrationManifest,
+) -> Result<(), MigrationError> {
+    compare_manifests(before, after)
+        .map_err(|_| MigrationError::InvalidInput("source changed during final pass"))
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum MigrationStage {
     Prepared,
@@ -671,7 +678,9 @@ pub fn execute_migration(
     record.stage.transition(MigrationStage::InitialSynced)?;
     save_record(record_path, &record)?;
     quiesce()?;
+    let source_before = MigrationManifest::scan(&record.paths.origin)?;
     RsyncInvocation::new(rsync.to_path_buf(), &record.paths, SyncPass::Final).run()?;
+    ensure_source_stable(&source_before, &MigrationManifest::scan(&record.paths.origin)?)?;
     verify_roots(&record.paths)?;
     record.stage.transition(MigrationStage::Verified)?;
     save_record(record_path, &record)?;
