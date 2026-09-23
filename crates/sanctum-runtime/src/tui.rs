@@ -25,7 +25,7 @@ pub struct MemoryBytes(pub u64);
 impl MemoryBytes{pub fn ratio(self,total:Self)->f64{if total.0==0{0.0}else{self.0 as f64/total.0 as f64}}}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub struct MemoryTelemetry{pub wired:MemoryBytes,pub os_cache:MemoryBytes,pub total:MemoryBytes}
-impl MemoryTelemetry{pub fn new(wired:MemoryBytes,os_cache:MemoryBytes,total:MemoryBytes)->Result<Self,DashboardError>{if total.0==0||wired.0>total.0||os_cache.0>total.0{return Err(DashboardError::InvalidMetric);}Ok(Self{wired,os_cache,total})}}
+impl MemoryTelemetry{pub fn new(wired:MemoryBytes,os_cache:MemoryBytes,total:MemoryBytes)->Result<Self,DashboardError>{if total.0==0||wired.0>total.0||os_cache.0>total.0||wired.0>total.0-os_cache.0{return Err(DashboardError::InvalidMetric);}Ok(Self{wired,os_cache,total})}}
 impl MemoryTelemetry{pub fn severity(self)->MetricSeverity{severity(self.wired.ratio(self.total))}}
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub struct Utilization(f32);
