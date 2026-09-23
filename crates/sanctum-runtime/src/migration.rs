@@ -649,7 +649,7 @@ pub fn execute_migration(
     if !inspect_live_bus()?.qualifies() {
         return Err(MigrationError::InvalidInput("x4 Thunderbolt link"));
     }
-    let trim = inspect_live_trim()?;
+    let trim = inspect_live_trim_for_target(&paths.target)?;
     if trim.status != TrimStatus::Observed || !trim.is_fresh(std::time::SystemTime::now()) {
         return Err(MigrationError::InvalidInput("fresh APFS TRIM evidence"));
     }
