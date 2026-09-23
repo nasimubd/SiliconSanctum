@@ -61,4 +61,5 @@ impl MigrationStage{pub fn transition(&mut self,next:Self)->Result<(),MigrationE
 #[derive(Debug,Clone,PartialEq,Eq,serde::Serialize,serde::Deserialize)]
 pub struct CutoverRecord{pub paths:MigrationPaths,pub stage:MigrationStage,pub activated_at:u64}
 impl CutoverRecord{pub fn encode(&self)->Result<Vec<u8>,MigrationError>{serde_json::to_vec_pretty(self).map_err(|error|MigrationError::Io(error.to_string()))}pub fn decode(bytes:&[u8])->Result<Self,MigrationError>{serde_json::from_slice(bytes).map_err(|error|MigrationError::InvalidInput(if error.is_syntax(){"cutover record syntax"}else{"cutover record"}))}}
+pub const ROLLBACK_WINDOW_SECONDS:u64=72*60*60;
 // Migration extensions.
