@@ -68,4 +68,6 @@ pub fn write_ai_root(pointer:&std::path::Path,root:&std::path::Path)->Result<(),
 pub fn save_record(path:&std::path::Path,record:&CutoverRecord)->Result<(),MigrationError>{write_atomic(path,&record.encode()?)}
 pub fn load_record(path:&std::path::Path)->Result<CutoverRecord,MigrationError>{CutoverRecord::decode(&std::fs::read(path).map_err(|error|MigrationError::Io(error.to_string()))?)}
 pub fn rollback(record_path:&std::path::Path,pointer:&std::path::Path)->Result<CutoverRecord,MigrationError>{let mut record=load_record(record_path)?;if record.stage!=MigrationStage::Activated{return Err(MigrationError::InvalidInput("rollback stage"));}if !record.paths.origin.is_dir(){return Err(MigrationError::InvalidInput("origin unavailable"));}write_ai_root(pointer,&record.paths.origin)?;record.stage.transition(MigrationStage::RolledBack)?;save_record(record_path,&record)?;Ok(record)}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub enum FailoverCause{LinkDropped,KernelPanic,TargetUnavailable}
 // Migration extensions.
