@@ -5,4 +5,7 @@
 pub enum MigrationError{InvalidInput(&'static str),ToolFailure(String),Io(String)}
 impl std::fmt::Display for MigrationError{fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->std::fmt::Result{write!(f,"{self:?}")}}
 impl std::error::Error for MigrationError{}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct LinkWidth(u8);
+impl LinkWidth{pub fn new(lanes:u8)->Result<Self,MigrationError>{if lanes==0||lanes>16{return Err(MigrationError::InvalidInput("link width"));}Ok(Self(lanes))}pub const fn lanes(self)->u8{self.0}}
 // Migration extensions.
