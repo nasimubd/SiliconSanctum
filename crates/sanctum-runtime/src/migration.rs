@@ -25,4 +25,7 @@ pub fn inspect_live_bus()->Result<BusInspection,MigrationError>{let output=std::
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum TrimStatus{Observed,Absent,Unsupported}
 pub fn parse_trim_log(log:&str)->TrimStatus{let mut observed=false;for line in log.lines(){let lower=line.to_ascii_lowercase();if !lower.contains("spaceman")||!lower.contains("trim"){continue;}if lower.contains("unsupported")||lower.contains("disabled"){return TrimStatus::Unsupported;}if lower.contains("completed")||lower.contains("issued")||lower.contains("enabled"){observed=true;}}if observed{TrimStatus::Observed}else{TrimStatus::Absent}}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct TrimEvidence{pub status:TrimStatus,pub observed_at:std::time::SystemTime}
+impl TrimEvidence{pub fn is_fresh(self,now:std::time::SystemTime)->bool{now.duration_since(self.observed_at).is_ok_and(|age|age<=std::time::Duration::from_secs(3600))}}
 // Migration extensions.
