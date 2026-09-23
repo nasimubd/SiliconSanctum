@@ -8,4 +8,5 @@ impl std::error::Error for MigrationError{}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub struct LinkWidth(u8);
 impl LinkWidth{pub fn new(lanes:u8)->Result<Self,MigrationError>{if lanes==0||lanes>16{return Err(MigrationError::InvalidInput("link width"));}Ok(Self(lanes))}pub const fn lanes(self)->u8{self.0}}
+impl LinkWidth{pub fn parse(value:&str)->Result<Self,MigrationError>{let lanes=value.trim().trim_start_matches('x').parse::<u8>().map_err(|_|MigrationError::InvalidInput("link width"))?;Self::new(lanes)}}
 // Migration extensions.
