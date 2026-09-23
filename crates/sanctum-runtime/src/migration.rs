@@ -484,6 +484,16 @@ pub fn persist_monitor_service(
     }
     write_atomic(plist_path, service.render_plist()?.as_bytes())
 }
+pub fn launchctl_bootstrap_arguments(
+    uid: u32,
+    plist_path: &std::path::Path,
+) -> [std::ffi::OsString; 3] {
+    [
+        "bootstrap".into(),
+        format!("gui/{uid}").into(),
+        plist_path.as_os_str().to_owned(),
+    ]
+}
 pub fn ensure_source_stable(
     before: &MigrationManifest,
     after: &MigrationManifest,
