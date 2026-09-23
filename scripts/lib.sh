@@ -2,10 +2,15 @@
 set -euo pipefail
 
 repo_dir="${0:A:h:h}"
+ai_root_from_environment="${AI_ROOT-}"
 if [[ -f "$repo_dir/.env" ]]; then
   set -a
   source "$repo_dir/.env"
   set +a
+fi
+
+if [[ -z "$ai_root_from_environment" && -f "$repo_dir/.state/ai-root" ]]; then
+  IFS= read -r AI_ROOT < "$repo_dir/.state/ai-root"
 fi
 
 : "${AI_VOLUME:=/Volumes/AI-NVME}"
