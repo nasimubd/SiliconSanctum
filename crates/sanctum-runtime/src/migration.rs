@@ -54,4 +54,5 @@ impl MigrationManifest{fn visit(root:&std::path::Path,path:&std::path::Path,entr
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub enum ManifestDifference{Missing(std::path::PathBuf),Extra(std::path::PathBuf),Changed(std::path::PathBuf)}
 pub fn compare_manifests(source:&MigrationManifest,target:&MigrationManifest)->Result<(),ManifestDifference>{for (path,expected) in &source.entries{match target.entries.get(path){None=>return Err(ManifestDifference::Missing(path.clone())),Some(actual) if actual!=expected=>return Err(ManifestDifference::Changed(path.clone())),Some(_)=>{}}}for path in target.entries.keys(){if !source.entries.contains_key(path){return Err(ManifestDifference::Extra(path.clone()));}}Ok(())}
+pub fn verify_roots(paths:&MigrationPaths)->Result<(),MigrationError>{let source=MigrationManifest::scan(&paths.origin)?;let target=MigrationManifest::scan(&paths.target)?;compare_manifests(&source,&target).map_err(|difference|MigrationError::InvalidInput(match difference{ManifestDifference::Missing(_)=>"missing target entry",ManifestDifference::Extra(_)=>"unexpected target entry",ManifestDifference::Changed(_)=>"changed target entry"}))}
 // Migration extensions.
