@@ -1,4 +1,9 @@
 //! Ratatui views for runtime telemetry.
+#![allow(
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::must_use_candidate
+)]
 use super::{DashboardState, DashboardTab, MetricHistory};
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
