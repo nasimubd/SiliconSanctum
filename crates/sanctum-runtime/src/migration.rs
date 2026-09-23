@@ -47,4 +47,6 @@ impl Sha256Digest{pub fn to_hex(self)->String{self.0.iter().map(|byte|format!("{
 pub fn hash_file(path:&std::path::Path)->Result<Sha256Digest,MigrationError>{use sha2::{Digest,Sha256};use std::io::Read;let mut file=std::fs::File::open(path).map_err(|error|MigrationError::Io(error.to_string()))?;let mut hash=Sha256::new();let mut chunk=[0_u8;64*1024];loop{let size=file.read(&mut chunk).map_err(|error|MigrationError::Io(error.to_string()))?;if size==0{break;}hash.update(&chunk[..size]);}Ok(Sha256Digest(hash.finalize().into()))}
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub enum ManifestEntry{Directory,File{bytes:u64,digest:Sha256Digest},Symlink(std::path::PathBuf)}
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct MigrationManifest{pub entries:std::collections::BTreeMap<std::path::PathBuf,ManifestEntry>}
 // Migration extensions.
