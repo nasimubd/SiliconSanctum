@@ -1,2 +1,13 @@
-use sanctum_runtime::migration::{compare_manifests,ManifestDifference,MigrationManifest};
-#[test]fn detects_extra_file(){let a=tempfile::tempdir().unwrap();let b=tempfile::tempdir().unwrap();std::fs::write(b.path().join("other"),b"a").unwrap();let error=compare_manifests(&MigrationManifest::scan(a.path()).unwrap(),&MigrationManifest::scan(b.path()).unwrap()).unwrap_err();assert_eq!(error,ManifestDifference::Extra("other".into()));}
+use sanctum_runtime::migration::{ManifestDifference, MigrationManifest, compare_manifests};
+#[test]
+fn detects_extra_file() {
+    let a = tempfile::tempdir().unwrap();
+    let b = tempfile::tempdir().unwrap();
+    std::fs::write(b.path().join("other"), b"a").unwrap();
+    let error = compare_manifests(
+        &MigrationManifest::scan(a.path()).unwrap(),
+        &MigrationManifest::scan(b.path()).unwrap(),
+    )
+    .unwrap_err();
+    assert_eq!(error, ManifestDifference::Extra("other".into()));
+}

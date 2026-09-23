@@ -1,3 +1,78 @@
-use sanctum_runtime::migration::{execute_migration,inspect_live_bus,inspect_live_trim,load_record,monitor_once,MigrationError,MigrationPaths,MigrationStage,RsyncInvocation,SyncPass};
-fn main(){if let Err(error)=run(){eprintln!("migration: {error}");std::process::exit(1);}}
-fn run()->Result<(),MigrationError>{let args:Vec<std::ffi::OsString>=std::env::args_os().collect();match args.get(1).and_then(|value|value.to_str()){Some("inspect")=>{let link=inspect_live_bus()?;let trim=inspect_live_trim()?;println!("Thunderbolt PCIe x{} at {}.0 GT/s; APFS TRIM: {:?}",link.width.lanes(),link.speed.gt_per_second(),trim.status);Ok(())},Some("dry-run") if args.len()==5=>{let paths=MigrationPaths::new(args[2].clone().into(),args[3].clone().into())?;for pass in [SyncPass::Initial,SyncPass::Final]{let call=RsyncInvocation::new(args[4].clone().into(),&paths,pass);println!("{:?}: {:?} {:?}",pass,call.executable,call.arguments);}Ok(())},Some("execute") if args.len()==7=>{let paths=MigrationPaths::new(args[2].clone().into(),args[3].clone().into())?;let binary=std::env::current_exe().map_err(|error|MigrationError::Io(error.to_string()))?;let record=execute_migration(paths,std::path::Path::new(&args[4]),std::path::Path::new(&args[5]),std::path::Path::new(&args[6]),&binary)?;println!("Cutover active until UNIX second {}",record.rollback_deadline()?);Ok(())},Some("monitor") if args.len()==4=>{let state=std::path::Path::new(&args[2]);let pointer=std::path::Path::new(&args[3]);loop{if load_record(state)?.stage!=MigrationStage::Activated{break;}match monitor_once(state,pointer){Ok(Some(cause))=>{eprintln!("rollback triggered: {cause:?}");break;},Ok(None)=>{},Err(error)=>eprintln!("monitor retry: {error}")}std::thread::sleep(std::time::Duration::from_secs(10));}Ok(())},_=>Err(MigrationError::InvalidInput("usage: sanctum-migrate inspect | dry-run ORIGIN TARGET RSYNC | execute ORIGIN TARGET RSYNC RECORD POINTER | monitor RECORD POINTER"))}}
+use sanctum_runtime::migration::{
+    MigrationError, MigrationPaths, MigrationStage, RsyncInvocation, SyncPass, execute_migration,
+    inspect_live_bus, inspect_live_trim, load_record, monitor_once,
+};
+fn main() {
+    if let Err(error) = run() {
+        eprintln!("migration: {error}");
+        std::process::exit(1);
+    }
+}
+fn run() -> Result<(), MigrationError> {
+    let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
+    match args.get(1).and_then(|value| value.to_str()) {
+        Some("inspect") => {
+            let link = inspect_live_bus()?;
+            let trim = inspect_live_trim()?;
+            println!(
+                "Thunderbolt PCIe x{} at {}.0 GT/s; APFS TRIM: {:?}",
+                link.width.lanes(),
+                link.speed.gt_per_second(),
+                trim.status
+            );
+            Ok(())
+        }
+        Some("dry-run") if args.len() == 5 => {
+            let paths = MigrationPaths::new(args[2].clone().into(), args[3].clone().into())?;
+            for pass in [SyncPass::Initial, SyncPass::Final] {
+                let call = RsyncInvocation::new(args[4].clone().into(), &paths, pass);
+                println!(
+                    "{:?}: {} {:?}",
+                    pass,
+                    call.executable.display(),
+                    call.arguments
+                );
+            }
+            Ok(())
+        }
+        Some("execute") if args.len() == 7 => {
+            let paths = MigrationPaths::new(args[2].clone().into(), args[3].clone().into())?;
+            let binary =
+                std::env::current_exe().map_err(|error| MigrationError::Io(error.to_string()))?;
+            let record = execute_migration(
+                paths,
+                std::path::Path::new(&args[4]),
+                std::path::Path::new(&args[5]),
+                std::path::Path::new(&args[6]),
+                &binary,
+            )?;
+            println!(
+                "Cutover active until UNIX second {}",
+                record.rollback_deadline()?
+            );
+            Ok(())
+        }
+        Some("monitor") if args.len() == 4 => {
+            let state = std::path::Path::new(&args[2]);
+            let pointer = std::path::Path::new(&args[3]);
+            loop {
+                if load_record(state)?.stage != MigrationStage::Activated {
+                    break;
+                }
+                match monitor_once(state, pointer) {
+                    Ok(Some(cause)) => {
+                        eprintln!("rollback triggered: {cause:?}");
+                        break;
+                    }
+                    Ok(None) => {}
+                    Err(error) => eprintln!("monitor retry: {error}"),
+                }
+                std::thread::sleep(std::time::Duration::from_secs(10));
+            }
+            Ok(())
+        }
+        _ => Err(MigrationError::InvalidInput(
+            "usage: sanctum-migrate inspect | dry-run ORIGIN TARGET RSYNC | execute ORIGIN TARGET RSYNC RECORD POINTER | monitor RECORD POINTER",
+        )),
+    }
+}
