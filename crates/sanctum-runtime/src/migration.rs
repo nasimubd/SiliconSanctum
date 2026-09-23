@@ -43,4 +43,5 @@ impl RsyncInvocation{pub fn run(&self)->Result<(),MigrationError>{let help=std::
 pub fn supports_required_rsync_flags(help:&str)->bool{let short=help.lines().find(|line|line.trim_start().starts_with("usage: rsync [")).unwrap_or("");short.contains('X')&&short.contains('H')&&short.contains('E')}
 #[derive(Debug,Clone,Copy,PartialEq,Eq,PartialOrd,Ord)]
 pub struct Sha256Digest(pub [u8;32]);
+impl Sha256Digest{pub fn to_hex(self)->String{self.0.iter().map(|byte|format!("{byte:02x}")).collect()}}
 // Migration extensions.
