@@ -30,4 +30,5 @@ pub struct TrimEvidence{pub status:TrimStatus,pub observed_at:std::time::SystemT
 impl TrimEvidence{pub fn is_fresh(self,now:std::time::SystemTime)->bool{now.duration_since(self.observed_at).is_ok_and(|age|age<=std::time::Duration::from_secs(3600))}}
 pub fn trim_log_arguments()->[&'static str;6]{["show","--last","1h","--style","compact","--predicate"]}
 pub const TRIM_LOG_PREDICATE:&str="process == \"kernel\" AND eventMessage CONTAINS[c] \"spaceman\"";
+pub fn inspect_live_trim()->Result<TrimEvidence,MigrationError>{let output=std::process::Command::new("log").args(trim_log_arguments()).arg(TRIM_LOG_PREDICATE).output().map_err(|error|MigrationError::Io(error.to_string()))?;if !output.status.success(){return Err(MigrationError::ToolFailure("log show".into()));}Ok(TrimEvidence{status:parse_trim_log(&String::from_utf8_lossy(&output.stdout)),observed_at:std::time::SystemTime::now()})}
 // Migration extensions.
