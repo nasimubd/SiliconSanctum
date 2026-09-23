@@ -1,6 +1,9 @@
 //! Interactive runtime telemetry dashboard.
 pub mod render;
 use std::collections::VecDeque;
+use std::io::{self,Stdout};
+use crossterm::{execute,terminal::{disable_raw_mode,enable_raw_mode,EnterAlternateScreen,LeaveAlternateScreen}};
+use ratatui::{backend::CrosstermBackend,Terminal};
 
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub enum DashboardError{ZeroRefreshRate,ZeroDimension,InvalidPercentage,InvalidMetric,EmptyProfile,Terminal(String)}
@@ -44,6 +47,9 @@ impl MetricHistory{pub fn record(&mut self,snapshot:&DashboardSnapshot){if self.
 impl MetricHistory{pub fn token_rates(&self)->&VecDeque<f64>{&self.token_rates}pub fn wired_ratios(&self)->&VecDeque<f64>{&self.wired_ratios}pub fn performance_ratios(&self)->&VecDeque<f32>{&self.performance_ratios}}
 impl DashboardSnapshot{pub fn new(token_rate:TokenRate,memory:MemoryTelemetry,cpu:CpuTelemetry,kv:KvResidency,profile:ActiveProfile)->Self{Self{token_rate,memory,cpu,kv,profile}}}
 pub trait TelemetrySource{fn snapshot(&mut self)->Result<DashboardSnapshot,DashboardError>;}
+pub struct TerminalSession{terminal:Terminal<CrosstermBackend<Stdout>>}
+impl TerminalSession{pub fn enter()->Result<Self,DashboardError>{enable_raw_mode().map_err(|error|DashboardError::Terminal(error.to_string()))?;if let Err(error)=execute!(io::stdout(),EnterAlternateScreen){let _=disable_raw_mode();return Err(DashboardError::Terminal(error.to_string()));}let terminal=match Terminal::new(CrosstermBackend::new(io::stdout())){Ok(terminal)=>terminal,Err(error)=>{let _=execute!(io::stdout(),LeaveAlternateScreen);let _=disable_raw_mode();return Err(DashboardError::Terminal(error.to_string()));}};Ok(Self{terminal})}pub fn terminal(&mut self)->&mut Terminal<CrosstermBackend<Stdout>>{&mut self.terminal}}
+impl Drop for TerminalSession{fn drop(&mut self){let _=execute!(io::stdout(),LeaveAlternateScreen);let _=disable_raw_mode();}}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum DashboardTab{Overview,Memory,Compute}
 impl DashboardTab{pub const fn next(self)->Self{match self{Self::Overview=>Self::Memory,Self::Memory=>Self::Compute,Self::Compute=>Self::Overview}}}
