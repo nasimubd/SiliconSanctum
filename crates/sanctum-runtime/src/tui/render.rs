@@ -2,8 +2,8 @@
 use ratatui::layout::{Constraint,Direction,Layout,Rect};
 use ratatui::Frame;
 use ratatui::widgets::{Block,Borders,Gauge,Paragraph,Sparkline};
-use super::{DashboardState,MetricHistory};
-pub fn render_dashboard(_frame:&mut Frame<'_>,_state:&DashboardState,_history:&MetricHistory){}
+use super::{DashboardState,DashboardTab,MetricHistory};
+pub fn render_dashboard(frame:&mut Frame<'_>,state:&DashboardState,history:&MetricHistory){let layout=regions(frame.area());render_header(frame,layout.header,state);match state.tab{DashboardTab::Overview=>render_overview(frame,layout.body,state,history),DashboardTab::Memory=>render_memory(frame,layout.body,state),DashboardTab::Compute=>render_compute(frame,layout.body,state)}render_footer(frame,layout.footer);}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub struct DashboardRegions{pub header:Rect,pub body:Rect,pub footer:Rect}
 pub fn regions(area:Rect)->DashboardRegions{let chunks=Layout::default().direction(Direction::Vertical).constraints([Constraint::Length(3),Constraint::Min(1),Constraint::Length(2)]).split(area);DashboardRegions{header:chunks[0],body:chunks[1],footer:chunks[2]}}
