@@ -1,3 +1,20 @@
-use ratatui::{backend::TestBackend,Terminal};
-use sanctum_runtime::tui::{render::render_dashboard,*};
-#[test]fn handles_compact_terminal(){let snapshot=DashboardSnapshot::new(TokenRate::new(0.0).unwrap(),MemoryTelemetry::new(MemoryBytes(0),MemoryBytes(0),MemoryBytes(1)).unwrap(),CpuTelemetry{performance:Utilization::new(0.0).unwrap(),efficiency:Utilization::new(0.0).unwrap()},KvResidency::new(0,1).unwrap(),ActiveProfile::new("idle").unwrap());let state=DashboardState::new(snapshot);let mut terminal=Terminal::new(TestBackend::new(20,8)).unwrap();terminal.draw(|frame|render_dashboard(frame,&state,&MetricHistory::new(1).unwrap())).unwrap();}
+use ratatui::{Terminal, backend::TestBackend};
+use sanctum_runtime::tui::{render::render_dashboard, *};
+#[test]
+fn handles_compact_terminal() {
+    let snapshot = DashboardSnapshot::new(
+        TokenRate::new(0.0).unwrap(),
+        MemoryTelemetry::new(MemoryBytes(0), MemoryBytes(0), MemoryBytes(1)).unwrap(),
+        CpuTelemetry {
+            performance: Utilization::new(0.0).unwrap(),
+            efficiency: Utilization::new(0.0).unwrap(),
+        },
+        KvResidency::new(0, 1).unwrap(),
+        ActiveProfile::new("idle").unwrap(),
+    );
+    let state = DashboardState::new(snapshot);
+    let mut terminal = Terminal::new(TestBackend::new(20, 8)).unwrap();
+    terminal
+        .draw(|frame| render_dashboard(frame, &state, &MetricHistory::new(1).unwrap()))
+        .unwrap();
+}
