@@ -31,7 +31,7 @@ impl TrimEvidence{pub fn is_fresh(self,now:std::time::SystemTime)->bool{now.dura
 pub fn trim_log_arguments()->[&'static str;6]{["show","--last","1h","--style","compact","--predicate"]}
 pub const TRIM_LOG_PREDICATE:&str="process == \"kernel\" AND eventMessage CONTAINS[c] \"spaceman\"";
 pub fn inspect_live_trim()->Result<TrimEvidence,MigrationError>{let output=std::process::Command::new("log").args(trim_log_arguments()).arg(TRIM_LOG_PREDICATE).output().map_err(|error|MigrationError::Io(error.to_string()))?;if !output.status.success(){return Err(MigrationError::ToolFailure("log show".into()));}Ok(TrimEvidence{status:parse_trim_log(&String::from_utf8_lossy(&output.stdout)),observed_at:std::time::SystemTime::now()})}
-#[derive(Debug,Clone,PartialEq,Eq)]
+#[derive(Debug,Clone,PartialEq,Eq,serde::Serialize,serde::Deserialize)]
 pub struct MigrationPaths{pub origin:std::path::PathBuf,pub target:std::path::PathBuf}
 impl MigrationPaths{pub fn new(origin:std::path::PathBuf,target:std::path::PathBuf)->Result<Self,MigrationError>{use std::path::Component;let valid=|path:&std::path::Path|path.is_absolute()&&path!=std::path::Path::new("/")&&!path.components().any(|part|matches!(part,Component::ParentDir|Component::CurDir));if !valid(&origin)||!valid(&target)||origin==target||origin.starts_with(&target)||target.starts_with(&origin){return Err(MigrationError::InvalidInput("migration roots"));}Ok(Self{origin,target})}}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
@@ -55,7 +55,7 @@ impl MigrationManifest{fn visit(root:&std::path::Path,path:&std::path::Path,entr
 pub enum ManifestDifference{Missing(std::path::PathBuf),Extra(std::path::PathBuf),Changed(std::path::PathBuf)}
 pub fn compare_manifests(source:&MigrationManifest,target:&MigrationManifest)->Result<(),ManifestDifference>{for (path,expected) in &source.entries{match target.entries.get(path){None=>return Err(ManifestDifference::Missing(path.clone())),Some(actual) if actual!=expected=>return Err(ManifestDifference::Changed(path.clone())),Some(_)=>{}}}for path in target.entries.keys(){if !source.entries.contains_key(path){return Err(ManifestDifference::Extra(path.clone()));}}Ok(())}
 pub fn verify_roots(paths:&MigrationPaths)->Result<(),MigrationError>{let source=MigrationManifest::scan(&paths.origin)?;let target=MigrationManifest::scan(&paths.target)?;compare_manifests(&source,&target).map_err(|difference|MigrationError::InvalidInput(match difference{ManifestDifference::Missing(_)=>"missing target entry",ManifestDifference::Extra(_)=>"unexpected target entry",ManifestDifference::Changed(_)=>"changed target entry"}))}
-#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+#[derive(Debug,Clone,Copy,PartialEq,Eq,serde::Serialize,serde::Deserialize)]
 pub enum MigrationStage{Prepared,InitialSynced,Verified,Activated,RolledBack,Completed}
 impl MigrationStage{pub fn transition(&mut self,next:Self)->Result<(),MigrationError>{let valid=matches!((*self,next),(Self::Prepared,Self::InitialSynced)|(Self::InitialSynced,Self::Verified)|(Self::Verified,Self::Activated)|(Self::Activated,Self::RolledBack)|(Self::Activated,Self::Completed));if !valid{return Err(MigrationError::InvalidInput("migration stage"));}*self=next;Ok(())}}
 // Migration extensions.
