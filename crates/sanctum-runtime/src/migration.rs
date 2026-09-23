@@ -62,4 +62,5 @@ impl MigrationStage{pub fn transition(&mut self,next:Self)->Result<(),MigrationE
 pub struct CutoverRecord{pub paths:MigrationPaths,pub stage:MigrationStage,pub activated_at:u64}
 impl CutoverRecord{pub fn encode(&self)->Result<Vec<u8>,MigrationError>{serde_json::to_vec_pretty(self).map_err(|error|MigrationError::Io(error.to_string()))}pub fn decode(bytes:&[u8])->Result<Self,MigrationError>{serde_json::from_slice(bytes).map_err(|error|MigrationError::InvalidInput(if error.is_syntax(){"cutover record syntax"}else{"cutover record"}))}}
 pub const ROLLBACK_WINDOW_SECONDS:u64=72*60*60;
+impl CutoverRecord{pub fn rollback_deadline(&self)->Result<u64,MigrationError>{self.activated_at.checked_add(ROLLBACK_WINDOW_SECONDS).ok_or(MigrationError::InvalidInput("rollback deadline"))}pub fn rollback_active(&self,now:u64)->bool{self.stage==MigrationStage::Activated&&self.rollback_deadline().is_ok_and(|deadline|now<=deadline&&now>=self.activated_at)}}
 // Migration extensions.
