@@ -1,0 +1,2 @@
+use sanctum_runtime::migration::TargetVolumeIdentity;
+#[test]fn parses_apfs_identity(){let xml=br#"<?xml version="1.0"?><plist version="1.0"><dict><key>FilesystemType</key><string>apfs</string><key>VolumeUUID</key><string>98927CDF-4342-412B-AB62-231E18833833</string><key>DeviceIdentifier</key><string>disk5s1</string></dict></plist>"#;let identity=TargetVolumeIdentity::parse_plist(xml).unwrap();assert_eq!(identity.device_identifier,"disk5s1");}
