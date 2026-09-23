@@ -1,0 +1,2 @@
+use sanctum_runtime::migration::{compare_manifests,ManifestDifference,MigrationManifest};
+#[test]fn detects_missing_file(){let a=tempfile::tempdir().unwrap();let b=tempfile::tempdir().unwrap();std::fs::write(a.path().join("model"),b"a").unwrap();let error=compare_manifests(&MigrationManifest::scan(a.path()).unwrap(),&MigrationManifest::scan(b.path()).unwrap()).unwrap_err();assert_eq!(error,ManifestDifference::Missing("model".into()));}
