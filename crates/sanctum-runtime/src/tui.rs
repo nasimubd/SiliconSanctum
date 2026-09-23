@@ -60,3 +60,4 @@ pub struct DashboardState{pub snapshot:DashboardSnapshot,pub tab:DashboardTab,pu
 impl DashboardState{pub fn new(snapshot:DashboardSnapshot)->Self{Self{snapshot,tab:DashboardTab::Overview,paused:false,quit:false}}}
 impl DashboardState{pub fn apply(&mut self,command:DashboardCommand){match command{DashboardCommand::Quit=>self.quit=true,DashboardCommand::TogglePause=>self.paused=!self.paused,DashboardCommand::NextTab=>self.tab=self.tab.next(),DashboardCommand::Refresh|DashboardCommand::Ignore=>{}}}}
 impl DashboardState{pub fn refresh<S:TelemetrySource>(&mut self,source:&mut S)->Result<(),DashboardError>{if !self.paused{self.snapshot=source.snapshot()?;}Ok(())}}
+impl DashboardState{pub fn force_refresh<S:TelemetrySource>(&mut self,source:&mut S)->Result<(),DashboardError>{self.snapshot=source.snapshot()?;Ok(())}}
