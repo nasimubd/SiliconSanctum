@@ -58,4 +58,6 @@ pub fn verify_roots(paths:&MigrationPaths)->Result<(),MigrationError>{let source
 #[derive(Debug,Clone,Copy,PartialEq,Eq,serde::Serialize,serde::Deserialize)]
 pub enum MigrationStage{Prepared,InitialSynced,Verified,Activated,RolledBack,Completed}
 impl MigrationStage{pub fn transition(&mut self,next:Self)->Result<(),MigrationError>{let valid=matches!((*self,next),(Self::Prepared,Self::InitialSynced)|(Self::InitialSynced,Self::Verified)|(Self::Verified,Self::Activated)|(Self::Activated,Self::RolledBack)|(Self::Activated,Self::Completed));if !valid{return Err(MigrationError::InvalidInput("migration stage"));}*self=next;Ok(())}}
+#[derive(Debug,Clone,PartialEq,Eq,serde::Serialize,serde::Deserialize)]
+pub struct CutoverRecord{pub paths:MigrationPaths,pub stage:MigrationStage,pub activated_at:u64}
 // Migration extensions.
