@@ -642,6 +642,7 @@ pub fn execute_migration(
     record_path: &std::path::Path,
     pointer: &std::path::Path,
     monitor_executable: &std::path::Path,
+    quiesce: impl FnOnce() -> Result<(), MigrationError>,
 ) -> Result<CutoverRecord, MigrationError> {
     if !paths.origin.is_dir() || !paths.target.is_dir() {
         return Err(MigrationError::InvalidInput("mounted migration roots"));
@@ -669,6 +670,7 @@ pub fn execute_migration(
     RsyncInvocation::new(rsync.to_path_buf(), &record.paths, SyncPass::Initial).run()?;
     record.stage.transition(MigrationStage::InitialSynced)?;
     save_record(record_path, &record)?;
+    quiesce()?;
     RsyncInvocation::new(rsync.to_path_buf(), &record.paths, SyncPass::Final).run()?;
     verify_roots(&record.paths)?;
     record.stage.transition(MigrationStage::Verified)?;
