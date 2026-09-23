@@ -36,4 +36,6 @@ pub struct MigrationPaths{pub origin:std::path::PathBuf,pub target:std::path::Pa
 impl MigrationPaths{pub fn new(origin:std::path::PathBuf,target:std::path::PathBuf)->Result<Self,MigrationError>{use std::path::Component;let valid=|path:&std::path::Path|path.is_absolute()&&path!=std::path::Path::new("/")&&!path.components().any(|part|matches!(part,Component::ParentDir|Component::CurDir));if !valid(&origin)||!valid(&target)||origin==target||origin.starts_with(&target)||target.starts_with(&origin){return Err(MigrationError::InvalidInput("migration roots"));}Ok(Self{origin,target})}}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum SyncPass{Initial,Final}
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct RsyncInvocation{pub executable:std::path::PathBuf,pub arguments:Vec<std::ffi::OsString>,pub pass:SyncPass}
 // Migration extensions.
