@@ -151,12 +151,91 @@ pub enum TrimStatus {
     Absent,
     Unsupported,
 }
-#[derive(Debug,Clone,PartialEq,Eq)]
-pub struct TargetVolumeIdentity{pub volume_uuid:String,pub device_identifier:String}
-impl TargetVolumeIdentity{pub fn parse_plist(bytes:&[u8])->Result<Self,MigrationError>{let value=plist::Value::from_reader(std::io::Cursor::new(bytes)).map_err(|error|MigrationError::Io(error.to_string()))?;let dictionary=value.as_dictionary().ok_or(MigrationError::InvalidInput("diskutil dictionary"))?;let get=|name:&str|dictionary.get(name).and_then(plist::Value::as_string).ok_or(MigrationError::InvalidInput("diskutil volume identity"));if get("FilesystemType")?!="apfs"{return Err(MigrationError::InvalidInput("destination APFS filesystem"));}let volume_uuid=get("VolumeUUID")?.to_ascii_uppercase();let device_identifier=get("DeviceIdentifier")?.to_owned();if volume_uuid.len()!=36||!volume_uuid.bytes().all(|byte|byte.is_ascii_hexdigit()||byte==b'-')||!device_identifier.starts_with("disk")||!device_identifier.bytes().all(|byte|byte.is_ascii_alphanumeric()){return Err(MigrationError::InvalidInput("diskutil volume identity"));}Ok(Self{volume_uuid,device_identifier})}}
-pub fn parse_trim_log_for_volume(log:&str,identity:&TargetVolumeIdentity)->TrimStatus{let relevant=log.lines().filter(|line|line.split(|character:char|!(character.is_ascii_alphanumeric()||character=='-')).any(|token|token.eq_ignore_ascii_case(&identity.volume_uuid)||token.eq_ignore_ascii_case(&identity.device_identifier))).collect::<Vec<_>>().join("\n");parse_trim_log(&relevant)}
-pub fn inspect_target_volume(path:&std::path::Path)->Result<TargetVolumeIdentity,MigrationError>{let output=std::process::Command::new("diskutil").arg("info").arg("-plist").arg(path).output().map_err(|error|MigrationError::Io(error.to_string()))?;if !output.status.success(){return Err(MigrationError::ToolFailure("diskutil info".into()));}TargetVolumeIdentity::parse_plist(&output.stdout)}
-pub fn inspect_live_trim_for_target(path:&std::path::Path)->Result<TrimEvidence,MigrationError>{let identity=inspect_target_volume(path)?;let output=std::process::Command::new("log").args(trim_log_arguments()).arg(TRIM_LOG_PREDICATE).output().map_err(|error|MigrationError::Io(error.to_string()))?;if !output.status.success(){return Err(MigrationError::ToolFailure("log show".into()));}Ok(TrimEvidence{status:parse_trim_log_for_volume(&String::from_utf8_lossy(&output.stdout),&identity),observed_at:std::time::SystemTime::now()})}
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TargetVolumeIdentity {
+    pub volume_uuid: String,
+    pub device_identifier: String,
+}
+impl TargetVolumeIdentity {
+    pub fn parse_plist(bytes: &[u8]) -> Result<Self, MigrationError> {
+        let value = plist::Value::from_reader(std::io::Cursor::new(bytes))
+            .map_err(|error| MigrationError::Io(error.to_string()))?;
+        let dictionary = value
+            .as_dictionary()
+            .ok_or(MigrationError::InvalidInput("diskutil dictionary"))?;
+        let get = |name: &str| {
+            dictionary
+                .get(name)
+                .and_then(plist::Value::as_string)
+                .ok_or(MigrationError::InvalidInput("diskutil volume identity"))
+        };
+        if get("FilesystemType")? != "apfs" {
+            return Err(MigrationError::InvalidInput("destination APFS filesystem"));
+        }
+        let volume_uuid = get("VolumeUUID")?.to_ascii_uppercase();
+        let device_identifier = get("DeviceIdentifier")?.to_owned();
+        if volume_uuid.len() != 36
+            || !volume_uuid
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() || byte == b'-')
+            || !device_identifier.starts_with("disk")
+            || !device_identifier
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric())
+        {
+            return Err(MigrationError::InvalidInput("diskutil volume identity"));
+        }
+        Ok(Self {
+            volume_uuid,
+            device_identifier,
+        })
+    }
+}
+pub fn parse_trim_log_for_volume(log: &str, identity: &TargetVolumeIdentity) -> TrimStatus {
+    let relevant = log
+        .lines()
+        .filter(|line| {
+            line.split(|character: char| !(character.is_ascii_alphanumeric() || character == '-'))
+                .any(|token| {
+                    token.eq_ignore_ascii_case(&identity.volume_uuid)
+                        || token.eq_ignore_ascii_case(&identity.device_identifier)
+                })
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    parse_trim_log(&relevant)
+}
+pub fn inspect_target_volume(
+    path: &std::path::Path,
+) -> Result<TargetVolumeIdentity, MigrationError> {
+    let output = std::process::Command::new("diskutil")
+        .arg("info")
+        .arg("-plist")
+        .arg(path)
+        .output()
+        .map_err(|error| MigrationError::Io(error.to_string()))?;
+    if !output.status.success() {
+        return Err(MigrationError::ToolFailure("diskutil info".into()));
+    }
+    TargetVolumeIdentity::parse_plist(&output.stdout)
+}
+pub fn inspect_live_trim_for_target(
+    path: &std::path::Path,
+) -> Result<TrimEvidence, MigrationError> {
+    let identity = inspect_target_volume(path)?;
+    let output = std::process::Command::new("log")
+        .args(trim_log_arguments())
+        .arg(TRIM_LOG_PREDICATE)
+        .output()
+        .map_err(|error| MigrationError::Io(error.to_string()))?;
+    if !output.status.success() {
+        return Err(MigrationError::ToolFailure("log show".into()));
+    }
+    Ok(TrimEvidence {
+        status: parse_trim_log_for_volume(&String::from_utf8_lossy(&output.stdout), &identity),
+        observed_at: std::time::SystemTime::now(),
+    })
+}
 pub fn parse_trim_log(log: &str) -> TrimStatus {
     let mut observed = false;
     for line in log.lines() {
@@ -460,11 +539,16 @@ impl MonitorService<'_> {
                 if !path.is_absolute() {
                     return Err(MigrationError::InvalidInput("monitor service path"));
                 }
-                let value = path.to_str().ok_or(MigrationError::InvalidInput("monitor service UTF-8 path"))?;
+                let value = path
+                    .to_str()
+                    .ok_or(MigrationError::InvalidInput("monitor service UTF-8 path"))?;
                 Ok(format!("<string>{}</string>", escape_plist_xml(value)))
             })
             .collect::<Result<Vec<_>, MigrationError>>()?;
-        Ok(format!("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>Label</key><string>{MONITOR_SERVICE_LABEL}</string><key>ProgramArguments</key><array>{}<string>monitor</string>{}{}</array><key>RunAtLoad</key><true/><key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict></dict></plist>", arguments[0], arguments[1], arguments[2]))
+        Ok(format!(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>Label</key><string>{MONITOR_SERVICE_LABEL}</string><key>ProgramArguments</key><array>{}<string>monitor</string>{}{}</array><key>RunAtLoad</key><true/><key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict></dict></plist>",
+            arguments[0], arguments[1], arguments[2]
+        ))
     }
 }
 pub fn persist_monitor_service(
@@ -472,13 +556,19 @@ pub fn persist_monitor_service(
     plist_path: &std::path::Path,
 ) -> Result<(), MigrationError> {
     if !plist_path.is_absolute()
-        || plist_path.parent().and_then(std::path::Path::file_name) != Some(std::ffi::OsStr::new("LaunchAgents"))
-        || plist_path.file_name() != Some(std::ffi::OsStr::new("com.siliconsanctum.migration-monitor.plist"))
+        || plist_path.parent().and_then(std::path::Path::file_name)
+            != Some(std::ffi::OsStr::new("LaunchAgents"))
+        || plist_path.file_name()
+            != Some(std::ffi::OsStr::new(
+                "com.siliconsanctum.migration-monitor.plist",
+            ))
     {
         return Err(MigrationError::InvalidInput("monitor LaunchAgents path"));
     }
     if plist_path.exists() {
-        return Err(MigrationError::InvalidInput("monitor service already exists"));
+        return Err(MigrationError::InvalidInput(
+            "monitor service already exists",
+        ));
     }
     write_atomic(plist_path, service.render_plist()?.as_bytes())
 }
@@ -752,7 +842,10 @@ pub fn execute_migration(
     quiesce()?;
     let source_before = MigrationManifest::scan(&record.paths.origin)?;
     RsyncInvocation::new(rsync.to_path_buf(), &record.paths, SyncPass::Final).run()?;
-    ensure_source_stable(&source_before, &MigrationManifest::scan(&record.paths.origin)?)?;
+    ensure_source_stable(
+        &source_before,
+        &MigrationManifest::scan(&record.paths.origin)?,
+    )?;
     verify_roots(&record.paths)?;
     record.stage.transition(MigrationStage::Verified)?;
     save_record(record_path, &record)?;
@@ -763,7 +856,11 @@ pub fn execute_migration(
     record.stage.transition(MigrationStage::Activated)?;
     save_record(record_path, &record)?;
     write_ai_root(pointer, &record.paths.target)?;
-    let service = MonitorService { executable: monitor_executable, record: record_path, pointer };
+    let service = MonitorService {
+        executable: monitor_executable,
+        record: record_path,
+        pointer,
+    };
     if let Err(error) = install_monitor_service(&service, service_plist_path) {
         rollback(record_path, pointer)?;
         return Err(error);
