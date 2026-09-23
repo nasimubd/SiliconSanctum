@@ -16,4 +16,7 @@ impl LinkSpeed{pub fn parse(value:&str)->Result<Self,MigrationError>{match value
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum PortStatus{Connected,Disconnected}
 impl PortStatus{pub fn parse(value:&str)->Self{let value=value.trim().to_ascii_lowercase();if value.contains("connected")&&!value.contains("no device"){Self::Connected}else{Self::Disconnected}}}
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub struct BusInspection{pub width:LinkWidth,pub speed:LinkSpeed}
+impl BusInspection{pub const fn qualifies(self)->bool{self.width.lanes()==4}}
 // Migration extensions.
