@@ -33,4 +33,5 @@ pub const TRIM_LOG_PREDICATE:&str="process == \"kernel\" AND eventMessage CONTAI
 pub fn inspect_live_trim()->Result<TrimEvidence,MigrationError>{let output=std::process::Command::new("log").args(trim_log_arguments()).arg(TRIM_LOG_PREDICATE).output().map_err(|error|MigrationError::Io(error.to_string()))?;if !output.status.success(){return Err(MigrationError::ToolFailure("log show".into()));}Ok(TrimEvidence{status:parse_trim_log(&String::from_utf8_lossy(&output.stdout)),observed_at:std::time::SystemTime::now()})}
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct MigrationPaths{pub origin:std::path::PathBuf,pub target:std::path::PathBuf}
+impl MigrationPaths{pub fn new(origin:std::path::PathBuf,target:std::path::PathBuf)->Result<Self,MigrationError>{use std::path::Component;let valid=|path:&std::path::Path|path.is_absolute()&&path!=std::path::Path::new("/")&&!path.components().any(|part|matches!(part,Component::ParentDir|Component::CurDir));if !valid(&origin)||!valid(&target)||origin==target||origin.starts_with(&target)||target.starts_with(&origin){return Err(MigrationError::InvalidInput("migration roots"));}Ok(Self{origin,target})}}
 // Migration extensions.
