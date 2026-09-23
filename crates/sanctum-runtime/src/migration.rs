@@ -494,6 +494,25 @@ pub fn launchctl_bootstrap_arguments(
         plist_path.as_os_str().to_owned(),
     ]
 }
+pub fn install_monitor_service(
+    service: &MonitorService<'_>,
+    plist_path: &std::path::Path,
+) -> Result<(), MigrationError> {
+    persist_monitor_service(service, plist_path)?;
+    #[cfg(target_os = "macos")]
+    let uid = unsafe { libc::getuid() };
+    #[cfg(not(target_os = "macos"))]
+    let uid = 0;
+    let status = Command::new("launchctl")
+        .args(launchctl_bootstrap_arguments(uid, plist_path))
+        .status()
+        .map_err(|error| MigrationError::Io(error.to_string()));
+    if !matches!(status, Ok(exit) if exit.success()) {
+        let _ = std::fs::remove_file(plist_path);
+        return Err(MigrationError::ToolFailure("launchctl bootstrap".into()));
+    }
+    Ok(())
+}
 pub fn ensure_source_stable(
     before: &MigrationManifest,
     after: &MigrationManifest,
