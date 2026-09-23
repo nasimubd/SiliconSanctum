@@ -57,4 +57,5 @@ pub fn compare_manifests(source:&MigrationManifest,target:&MigrationManifest)->R
 pub fn verify_roots(paths:&MigrationPaths)->Result<(),MigrationError>{let source=MigrationManifest::scan(&paths.origin)?;let target=MigrationManifest::scan(&paths.target)?;compare_manifests(&source,&target).map_err(|difference|MigrationError::InvalidInput(match difference{ManifestDifference::Missing(_)=>"missing target entry",ManifestDifference::Extra(_)=>"unexpected target entry",ManifestDifference::Changed(_)=>"changed target entry"}))}
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum MigrationStage{Prepared,InitialSynced,Verified,Activated,RolledBack,Completed}
+impl MigrationStage{pub fn transition(&mut self,next:Self)->Result<(),MigrationError>{let valid=matches!((*self,next),(Self::Prepared,Self::InitialSynced)|(Self::InitialSynced,Self::Verified)|(Self::Verified,Self::Activated)|(Self::Activated,Self::RolledBack)|(Self::Activated,Self::Completed));if !valid{return Err(MigrationError::InvalidInput("migration stage"));}*self=next;Ok(())}}
 // Migration extensions.
