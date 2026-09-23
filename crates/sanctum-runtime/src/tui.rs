@@ -1,4 +1,10 @@
 //! Interactive runtime telemetry dashboard.
+#![allow(
+    clippy::cast_precision_loss,
+    clippy::missing_errors_doc,
+    clippy::must_use_candidate,
+    clippy::return_self_not_must_use
+)]
 pub mod render;
 use crossterm::{
     execute,
