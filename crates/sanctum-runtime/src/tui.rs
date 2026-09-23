@@ -2,6 +2,7 @@
 pub mod render;
 use std::collections::VecDeque;
 use std::io::{self,Stdout};
+use std::sync::{Arc,RwLock};
 use crossterm::{execute,terminal::{disable_raw_mode,enable_raw_mode,EnterAlternateScreen,LeaveAlternateScreen}};
 use ratatui::{backend::CrosstermBackend,Terminal};
 
@@ -47,6 +48,10 @@ impl MetricHistory{pub fn record(&mut self,snapshot:&DashboardSnapshot){if self.
 impl MetricHistory{pub fn token_rates(&self)->&VecDeque<f64>{&self.token_rates}pub fn wired_ratios(&self)->&VecDeque<f64>{&self.wired_ratios}pub fn performance_ratios(&self)->&VecDeque<f32>{&self.performance_ratios}}
 impl DashboardSnapshot{pub fn new(token_rate:TokenRate,memory:MemoryTelemetry,cpu:CpuTelemetry,kv:KvResidency,profile:ActiveProfile)->Self{Self{token_rate,memory,cpu,kv,profile}}}
 pub trait TelemetrySource{fn snapshot(&mut self)->Result<DashboardSnapshot,DashboardError>;}
+#[derive(Debug,Clone)]
+pub struct SharedTelemetrySource(Arc<RwLock<DashboardSnapshot>>);
+impl SharedTelemetrySource{pub fn new(snapshot:DashboardSnapshot)->Self{Self(Arc::new(RwLock::new(snapshot)))}pub fn publish(&self,snapshot:DashboardSnapshot)->Result<(),DashboardError>{*self.0.write().map_err(|error|DashboardError::Terminal(error.to_string()))?=snapshot;Ok(())}}
+impl TelemetrySource for SharedTelemetrySource{fn snapshot(&mut self)->Result<DashboardSnapshot,DashboardError>{Ok(self.0.read().map_err(|error|DashboardError::Terminal(error.to_string()))?.clone())}}
 pub struct TerminalSession{terminal:Terminal<CrosstermBackend<Stdout>>}
 impl TerminalSession{pub fn enter()->Result<Self,DashboardError>{enable_raw_mode().map_err(|error|DashboardError::Terminal(error.to_string()))?;if let Err(error)=execute!(io::stdout(),EnterAlternateScreen){let _=disable_raw_mode();return Err(DashboardError::Terminal(error.to_string()));}let terminal=match Terminal::new(CrosstermBackend::new(io::stdout())){Ok(terminal)=>terminal,Err(error)=>{let _=execute!(io::stdout(),LeaveAlternateScreen);let _=disable_raw_mode();return Err(DashboardError::Terminal(error.to_string()));}};Ok(Self{terminal})}pub fn terminal(&mut self)->&mut Terminal<CrosstermBackend<Stdout>>{&mut self.terminal}}
 impl Drop for TerminalSession{fn drop(&mut self){let _=execute!(io::stdout(),LeaveAlternateScreen);let _=disable_raw_mode();}}
