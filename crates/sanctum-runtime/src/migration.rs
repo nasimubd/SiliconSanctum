@@ -39,4 +39,5 @@ pub enum SyncPass{Initial,Final}
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct RsyncInvocation{pub executable:std::path::PathBuf,pub arguments:Vec<std::ffi::OsString>,pub pass:SyncPass}
 impl RsyncInvocation{pub fn new(executable:std::path::PathBuf,paths:&MigrationPaths,pass:SyncPass)->Self{let mut source=paths.origin.as_os_str().to_os_string();source.push("/");let arguments=vec!["-avXHE".into(),"--".into(),source,paths.target.as_os_str().to_os_string()];Self{executable,arguments,pass}}}
+pub fn supports_required_rsync_flags(help:&str)->bool{let short=help.lines().find(|line|line.trim_start().starts_with("usage: rsync [")).unwrap_or("");short.contains('X')&&short.contains('H')&&short.contains('E')}
 // Migration extensions.
