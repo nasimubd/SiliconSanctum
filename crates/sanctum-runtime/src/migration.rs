@@ -49,4 +49,5 @@ pub fn hash_file(path:&std::path::Path)->Result<Sha256Digest,MigrationError>{use
 pub enum ManifestEntry{Directory,File{bytes:u64,digest:Sha256Digest},Symlink(std::path::PathBuf)}
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct MigrationManifest{pub entries:std::collections::BTreeMap<std::path::PathBuf,ManifestEntry>}
+impl MigrationManifest{pub fn scan(root:&std::path::Path)->Result<Self,MigrationError>{let metadata=std::fs::symlink_metadata(root).map_err(|error|MigrationError::Io(error.to_string()))?;if !metadata.is_dir(){return Err(MigrationError::InvalidInput("manifest root"));}Ok(Self{entries:std::collections::BTreeMap::new()})}}
 // Migration extensions.
