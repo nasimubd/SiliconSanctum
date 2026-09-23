@@ -448,6 +448,27 @@ pub fn escape_plist_xml(value: &str) -> String {
         .replace('"', "&quot;")
         .replace('\'', "&apos;")
 }
+pub const MONITOR_SERVICE_LABEL: &str = "com.siliconsanctum.migration-monitor";
+pub struct MonitorService<'a> {
+    pub executable: &'a std::path::Path,
+    pub record: &'a std::path::Path,
+    pub pointer: &'a std::path::Path,
+}
+impl MonitorService<'_> {
+    pub fn render_plist(&self) -> Result<String, MigrationError> {
+        let arguments = [self.executable, self.record, self.pointer]
+            .into_iter()
+            .map(|path| {
+                if !path.is_absolute() {
+                    return Err(MigrationError::InvalidInput("monitor service path"));
+                }
+                let value = path.to_str().ok_or(MigrationError::InvalidInput("monitor service UTF-8 path"))?;
+                Ok(format!("<string>{}</string>", escape_plist_xml(value)))
+            })
+            .collect::<Result<Vec<_>, MigrationError>>()?;
+        Ok(format!("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>Label</key><string>{MONITOR_SERVICE_LABEL}</string><key>ProgramArguments</key><array>{}<string>monitor</string>{}{}</array><key>RunAtLoad</key><true/><key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict></dict></plist>", arguments[0], arguments[1], arguments[2]))
+    }
+}
 pub fn ensure_source_stable(
     before: &MigrationManifest,
     after: &MigrationManifest,
