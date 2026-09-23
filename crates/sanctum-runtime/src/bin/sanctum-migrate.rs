@@ -35,7 +35,7 @@ fn run() -> Result<(), MigrationError> {
             }
             Ok(())
         }
-        Some("execute") if args.len() == 7 => {
+        Some("execute") if args.len() == 8 => {
             let paths = MigrationPaths::new(args[2].clone().into(), args[3].clone().into())?;
             let binary =
                 std::env::current_exe().map_err(|error| MigrationError::Io(error.to_string()))?;
@@ -45,6 +45,7 @@ fn run() -> Result<(), MigrationError> {
                 std::path::Path::new(&args[5]),
                 std::path::Path::new(&args[6]),
                 &binary,
+                std::path::Path::new(&args[7]),
                 || {
                     eprintln!("Pause all writes to the origin, then type QUIESCED to begin the final pass:");
                     let mut input = String::new();
@@ -78,7 +79,7 @@ fn run() -> Result<(), MigrationError> {
             Ok(())
         }
         _ => Err(MigrationError::InvalidInput(
-            "usage: sanctum-migrate inspect | dry-run ORIGIN TARGET RSYNC | execute ORIGIN TARGET RSYNC RECORD POINTER | monitor RECORD POINTER",
+            "usage: sanctum-migrate inspect | dry-run ORIGIN TARGET RSYNC | execute ORIGIN TARGET RSYNC RECORD POINTER SERVICE_PLIST | monitor RECORD POINTER",
         )),
     }
 }

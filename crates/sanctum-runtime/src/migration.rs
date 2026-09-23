@@ -5,9 +5,7 @@
     clippy::unnested_or_patterns
 )]
 
-#[cfg(unix)]
-use std::os::unix::process::CommandExt;
-use std::process::{Command, Stdio};
+use std::process::Command;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MigrationError {
@@ -722,6 +720,7 @@ pub fn execute_migration(
     record_path: &std::path::Path,
     pointer: &std::path::Path,
     monitor_executable: &std::path::Path,
+    service_plist_path: &std::path::Path,
     quiesce: impl FnOnce() -> Result<(), MigrationError>,
 ) -> Result<CutoverRecord, MigrationError> {
     if !paths.origin.is_dir() || !paths.target.is_dir() {
@@ -764,21 +763,10 @@ pub fn execute_migration(
     record.stage.transition(MigrationStage::Activated)?;
     save_record(record_path, &record)?;
     write_ai_root(pointer, &record.paths.target)?;
-    let mut command = Command::new(monitor_executable);
-    command
-        .arg("monitor")
-        .arg(record_path)
-        .arg(pointer)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
-    #[cfg(unix)]
-    {
-        command.process_group(0);
-    }
-    if let Err(error) = command.spawn() {
+    let service = MonitorService { executable: monitor_executable, record: record_path, pointer };
+    if let Err(error) = install_monitor_service(&service, service_plist_path) {
         rollback(record_path, pointer)?;
-        return Err(MigrationError::Io(error.to_string()));
+        return Err(error);
     }
     Ok(record)
 }
