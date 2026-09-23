@@ -1,5 +1,5 @@
 use sanctum_runtime::migration::{
-    MigrationError, MigrationPaths, MigrationStage, RsyncInvocation, SyncPass, execute_migration,
+    MigrationError, MigrationPaths, MigrationStage, RsyncInvocation, SyncPass, confirm_quiescence, execute_migration,
     inspect_live_bus, inspect_live_trim, load_record, monitor_once,
 };
 fn main() {
@@ -45,6 +45,12 @@ fn run() -> Result<(), MigrationError> {
                 std::path::Path::new(&args[5]),
                 std::path::Path::new(&args[6]),
                 &binary,
+                || {
+                    eprintln!("Pause all writes to the origin, then type QUIESCED to begin the final pass:");
+                    let mut input = String::new();
+                    std::io::stdin().read_line(&mut input).map_err(|error| MigrationError::Io(error.to_string()))?;
+                    confirm_quiescence(&input)
+                },
             )?;
             println!(
                 "Cutover active until UNIX second {}",
