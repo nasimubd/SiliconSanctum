@@ -1,6 +1,6 @@
 use sanctum_runtime::migration::{
-    MigrationError, MigrationPaths, MigrationStage, RsyncInvocation, SyncPass, confirm_quiescence, execute_migration,
-    inspect_live_bus, inspect_live_trim, load_record, monitor_once,
+    MigrationError, MigrationPaths, MigrationStage, RsyncInvocation, SyncPass, confirm_quiescence,
+    execute_migration, inspect_live_bus, inspect_live_trim, load_record, monitor_once,
 };
 fn main() {
     if let Err(error) = run() {
@@ -47,9 +47,13 @@ fn run() -> Result<(), MigrationError> {
                 &binary,
                 std::path::Path::new(&args[7]),
                 || {
-                    eprintln!("Pause all writes to the origin, then type QUIESCED to begin the final pass:");
+                    eprintln!(
+                        "Pause all writes to the origin, then type QUIESCED to begin the final pass:"
+                    );
                     let mut input = String::new();
-                    std::io::stdin().read_line(&mut input).map_err(|error| MigrationError::Io(error.to_string()))?;
+                    std::io::stdin()
+                        .read_line(&mut input)
+                        .map_err(|error| MigrationError::Io(error.to_string()))?;
                     confirm_quiescence(&input)
                 },
             )?;
