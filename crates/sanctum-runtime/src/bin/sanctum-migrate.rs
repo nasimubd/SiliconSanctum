@@ -1,0 +1,3 @@
+use sanctum_runtime::migration::{inspect_live_bus,inspect_live_trim,MigrationError};
+fn main(){if let Err(error)=run(){eprintln!("migration: {error}");std::process::exit(1);}}
+fn run()->Result<(),MigrationError>{let args:Vec<std::ffi::OsString>=std::env::args_os().collect();match args.get(1).and_then(|value|value.to_str()){Some("inspect")=>{let link=inspect_live_bus()?;let trim=inspect_live_trim()?;println!("Thunderbolt PCIe x{} at {}.0 GT/s; APFS TRIM: {:?}",link.width.lanes(),link.speed.gt_per_second(),trim.status);Ok(())},_=>Err(MigrationError::InvalidInput("usage: sanctum-migrate inspect"))}}
