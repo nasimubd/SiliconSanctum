@@ -440,6 +440,14 @@ pub fn confirm_quiescence(input: &str) -> Result<(), MigrationError> {
         Err(MigrationError::InvalidInput("quiescence confirmation"))
     }
 }
+pub fn escape_plist_xml(value: &str) -> String {
+    value
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&apos;")
+}
 pub fn ensure_source_stable(
     before: &MigrationManifest,
     after: &MigrationManifest,
