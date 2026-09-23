@@ -38,4 +38,5 @@ impl MigrationPaths{pub fn new(origin:std::path::PathBuf,target:std::path::PathB
 pub enum SyncPass{Initial,Final}
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct RsyncInvocation{pub executable:std::path::PathBuf,pub arguments:Vec<std::ffi::OsString>,pub pass:SyncPass}
+impl RsyncInvocation{pub fn new(executable:std::path::PathBuf,paths:&MigrationPaths,pass:SyncPass)->Self{let mut source=paths.origin.as_os_str().to_os_string();source.push("/");let arguments=vec!["-avXHE".into(),"--".into(),source,paths.target.as_os_str().to_os_string()];Self{executable,arguments,pass}}}
 // Migration extensions.
