@@ -4,6 +4,7 @@ pub mod arbiter;
 pub mod context;
 pub mod decision;
 pub mod gateway;
+pub mod migration;
 pub mod plugin;
 pub mod prefill;
 pub mod radix;
