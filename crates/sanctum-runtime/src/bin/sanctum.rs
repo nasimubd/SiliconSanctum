@@ -58,7 +58,8 @@ async fn run_agent(command: &str) -> Result<(), Box<dyn std::error::Error>> {
     {
         None
     } else {
-        let child = std::process::Command::new(std::env::current_exe()?)
+        let server_executable = std::env::current_exe()?.with_file_name("sanctum");
+        let child = std::process::Command::new(server_executable)
             .arg("serve")
             .env("SANCTUM_PORT", &port)
             .spawn()?;
