@@ -44,7 +44,7 @@ async fn run_agent(command: &str) -> Result<(), Box<dyn std::error::Error>> {
         .get(format!("{endpoint}/health"))
         .send()
         .await
-        .is_ok()
+        .is_ok_and(|response| response.status().is_success())
     {
         None
     } else {
@@ -58,7 +58,7 @@ async fn run_agent(command: &str) -> Result<(), Box<dyn std::error::Error>> {
                 .get(format!("{endpoint}/health"))
                 .send()
                 .await
-                .is_ok()
+                .is_ok_and(|response| response.status().is_success())
             {
                 ready = true;
                 break;
@@ -115,13 +115,61 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         std::env::var("SANCTUM_UPSTREAM").unwrap_or_else(|_| "http://127.0.0.1:11434".to_owned());
     let model = std::env::var("SANCTUM_MODEL").unwrap_or_else(|_| "qwen3.5:4b-q4_K_M".to_owned());
     let address = format!("{host}:{port}");
+    let managed_upstream = ensure_upstream(&upstream).await?;
     let listener = tokio::net::TcpListener::bind(&address).await?;
     println!("Silicon Sanctum listening on http://{address}");
     println!("OpenAI API: http://{address}/v1");
     println!("Anthropic API: http://{address}/v1/messages");
     println!("Upstream: {upstream} ({model})");
-    axum::serve(listener, api::router(api::ApiState::new(upstream, model))).await?;
+    axum::serve(listener, api::router(api::ApiState::new(upstream, model)))
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
+    if let Some(mut child) = managed_upstream {
+        let _ = child.kill().await;
+    }
     Ok(())
+}
+
+async fn ensure_upstream(
+    upstream: &str,
+) -> Result<Option<tokio::process::Child>, Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
+    if upstream_ready(&client, upstream).await {
+        return Ok(None);
+    }
+    if std::env::var("SANCTUM_MANAGE_UPSTREAM").as_deref() == Ok("0") {
+        return Err(format!("upstream {upstream} is unavailable").into());
+    }
+    let mut child = tokio::process::Command::new("ollama")
+        .arg("serve")
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::inherit())
+        .spawn()
+        .map_err(|error| format!("cannot start Ollama upstream: {error}"))?;
+    for _ in 0..60 {
+        tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+        if upstream_ready(&client, upstream).await {
+            return Ok(Some(child));
+        }
+        if child.try_wait()?.is_some() {
+            return Err("Ollama upstream exited before becoming ready".into());
+        }
+    }
+    let _ = child.kill().await;
+    Err(format!("Ollama upstream did not become ready at {upstream}").into())
+}
+
+async fn upstream_ready(client: &reqwest::Client, upstream: &str) -> bool {
+    client
+        .get(format!("{}/api/version", upstream.trim_end_matches('/')))
+        .send()
+        .await
+        .is_ok_and(|response| response.status().is_success())
+}
+
+async fn shutdown_signal() {
+    let _ = tokio::signal::ctrl_c().await;
 }
 
 fn doctor() -> Result<(), Box<dyn std::error::Error>> {
