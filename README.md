@@ -1,238 +1,176 @@
 # Silicon Sanctum
 
-## Rust core development
+Silicon Sanctum is a Rust control plane for reproducible local AI inference and
+quantitative-development workflows on Apple Silicon. It keeps model assets on
+external NVMe, selects a model according to measured hardware capacity, and
+exposes one local service that applications and coding agents can use through
+standard APIs.
 
-The Darwin systems foundation requires an Apple Silicon host for native kernel,
-dispatch, and QoS integration checks.
+## About
 
-```bash
-make core-check
-make core-test
-make core-lint
-```
+Silicon Sanctum is aimed at high-frequency AI inference in the practical sense:
+many small, latency-sensitive decisions around an agent or research workflow,
+with predictable local execution and minimal network dependence. It is not a
+claim of financial high-frequency trading performance and it does not place
+orders.
 
-The fuzz package requires nightly Rust and `cargo-fuzz`:
-
-```bash
-cargo +nightly fuzz run layout
-cargo +nightly fuzz run telemetry
-cargo +nightly fuzz run sysctl_payload
-```
-
-See [Phase 1 Darwin Core](docs/PHASE1_DARWIN_CORE.md) for safety invariants and
-the kernel/storage contracts.
-
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Conventional Commits](https://img.shields.io/badge/commits-Conventional%20Commits-fe5196.svg)](https://www.conventionalcommits.org/)
-[![macOS](https://img.shields.io/badge/platform-macOS-000000.svg?logo=apple)](https://www.apple.com/macos/)
-[![Ollama](https://img.shields.io/badge/runtime-Ollama-000000.svg)](https://ollama.com/)
-[![llama.cpp](https://img.shields.io/badge/runtime-llama.cpp-4285f4.svg)](https://github.com/ggml-org/llama.cpp)
-[![MLX](https://img.shields.io/badge/runtime-MLX-555555.svg)](https://github.com/ml-explore/mlx)
-[![Kaggle](https://img.shields.io/badge/burst%20compute-Kaggle-20beff.svg?logo=kaggle)](https://www.kaggle.com/)
-
-Reproducible local inference and quantitative-development tooling for Apple
-Silicon Macs with model storage on an external NVMe volume. It combines
-Ollama, llama.cpp, MLX, Claude Code, Aider, and checkpointed Kaggle workers for
-coding, research review, and backtest experimentation.
-
-> **Important:** This is research infrastructure, not trading advice. Never
-> connect it to live order execution without independent controls and human
-> authorization.
-
-## Quick start
-
-### Requirements
-
-- Apple Silicon macOS (the tested machine is an M1 Pro with 16 GB unified memory)
-- Homebrew and an external volume mounted under `/Volumes`
-- A source repository for your quantitative project
-- Optional: a Kaggle account for burst jobs and Claude Code for the agent UI
-
-### Install
-
-```bash
-git clone https://github.com/nasimubd/SiliconSanctum.git
-cd SiliconSanctum
-cp .env.example .env
-# Edit .env: replace YOUR_NVME_NAME with the exact name shown by `ls /Volumes`.
-./scripts/bootstrap.sh
-local-ai doctor
-```
-
-If the command is not found in an existing terminal, open a new terminal or
-run `export PATH="$HOME/.local/bin:$PATH"`.
-
-### Start local inference
-
-```bash
-local-ai serve daily       # Qwen3.5 4B, 32K context: default coding mode
-local-ai status
-```
-
-The managed Ollama LaunchAgent stays on localhost, keeps one model resident,
-and stores weights/cache/benchmarks under `AI_ROOT`. The first model load is
-storage-bound; later requests reuse memory and the prompt cache.
-
-## Claude Code workflow
-
-Claude Code runs on the Mac and uses Ollama's Anthropic-compatible local API;
-Qwen performs inference, while Claude Code supplies the terminal/tool harness.
-Your repository, tests, backtests, and Git history remain local.
-
-```bash
-cd /path/to/your/quant-project
-local-ai agent claude qwen35-4b-coding
-```
-
-For a long-context audit, start progressively at 524K:
-
-```bash
-local-ai agent claude qwen35-4b-1m 524288
-```
-
-Advance to `786432` and `1010000` only after retrieval accuracy, tool calls,
-memory pressure, and swap usage pass validation. Qwen3.5's native context is
-262K; larger values are extrapolation experiments. Use long context for
-repository-wide review, then switch back to 32K/128K for iterative edits.
-
-## Quantitative research and backtesting
-
-Ask the agent to inspect code, propose a diff, run tests, and execute a
-deterministic backtest. Require it to record the Git commit, data manifest,
-random seed, parameters, and output path. Keep raw market data and credentials
-outside prompts and Git. Review every change involving timestamps, execution,
-portfolio accounting, and leakage.
+The architecture separates three jobs:
 
 ```text
-Run the backtest with the pinned dataset and seed. Check for look-ahead,
-survivorship, timestamp, and train/test leakage. Write metrics and the run
-manifest to `$AI_ROOT/benchmarks`. Do not place orders.
+Rust control plane
+  ├─ hardware benchmark and model-fit recommendation
+  ├─ OpenAI-compatible /v1 API
+  ├─ Anthropic-compatible /v1/messages API
+  ├─ agent adapters and automatic local environment setup
+  ├─ decision plane: typed routing, confidence, policy, and verification
+  └─ model backends: MLX, llama.cpp, Ollama, and future native backends
 ```
 
-## Kaggle burst compute
+The current repository is the control-plane and runtime foundation. The
+single-binary API server and zero-configuration agent commands are the target
+Phase 1 product surface described in
+[`docs/CONTROL_PLANE.md`](docs/CONTROL_PLANE.md); they are not all implemented
+by the current release.
 
-Kaggle is a separate, quota-bounded batch worker—not a live extension of the
-Claude Code process. Configure `kaggle/job.json`, authenticate, and submit:
+## What it solves today
+
+- Reproducible local model profiles and manifests.
+- External-NVMe storage for model weights, caches, and benchmark artifacts.
+- Ollama, llama.cpp, and MLX process supervision on Apple Silicon.
+- Context and memory guardrails for small local coding models.
+- Repository-aware agent workflows through Aider and Claude Code.
+- Deterministic quantitative research and backtest orchestration with safety
+  checks, manifests, seeds, and no-live-order defaults.
+- A Rust foundation for routing, speculative execution, prefix caching,
+  chunked prefill, pressure handling, and typed decision policies.
+
+It does not currently make arbitrary trillion-parameter models fit in RAM. The
+Kimi K3 backend is documented as a future native backend and is explicitly
+**coming soon**, not included in this release. See
+[`docs/KIMI_BACKEND.md`](docs/KIMI_BACKEND.md).
+
+## Current status
+
+The tested workstation is an M1 Pro Mac with 16 GiB unified memory. Existing
+profiles include Qwen3.5 4B, Qwen3.5 9B, an experimental Qwen3.5 long-context
+profile, and a guarded Qwen3.8 27B profile. The 1M profile is an extrapolation
+experiment, not a verified native-million-token deployment; it is guarded at
+64 GiB RAM. See [`docs/LONG_CONTEXT.md`](docs/LONG_CONTEXT.md).
+
+The Rust runtime already contains backend-neutral registry, supervisor, routing,
+gateway, speculative, context, and decision contracts. Several contracts are
+tested as foundations while the unified server and installer experience remain
+the next product phase.
+
+## Installation and intended user experience
+
+The intended end state is one installed binary and one command:
 
 ```bash
-kaggle auth login
-make kaggle-submit
-kaggle kernels status <your-kaggle-username>/quant-long-context-worker
-make kaggle-output
+sanctum serve
 ```
 
-The worker embeds its manifest, enforces a deadline, and writes checkpoints.
-Upload only approved code/data/model artifacts. Kaggle's T4×2 allocation is two
-16 GB GPUs; use a tensor-parallel CUDA runtime for large models. Start long
-context jobs at 524K and checkpoint each shard. Do not operate multiple accounts
-to pool quota; follow [Kaggle's Terms](https://www.kaggle.com/terms).
+On first run, the binary will benchmark the host, inspect available storage,
+select or recommend model profiles, start one resident backend, and print:
 
-See [Kaggle operations](docs/KAGGLE.md) and [performance results](docs/PERFORMANCE.md).
+```text
+OpenAI API:    http://127.0.0.1:8080/v1
+Anthropic API: http://127.0.0.1:8080/v1/messages
+Model:         <selected profile>
+Hardware fit:  comfortable | usable with latency | unsupported
+```
 
-### Local alpha-forge fallback
-
-The TickArchive-aware hot path for `msys-alpha-forage` is registered as a
-local backtesting project. It runs only discovery-split research jobs that the
-repository already designates as Mac-local; it does not ingest live data,
-access lockbox data, or execute orders. Every run records its Git SHA, exact
-command, data roots, exit status, and output log under
-`$AI_ROOT/benchmarks/backtests`.
+The planned dedicated commands are:
 
 ```bash
-local-ai backtest list
-local-ai backtest run alpha-forge fade-comparison --dry-run
+sanctum serve       # generic local server
+sanctum claude      # prepare and launch Claude Code against the local API
+sanctum codex       # prepare and launch Codex against the local API
+sanctum opencode    # prepare and launch OpenCode against the local API
+sanctum aether      # prepare and launch Aether against the local API
+sanctum doctor      # inspect installation, backend, storage, and API health
+sanctum benchmark   # rerun the reproducible hardware/model benchmark
+```
+
+The agent commands will detect an already-open supported client where its
+public integration permits it, preserve existing user configuration, write
+only a scoped local profile, and restore the prior environment on exit. No
+provider credentials should be overwritten. Until this surface is implemented,
+use the existing compatibility commands below.
+
+## Current commands
+
+```bash
+cp .env.example .env       # set the exact external NVMe volume name
+./scripts/bootstrap.sh
+local-ai doctor
+local-ai serve daily
+local-ai status
+local-ai agent claude qwen35-4b-coding
+local-ai benchmark qwen35-4b-coding 32768
 local-ai stop
-local-ai backtest run alpha-forge fade-sweep
 ```
 
-Set `AI_ALPHA_FORGE_DIR` only when the checkout is not the sibling
-`../msys-alpha-forage` directory. A resident inference model blocks a backtest
-on this 16 GB machine to avoid memory pressure and swap.
+The current implementation uses Ollama as the managed server. `scripts/serve.sh`
+can alternatively launch llama.cpp with a pinned GGUF. Model files and runtime
+state live below `AI_ROOT`, normally on the external volume.
 
-### One-command project workflow
+## Hardware recommendations
 
-Run `./scripts/install-cli.sh` once. It installs `backtest` and `plot` into
-`~/.local/bin`; after that, change into a project directory:
+Installation must distinguish model *fit* from model *quality*. The benchmark
+plan defines two recommendations:
 
-```bash
-backtest    # list registered jobs
-plot        # run the alpha-forge plotting job and record its manifest
-```
+1. **Comfortable**: fits physical memory without swap and meets the selected
+   interactive latency target under a representative prompt.
+2. **Robust but delayed**: fits and completes correctly, but cold load, prompt
+   processing, or token latency is visibly slower.
 
-For alpha-forge, run `backtest run alpha-forge fade-comparison` or
-`backtest run alpha-forge fade-sweep`. Backtests are strict by default; plots
-permit a dirty checkout but record that fact in the manifest. Neither command
-executes live orders.
+Recommendations must be based on measured memory headroom, storage bandwidth,
+prompt processing, decode rate, first-token latency, context growth, and thermal
+repeatability—not parameter count alone. See
+[`docs/BENCHMARKING.md`](docs/BENCHMARKING.md).
 
-## Open-source safety
+## Decision models and Jev
 
-Keep `.env`, credentials, raw market data, model weights, logs, and generated
-benchmark outputs outside Git. `AI_VOLUME` is the mounted volume and `AI_ROOT`
-is its workstation-data directory; both are local placeholders, not public
-paths. Run `./scripts/security-scan.sh` before every push and follow the
-[security policy](SECURITY.md), [third-party notices](THIRD_PARTY_NOTICES.md),
-and [public-release checklist](docs/PUBLICATION_CHECKLIST.md).
+The decision plane is where Silicon Sanctum can become faster and more reliable
+without pretending a small generative model is a frontier model. A decision
+model can classify intent, select a backend, decide whether a tool call is
+safe, score confidence, detect ambiguity, and gate escalation. The final policy
+and side effects remain in Rust.
 
-## Profiles and commands
+TypeSafe's Jev is a relevant hosted System One decision model. Based on the
+official TypeSafe documentation checked on 2026-09-25, Jev is accessed through
+TypeSafe's API; its weights are not published as an open-weight local model.
+TypeSafe's SDKs and `system-one-adapter` are open source, but they do not make
+Jev locally runnable. See [`docs/DECISION_MODELS.md`](docs/DECISION_MODELS.md).
 
-| Command | Profile | Use |
-|---|---|---|
-| `local-ai serve chat` | Qwen3.5 4B / 8K | Fast conversation |
-| `local-ai serve daily` | Qwen3.5 4B / 32K | Default coding and agents |
-| `local-ai serve quality` | Qwen3.5 9B / 32K | Focused quality pass |
-| `local-ai serve long 524288` | Qwen3.5 4B | Experimental long context |
-| `local-ai serve qwen38` | Qwen3.8 27B | Guarded, memory-heavy experiment |
+## Safety boundary
 
-Useful commands: `local-ai doctor`, `local-ai validate`, `local-ai benchmark`,
-`local-ai context-ladder`, `local-ai lock-models`, and `local-ai bundle`.
+This is research infrastructure, not trading advice. Do not connect it to live
+order execution without independent controls and explicit human authorization.
+Local model output is not an authority: tests, deterministic tools, manifests,
+and independent verification remain authoritative.
 
-## Reproducibility and recovery
+## Further documentation
 
-Configuration, scripts, manifests, and documentation are versioned in Git.
-Model weights are deliberately excluded. Run `local-ai lock-models` after model
-changes and `local-ai bundle` to refresh the offline recovery bundle on
-`AI_ROOT`. See [recovery](docs/RECOVERY.md) and [Thunderbolt migration](docs/THUNDERBOLT_MIGRATION.md).
-
-## Contributing
-
-Use [Conventional Commits](https://www.conventionalcommits.org/), add tests or
-benchmark evidence for behavior changes, and keep pull requests focused. Do
-not commit credentials, proprietary market data, model weights, or generated
-runtime artifacts.
-
-## Releasing
-
-Releases follow the same `mise` + semantic-release convention used by the
-quantitative research projects in this organization. Run from a clean `main`
-checkout with GitHub authentication available:
-
-```bash
-mise run release:drift       # inspect version, tags, and unreleased commits
-mise run release:dry         # preview the next release; no changes made
-mise run release:full        # preflight, changelog/version, tag, GitHub Release
-```
-
-`release:preflight` requires a clean tree, `main`, Conventional Commits, and a
-passing validation suite. semantic-release derives the version from commit
-types, updates `VERSION` and `CHANGELOG.md`, creates a `vX.Y.Z` tag, and publishes
-the GitHub Release. See `release.config.cjs` and `mise-tasks/release/` for the
-reproducible implementation.
-
-## Technology credits
-
-This project integrates [Ollama](https://github.com/ollama/ollama),
-[llama.cpp](https://github.com/ggml-org/llama.cpp),
-[MLX](https://github.com/ml-explore/mlx),
-[MLX-LM](https://github.com/ml-explore/mlx-lm),
-[Aider](https://github.com/Aider-AI/aider),
-[Claude Code](https://docs.anthropic.com/en/docs/claude-code),
-[Kaggle](https://www.kaggle.com/), and
-[Shields.io](https://shields.io/). Their names and marks remain the property
-of their respective owners.
+- [`docs/CONTROL_PLANE.md`](docs/CONTROL_PLANE.md) — unified binary, APIs, and
+  agent commands.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — ordered implementation plan, current
+  state, and acceptance criteria.
+- [`docs/BENCHMARKING.md`](docs/BENCHMARKING.md) — reproducible hardware and
+  model-fit benchmark plan.
+- [`docs/DECISION_MODELS.md`](docs/DECISION_MODELS.md) — Jev status and the
+  local decision-plane strategy.
+- [`docs/KIMI_BACKEND.md`](docs/KIMI_BACKEND.md) — Kimi K3 backend plan,
+  explicitly coming soon.
+- [`docs/LONG_CONTEXT.md`](docs/LONG_CONTEXT.md) — current 1M-context limits.
+- [`docs/PHASE1_DARWIN_CORE.md`](docs/PHASE1_DARWIN_CORE.md) — Darwin storage
+  and scheduling foundations.
 
 ## License
 
-Licensed under the [MIT License](LICENSE).
+MIT. Model weights, provider services, and third-party tools retain their own
+licenses and terms.
 
 ## Citation
 
