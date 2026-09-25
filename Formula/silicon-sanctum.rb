@@ -6,10 +6,10 @@ class SiliconSanctum < Formula
 
   if Hardware::CPU.arm?
     url "https://github.com/nasimubd/SiliconSanctum/releases/download/v#{version}/silicon-sanctum-#{version}-aarch64-apple-darwin.tar.gz"
-    sha256 "7177f3db04f424872470bcd407193a66dc282da0ecdc6d3e388c27bd48aef6d9"
+    sha256 "b3036189af8bbe74ad4ed53e84bf85eadba215f617a1429c8a00d008d169c92f"
   else
     url "https://github.com/nasimubd/SiliconSanctum/releases/download/v#{version}/silicon-sanctum-#{version}-x86_64-apple-darwin.tar.gz"
-    sha256 "REPLACE_WITH_RELEASE_SHA256"
+    sha256 "7177f3db04f424872470bcd407193a66dc282da0ecdc6d3e388c27bd48aef6d9"
   end
 
   def install
