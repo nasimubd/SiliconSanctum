@@ -2,10 +2,19 @@
 
 ## Product goal
 
-After installation, users should be able to run one binary and one command:
+After installation through Homebrew, users should be able to run one binary and
+one command:
 
 ```bash
-sanctum serve
+brew install silicon-sanctum
+sanctum-serve
+```
+
+The development-tap form is:
+
+```bash
+brew tap nasimubd/silicon-sanctum
+brew install nasimubd/silicon-sanctum/silicon-sanctum
 ```
 
 The binary should own discovery, benchmark selection, backend startup, health
@@ -39,13 +48,16 @@ errors, cancellation, and token accounting against captured fixtures.
 
 ## Dedicated agent commands
 
-The target commands are:
+The target executable commands are:
 
 ```bash
-sanctum claude
-sanctum codex
-sanctum opencode
-sanctum aether
+sanctum-serve
+sanctum-claude
+sanctum-codex
+sanctum-opencode
+sanctum-aider
+sanctum-doctor
+sanctum-benchmark
 ```
 
 Each command should:
@@ -61,10 +73,12 @@ Each command should:
    provider silently.
 
 Claude Code and Codex should use the Anthropic and OpenAI-compatible surfaces
-respectively where their current client contracts permit. OpenCode and Aether
-should use provider adapters selected from their supported environment/config
-interfaces. Because these clients can change, each adapter needs a versioned
-smoke test and a capability report rather than undocumented configuration hacks.
+respectively where their current client contracts permit. OpenCode should use
+its supported provider interface. `sanctum-aider` is the Aider adapter and will
+also be the compatibility shape for Aether until Aether's public integration
+contract is verified. Because these clients can change, each adapter needs a
+versioned smoke test and a capability report rather than undocumented
+configuration hacks.
 
 ## Runtime shape
 

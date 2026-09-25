@@ -64,6 +64,20 @@ the next product phase.
 
 ## Installation and intended user experience
 
+The distribution target is Homebrew. Once the formula is published, the
+installation command will be:
+
+```bash
+brew install silicon-sanctum
+```
+
+During development, the same formula can be tested from the project tap with:
+
+```bash
+brew tap nasimubd/silicon-sanctum
+brew install nasimubd/silicon-sanctum/silicon-sanctum
+```
+
 The intended end state is one installed binary and one command:
 
 ```bash
@@ -80,23 +94,30 @@ Model:         <selected profile>
 Hardware fit:  comfortable | usable with latency | unsupported
 ```
 
-The planned dedicated commands are:
+The dedicated commands are:
 
 ```bash
-sanctum serve       # generic local server
-sanctum claude      # prepare and launch Claude Code against the local API
-sanctum codex       # prepare and launch Codex against the local API
-sanctum opencode    # prepare and launch OpenCode against the local API
-sanctum aether      # prepare and launch Aether against the local API
-sanctum doctor      # inspect installation, backend, storage, and API health
-sanctum benchmark   # rerun the reproducible hardware/model benchmark
+sanctum-serve       # generic local server
+sanctum-claude      # prepare and launch Claude Code against the local API
+sanctum-codex       # prepare and launch Codex against the local API
+sanctum-opencode    # prepare and launch OpenCode against the local API
+sanctum-aider       # prepare and launch Aider/Aether against the local API
+sanctum-doctor      # inspect installation, backend, storage, and API health
+sanctum-benchmark   # rerun the reproducible hardware/model benchmark
 ```
 
-The agent commands will detect an already-open supported client where its
+The canonical executable names are lowercase. `sanctum-aider` is the Aider
+adapter; an Aether adapter will use the same command shape once Aether's public
+integration contract is verified. The agent commands will detect an already-open supported client where its
 public integration permits it, preserve existing user configuration, write
 only a scoped local profile, and restore the prior environment on exit. No
 provider credentials should be overwritten. Until this surface is implemented,
-use the existing compatibility commands below.
+the commands are planned and are not yet installed by the current release.
+
+The first installation on the target laptop is an explicit empirical gate. It
+must record the Homebrew formula revision, binary version, hardware benchmark,
+selected profile, API health, cold load, TTFT, decode rate, memory pressure,
+and repeated-run stability before a model is recommended.
 
 ## Current commands
 
