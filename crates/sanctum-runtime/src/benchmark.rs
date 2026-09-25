@@ -11,6 +11,8 @@ pub struct HardwareReport {
     pub memory_bytes: Option<u64>,
     pub storage_probe_ms: u128,
     pub recommendation: &'static str,
+    pub comfortable_models: Vec<&'static str>,
+    pub robust_but_delayed_models: Vec<&'static str>,
 }
 
 #[must_use]
@@ -20,11 +22,24 @@ pub fn probe() -> HardwareReport {
     let started = Instant::now();
     let _ = fs::read_dir(".").map(std::iter::Iterator::count);
     let storage_probe_ms = started.elapsed().as_millis();
-    let recommendation = match memory_bytes {
-        Some(bytes) if bytes >= 32 * 1024 * 1024 * 1024 => "quality-and-long-context",
-        Some(bytes) if bytes >= 16 * 1024 * 1024 * 1024 => "small-and-mid-size-models",
-        Some(_) => "small-models-only",
-        None => "run-backend-benchmark",
+    let (recommendation, comfortable_models, robust_but_delayed_models) = match memory_bytes {
+        Some(bytes) if bytes >= 64 * 1024 * 1024 * 1024 => (
+            "quality-and-long-context",
+            vec!["Qwen3.5 4B", "Qwen3.5 9B", "Qwen3.8 27B"],
+            vec!["verified 1M-context runtime"],
+        ),
+        Some(bytes) if bytes >= 32 * 1024 * 1024 * 1024 => (
+            "quality-and-mid-size-models",
+            vec!["Qwen3.5 4B", "Qwen3.5 9B"],
+            vec!["Qwen3.8 27B", "long-context profiles"],
+        ),
+        Some(bytes) if bytes >= 16 * 1024 * 1024 * 1024 => (
+            "small-and-mid-size-models",
+            vec!["Qwen3.5 4B"],
+            vec!["Qwen3.5 9B", "Qwen3.8 27B"],
+        ),
+        Some(_) => ("small-models-only", vec!["Qwen3.5 4B"], vec![]),
+        None => ("run-backend-benchmark", vec![], vec![]),
     };
     HardwareReport {
         platform: std::env::consts::OS.to_owned(),
@@ -32,6 +47,8 @@ pub fn probe() -> HardwareReport {
         memory_bytes,
         storage_probe_ms,
         recommendation,
+        comfortable_models,
+        robust_but_delayed_models,
     }
 }
 
