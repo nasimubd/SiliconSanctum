@@ -3,11 +3,13 @@
 
 use axum::{
     Json, Router,
+    body::Body,
     extract::State,
     http::StatusCode,
-    response::IntoResponse,
+    response::{IntoResponse, Response},
     routing::{get, post},
 };
+use futures_util::StreamExt;
 use reqwest::Client;
 use serde_json::{Value, json};
 use std::sync::Arc;
@@ -105,7 +107,7 @@ async fn openai_chat(
     State(state): State<Arc<ApiState>>,
     uri: axum::http::Uri,
     Json(request): Json<Value>,
-) -> impl IntoResponse {
+) -> Response {
     let model = request
         .get("model")
         .and_then(Value::as_str)
@@ -114,7 +116,7 @@ async fn openai_chat(
     let ollama = json!({
         "model": model,
         "messages": [{"role":"user", "content": prompt}],
-        "stream": false,
+        "stream": request.get("stream").and_then(Value::as_bool).unwrap_or(false),
         "options": {"num_ctx": request.get("max_tokens").and_then(Value::as_u64).unwrap_or(32768)}
     });
     let response = state
@@ -124,6 +126,14 @@ async fn openai_chat(
         .send()
         .await;
     match response {
+        Ok(response)
+            if request
+                .get("stream")
+                .and_then(Value::as_bool)
+                .unwrap_or(false) =>
+        {
+            openai_stream(response, model.to_owned()).into_response()
+        }
         Ok(response) => match response.json::<Value>().await {
             Ok(value) => {
                 let content = value
@@ -149,18 +159,18 @@ async fn openai_chat(
                         "usage":{"prompt_tokens":value.get("prompt_eval_count").and_then(Value::as_u64).unwrap_or(0),"completion_tokens":value.get("eval_count").and_then(Value::as_u64).unwrap_or(0)}
                     })
                 };
-                (StatusCode::OK, Json(response))
+                (StatusCode::OK, Json(response)).into_response()
             }
-            Err(error) => upstream_error(error.to_string()),
+            Err(error) => upstream_error(error.to_string()).into_response(),
         },
-        Err(error) => upstream_error(error.to_string()),
+        Err(error) => upstream_error(error.to_string()).into_response(),
     }
 }
 
 async fn anthropic_messages(
     State(state): State<Arc<ApiState>>,
     Json(request): Json<Value>,
-) -> impl IntoResponse {
+) -> Response {
     let model = request
         .get("model")
         .and_then(Value::as_str)
@@ -182,8 +192,12 @@ async fn anthropic_messages(
                 .join("\n")
         })
         .unwrap_or_default();
+    let stream = request
+        .get("stream")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
     let ollama =
-        json!({"model":model,"messages":[{"role":"user","content":prompt}],"stream":false});
+        json!({"model":model,"messages":[{"role":"user","content":prompt}],"stream":stream});
     let response = state
         .client
         .post(format!("{}/api/chat", state.upstream))
@@ -191,15 +205,14 @@ async fn anthropic_messages(
         .send()
         .await;
     match response {
+        Ok(response) if stream => anthropic_stream(response, model.to_owned()).into_response(),
         Ok(response) => match response.json::<Value>().await {
             Ok(value) => {
                 let content = value
                     .pointer("/message/content")
                     .and_then(Value::as_str)
                     .unwrap_or_default();
-                (
-                    StatusCode::OK,
-                    Json(json!({
+                (StatusCode::OK, Json(json!({
                         "id":"msg_sanctum_local",
                         "type":"message",
                         "role":"assistant",
@@ -208,13 +221,94 @@ async fn anthropic_messages(
                         "stop_reason":"end_turn",
                         "stop_sequence":null,
                         "usage":{"input_tokens":value.get("prompt_eval_count").and_then(Value::as_u64).unwrap_or(0),"output_tokens":value.get("eval_count").and_then(Value::as_u64).unwrap_or(0)}
-                    })),
-                )
+                    }))).into_response()
             }
-            Err(error) => upstream_error(error.to_string()),
+            Err(error) => upstream_error(error.to_string()).into_response(),
         },
-        Err(error) => upstream_error(error.to_string()),
+        Err(error) => upstream_error(error.to_string()).into_response(),
     }
+}
+
+fn openai_stream(response: reqwest::Response, model: String) -> Response {
+    let mut input = response.bytes_stream();
+    let stream = async_stream::stream! {
+        let mut buffer = Vec::new();
+        while let Some(chunk) = input.next().await {
+            match chunk {
+                Ok(chunk) => {
+                    buffer.extend_from_slice(&chunk);
+                    while let Some(index) = buffer.iter().position(|byte| *byte == b'\n') {
+                        let line: Vec<_> = buffer.drain(..=index).collect();
+                        let line = line.iter().copied().filter(|byte| *byte != b'\n' && *byte != b'\r').collect::<Vec<_>>();
+                        if line.is_empty() { continue; }
+                        if let Ok(value) = serde_json::from_slice::<Value>(&line) {
+                            let content = value.pointer("/message/content").and_then(Value::as_str).unwrap_or_default();
+                            let done = value.get("done").and_then(Value::as_bool).unwrap_or(false);
+                            let event = json!({
+                                "id":"chatcmpl-sanctum-local",
+                                "object":"chat.completion.chunk",
+                                "model":model,
+                                "choices":[{"index":0,"delta":{"content":content},"finish_reason":if done { Some("stop") } else { None::<&str> }}]
+                            });
+                            yield bytes::Bytes::from(format!("data: {event}\n\n"));
+                            if done { yield bytes::Bytes::from_static(b"data: [DONE]\n\n"); }
+                        }
+                    }
+                }
+                Err(error) => {
+                    let event = json!({"error":{"message":error.to_string(),"type":"upstream_error"}});
+                    yield bytes::Bytes::from(format!("data: {event}\n\n"));
+                    break;
+                }
+            }
+        }
+    };
+    let stream = stream.map(Ok::<_, std::convert::Infallible>);
+    Response::builder()
+        .status(StatusCode::OK)
+        .header("content-type", "text/event-stream")
+        .body(Body::from_stream(stream))
+        .unwrap_or_else(|_| Response::new(Body::empty()))
+}
+
+fn anthropic_stream(response: reqwest::Response, model: String) -> Response {
+    let mut input = response.bytes_stream();
+    let stream = async_stream::stream! {
+        let mut buffer = Vec::new();
+        yield bytes::Bytes::from(format!("event: message_start\ndata: {}\n\n", json!({"type":"message_start","message":{"id":"msg_sanctum_local","type":"message","role":"assistant","model":model,"content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":0,"output_tokens":0}}})));
+        while let Some(chunk) = input.next().await {
+            match chunk {
+                Ok(chunk) => {
+                    buffer.extend_from_slice(&chunk);
+                    while let Some(index) = buffer.iter().position(|byte| *byte == b'\n') {
+                        let line: Vec<_> = buffer.drain(..=index).collect();
+                        let line = line.iter().copied().filter(|byte| *byte != b'\n' && *byte != b'\r').collect::<Vec<_>>();
+                        if line.is_empty() { continue; }
+                        if let Ok(value) = serde_json::from_slice::<Value>(&line) {
+                            let content = value.pointer("/message/content").and_then(Value::as_str).unwrap_or_default();
+                            if !content.is_empty() {
+                                yield bytes::Bytes::from(format!("event: content_block_delta\ndata: {}\n\n", json!({"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":content}})));
+                            }
+                            if value.get("done").and_then(Value::as_bool).unwrap_or(false) {
+                                yield bytes::Bytes::from(format!("event: message_delta\ndata: {}\n\n", json!({"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},"usage":{"output_tokens":0}})));
+                                yield bytes::Bytes::from_static(b"event: message_stop\ndata: {\"type\":\"message_stop\"}\n\n");
+                            }
+                        }
+                    }
+                }
+                Err(error) => {
+                    yield bytes::Bytes::from(format!("event: error\ndata: {}\n\n", json!({"type":"error","error":{"type":"upstream_error","message":error.to_string()}})));
+                    break;
+                }
+            }
+        }
+    };
+    let stream = stream.map(Ok::<_, std::convert::Infallible>);
+    Response::builder()
+        .status(StatusCode::OK)
+        .header("content-type", "text/event-stream")
+        .body(Body::from_stream(stream))
+        .unwrap_or_else(|_| Response::new(Body::empty()))
 }
 
 fn openai_prompt(request: &Value) -> String {
