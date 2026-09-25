@@ -15,6 +15,130 @@ pub struct HardwareReport {
     pub robust_but_delayed_models: Vec<&'static str>,
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct BackendReport {
+    pub upstream: String,
+    pub reachable: bool,
+    pub model: String,
+    pub model_available: bool,
+    pub generation_ms: Option<u128>,
+    pub output_tokens: Option<u64>,
+    pub tokens_per_second: Option<f64>,
+    pub error: Option<String>,
+}
+
+#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::too_many_lines)]
+pub async fn backend_report(upstream: &str, model: &str, run_generation: bool) -> BackendReport {
+    let client = reqwest::Client::new();
+    let version = client
+        .get(format!("{}/api/version", upstream.trim_end_matches('/')))
+        .send()
+        .await;
+    if let Err(error) = version {
+        return BackendReport {
+            upstream: upstream.to_owned(),
+            reachable: false,
+            model: model.to_owned(),
+            model_available: false,
+            generation_ms: None,
+            output_tokens: None,
+            tokens_per_second: None,
+            error: Some(error.to_string()),
+        };
+    }
+    let tags = client
+        .get(format!("{}/api/tags", upstream.trim_end_matches('/')))
+        .send()
+        .await;
+    let model_available = match tags {
+        Ok(response) => response
+            .json::<serde_json::Value>()
+            .await
+            .ok()
+            .and_then(|value| value.get("models").cloned())
+            .and_then(|models| models.as_array().cloned())
+            .is_some_and(|models| {
+                models.iter().any(|entry| {
+                    entry.get("name").and_then(serde_json::Value::as_str) == Some(model)
+                })
+            }),
+        Err(_) => false,
+    };
+    if !model_available {
+        return BackendReport {
+            upstream: upstream.to_owned(),
+            reachable: true,
+            model: model.to_owned(),
+            model_available: false,
+            generation_ms: None,
+            output_tokens: None,
+            tokens_per_second: None,
+            error: Some("configured model is not present in the backend".to_owned()),
+        };
+    }
+    if !run_generation {
+        return BackendReport {
+            upstream: upstream.to_owned(),
+            reachable: true,
+            model: model.to_owned(),
+            model_available: true,
+            generation_ms: None,
+            output_tokens: None,
+            tokens_per_second: None,
+            error: None,
+        };
+    }
+    let started = Instant::now();
+    let response = client
+        .post(format!("{}/api/generate", upstream.trim_end_matches('/')))
+        .json(&serde_json::json!({"model":model,"prompt":"Reply with exactly OK","stream":false,"options":{"num_predict":8}}))
+        .timeout(std::time::Duration::from_secs(120))
+        .send()
+        .await;
+    match response {
+        Ok(response) => match response.json::<serde_json::Value>().await {
+            Ok(value) => {
+                let generation_ms = started.elapsed().as_millis();
+                let output_tokens = value.get("eval_count").and_then(serde_json::Value::as_u64);
+                let tokens_per_second = output_tokens.and_then(|tokens| {
+                    (generation_ms > 0).then_some(tokens as f64 / (generation_ms as f64 / 1000.0))
+                });
+                BackendReport {
+                    upstream: upstream.to_owned(),
+                    reachable: true,
+                    model: model.to_owned(),
+                    model_available: true,
+                    generation_ms: Some(generation_ms),
+                    output_tokens,
+                    tokens_per_second,
+                    error: None,
+                }
+            }
+            Err(error) => BackendReport {
+                upstream: upstream.to_owned(),
+                reachable: true,
+                model: model.to_owned(),
+                model_available: true,
+                generation_ms: None,
+                output_tokens: None,
+                tokens_per_second: None,
+                error: Some(error.to_string()),
+            },
+        },
+        Err(error) => BackendReport {
+            upstream: upstream.to_owned(),
+            reachable: true,
+            model: model.to_owned(),
+            model_available: true,
+            generation_ms: None,
+            output_tokens: None,
+            tokens_per_second: None,
+            error: Some(error.to_string()),
+        },
+    }
+}
+
 #[must_use]
 pub fn probe() -> HardwareReport {
     let logical_cpus = std::thread::available_parallelism().map_or(1, usize::from);

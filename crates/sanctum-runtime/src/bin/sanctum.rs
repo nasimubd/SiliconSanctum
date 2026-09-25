@@ -19,8 +19,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     match command.as_str() {
         "serve" | "sanctum-serve" => serve().await?,
-        "doctor" | "sanctum-doctor" => doctor()?,
-        "benchmark" | "sanctum-benchmark" => benchmark()?,
+        "doctor" | "sanctum-doctor" => doctor().await?,
+        "benchmark" | "sanctum-benchmark" => benchmark().await?,
         "claude" | "codex" | "opencode" | "aider" | "sanctum-claude" | "sanctum-codex"
         | "sanctum-opencode" | "sanctum-aider" => {
             run_agent(&command).await?;
@@ -172,13 +172,25 @@ async fn shutdown_signal() {
     let _ = tokio::signal::ctrl_c().await;
 }
 
-fn doctor() -> Result<(), Box<dyn std::error::Error>> {
-    println!("{}", serde_json::to_string_pretty(&benchmark::probe())?);
+async fn doctor() -> Result<(), Box<dyn std::error::Error>> {
+    let upstream =
+        std::env::var("SANCTUM_UPSTREAM").unwrap_or_else(|_| "http://127.0.0.1:11434".to_owned());
+    let model = std::env::var("SANCTUM_MODEL").unwrap_or_else(|_| "qwen3.5:4b-q4_K_M".to_owned());
+    let mut report = serde_json::to_value(benchmark::probe())?;
+    report["backend"] =
+        serde_json::to_value(benchmark::backend_report(&upstream, &model, false).await)?;
+    println!("{}", serde_json::to_string_pretty(&report)?);
     Ok(())
 }
 
-fn benchmark() -> Result<(), Box<dyn std::error::Error>> {
-    println!("{}", serde_json::to_string_pretty(&benchmark::probe())?);
+async fn benchmark() -> Result<(), Box<dyn std::error::Error>> {
+    let upstream =
+        std::env::var("SANCTUM_UPSTREAM").unwrap_or_else(|_| "http://127.0.0.1:11434".to_owned());
+    let model = std::env::var("SANCTUM_MODEL").unwrap_or_else(|_| "qwen3.5:4b-q4_K_M".to_owned());
+    let mut report = serde_json::to_value(benchmark::probe())?;
+    report["backend"] =
+        serde_json::to_value(benchmark::backend_report(&upstream, &model, true).await)?;
+    println!("{}", serde_json::to_string_pretty(&report)?);
     Ok(())
 }
 
