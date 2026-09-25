@@ -1,0 +1,75 @@
+name: Release binaries
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - runner: macos-14
+            target: aarch64-apple-darwin
+          - runner: macos-13
+            target: x86_64-apple-darwin
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Build
+        run: cargo build --release --target "${{ matrix.target }}" -p sanctum-runtime --bin sanctum
+      - name: Package
+        env:
+          VERSION: ${{ github.event.release.tag_name }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          version="${VERSION#v}"
+          staging="silicon-sanctum-${version}-${TARGET}"
+          mkdir -p "$staging"
+          cp "target/${TARGET}/release/sanctum" "$staging/sanctum"
+          tar -czf "${staging}.tar.gz" "$staging"
+          shasum -a 256 "${staging}.tar.gz" > "${staging}.sha256"
+      - name: Upload assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" silicon-sanctum-*.tar.gz silicon-sanctum-*.sha256
+
+  update-formula:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Download release checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mkdir -p release-assets
+          gh release download "$TAG" --pattern '*.sha256' --dir release-assets
+      - name: Update formula
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="${TAG#v}"
+          arm_sha="$(awk '{print $1}' release-assets/*aarch64-apple-darwin.sha256)"
+          intel_sha="$(awk '{print $1}' release-assets/*x86_64-apple-darwin.sha256)"
+          node scripts/release/sync-formula.cjs "$version" "$arm_sha" "$intel_sha"
+          ruby -c Formula/silicon-sanctum.rb
+      - name: Commit formula
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add Formula/silicon-sanctum.rb
+          git commit -m "chore(release): sync homebrew formula for ${TAG} [skip ci]"
+          git push origin main

@@ -8,7 +8,7 @@ module.exports = {
     ["@semantic-release/exec", { prepareCmd: 'node scripts/release/sync-version.cjs "${nextRelease.version}"' }],
     "@semantic-release/changelog",
     ["@semantic-release/git", {
-      assets: ["CHANGELOG.md", "VERSION"],
+      assets: ["CHANGELOG.md", "VERSION", "crates/sanctum-runtime/Cargo.toml", "Cargo.lock"],
       message: "chore(release): v${nextRelease.version} [skip ci]"
     }],
     ["@semantic-release/github", {

@@ -22,9 +22,10 @@ must still be built.
 | Agent commands | Existing Claude/Aider shell path | add versioned adapters for Claude, Codex, OpenCode, and Aether |
 | Kimi backend | Not implemented | documentation-only plan; see [`KIMI_BACKEND.md`](KIMI_BACKEND.md) |
 
-## Phase 1 — one binary and one local server
+## Phase 1 — one Homebrew-installed binary and one local server
 
-Deliver a native `sanctum` binary with:
+Deliver a native Rust binary distributed through Homebrew with the canonical
+entry points `sanctum-serve`, `sanctum-doctor`, and `sanctum-benchmark`:
 
 ```text
 sanctum serve
@@ -38,6 +39,8 @@ sanctum serve
 
 Acceptance criteria:
 
+- `brew install silicon-sanctum` installs the binary and all required runtime
+  assets without a repository checkout.
 - One command works from a clean installation after model assets are available.
 - `/v1/models`, `/v1/chat/completions`, `/v1/responses`, and `/v1/messages`
   have streaming and non-streaming contract tests.
@@ -45,6 +48,11 @@ Acceptance criteria:
   produce typed errors and never corrupt session state.
 - Only one model is resident unless a profile explicitly allows otherwise.
 - Existing Ollama/llama.cpp/MLX paths remain available during migration.
+
+The first laptop installation is an empirical verification gate, not a
+documentation exercise. Record the formula and binary revisions, hardware
+probe, storage benchmark, model recommendation, API compatibility tests,
+memory pressure, thermal repeatability, and rollback behavior.
 
 ## Phase 2 — hardware-aware installation
 
