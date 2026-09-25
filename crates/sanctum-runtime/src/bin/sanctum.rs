@@ -2,8 +2,21 @@ use sanctum_runtime::{api, benchmark};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let executable = std::env::args()
+        .next()
+        .and_then(|path| {
+            std::path::PathBuf::from(path)
+                .file_stem()
+                .map(std::ffi::OsStr::to_owned)
+        })
+        .and_then(|name| name.into_string().ok())
+        .unwrap_or_else(|| "sanctum".to_owned());
     let mut args = std::env::args().skip(1);
-    let command = args.next().unwrap_or_else(|| "serve".to_owned());
+    let command = if executable.starts_with("sanctum-") {
+        executable.clone()
+    } else {
+        args.next().unwrap_or_else(|| "serve".to_owned())
+    };
     match command.as_str() {
         "serve" | "sanctum-serve" => serve().await?,
         "doctor" | "sanctum-doctor" => doctor()?,
