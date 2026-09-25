@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/nasimubd/SiliconSanctum/compare/v1.14.0...v1.15.0) (2026-09-25)
+
+
+### Features
+
+* ship unified local inference binary ([659f50b](https://github.com/nasimubd/SiliconSanctum/commit/659f50bea4d23a5a164e135d4d6f8e1f96c8b84c))
+
 # [1.14.0](https://github.com/nasimubd/SiliconSanctum/compare/v1.13.0...v1.14.0) (2026-09-23)
 
 
