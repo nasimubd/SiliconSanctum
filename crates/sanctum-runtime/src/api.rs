@@ -112,12 +112,15 @@ async fn openai_chat(
         .get("model")
         .and_then(Value::as_str)
         .unwrap_or(&state.default_model);
-    let prompt = openai_prompt(&request);
+    let messages = openai_messages(&request);
     let ollama = json!({
         "model": model,
-        "messages": [{"role":"user", "content": prompt}],
+        "messages": messages,
         "stream": request.get("stream").and_then(Value::as_bool).unwrap_or(false),
-        "options": {"num_ctx": request.get("max_tokens").and_then(Value::as_u64).unwrap_or(32768)}
+        "options": {
+            "num_ctx": request.get("num_ctx").and_then(Value::as_u64).unwrap_or(32768),
+            "num_predict": request.get("max_tokens").and_then(Value::as_u64).unwrap_or(256)
+        }
     });
     let response = state
         .client
@@ -175,29 +178,19 @@ async fn anthropic_messages(
         .get("model")
         .and_then(Value::as_str)
         .unwrap_or(&state.default_model);
-    let prompt = request
+    let mut messages = request
         .get("messages")
         .and_then(Value::as_array)
-        .map(|messages| {
-            messages
-                .iter()
-                .filter_map(|message| {
-                    Some(format!(
-                        "{}: {}",
-                        message.get("role")?.as_str()?,
-                        message.get("content")?.as_str()?
-                    ))
-                })
-                .collect::<Vec<_>>()
-                .join("\n")
-        })
+        .cloned()
         .unwrap_or_default();
+    if let Some(system) = request.get("system").and_then(Value::as_str) {
+        messages.insert(0, json!({"role":"system","content":system}));
+    }
     let stream = request
         .get("stream")
         .and_then(Value::as_bool)
         .unwrap_or(false);
-    let ollama =
-        json!({"model":model,"messages":[{"role":"user","content":prompt}],"stream":stream});
+    let ollama = json!({"model":model,"messages":messages,"stream":stream,"options":{"num_predict":request.get("max_tokens").and_then(Value::as_u64).unwrap_or(256)}});
     let response = state
         .client
         .post(format!("{}/api/chat", state.upstream))
@@ -311,27 +304,14 @@ fn anthropic_stream(response: reqwest::Response, model: String) -> Response {
         .unwrap_or_else(|_| Response::new(Body::empty()))
 }
 
-fn openai_prompt(request: &Value) -> String {
-    if let Some(input) = request.get("input").and_then(Value::as_str) {
-        return input.to_owned();
+fn openai_messages(request: &Value) -> Vec<Value> {
+    if let Some(messages) = request.get("messages").and_then(Value::as_array) {
+        return messages.clone();
     }
-    request
-        .get("messages")
-        .and_then(Value::as_array)
-        .map(|messages| {
-            messages
-                .iter()
-                .filter_map(|message| {
-                    Some(format!(
-                        "{}: {}",
-                        message.get("role")?.as_str()?,
-                        message.get("content")?.as_str()?
-                    ))
-                })
-                .collect::<Vec<_>>()
-                .join("\n")
-        })
-        .unwrap_or_default()
+    if let Some(input) = request.get("input").and_then(Value::as_str) {
+        return vec![json!({"role":"user","content":input})];
+    }
+    Vec::new()
 }
 
 fn upstream_error(message: impl Into<String>) -> (StatusCode, Json<Value>) {
