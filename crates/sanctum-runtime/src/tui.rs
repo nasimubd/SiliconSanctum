@@ -314,17 +314,16 @@ pub fn run_dashboard<S: TelemetrySource>(
         let timeout = refresh_rate
             .duration()
             .saturating_sub(last_refresh.elapsed());
-        if event::poll(timeout).map_err(|error| DashboardError::Terminal(error.to_string()))? {
-            if let Event::Key(key) =
+        if event::poll(timeout).map_err(|error| DashboardError::Terminal(error.to_string()))?
+            && let Event::Key(key) =
                 event::read().map_err(|error| DashboardError::Terminal(error.to_string()))?
-            {
-                let command = map_key_event(key);
-                if command == DashboardCommand::Refresh {
-                    state.force_refresh(source)?;
-                    history.record(&state.snapshot);
-                } else {
-                    state.apply(command);
-                }
+        {
+            let command = map_key_event(key);
+            if command == DashboardCommand::Refresh {
+                state.force_refresh(source)?;
+                history.record(&state.snapshot);
+            } else {
+                state.apply(command);
             }
         }
         if last_refresh.elapsed() >= refresh_rate.duration() {

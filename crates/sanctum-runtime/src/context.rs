@@ -371,17 +371,17 @@ fn collect_nodes(
     source: &[u8],
     output: &mut Vec<StructuralSymbol>,
 ) {
-    if let Some(kind) = symbol_kind(language, node.kind()) {
-        if let Ok(range) = node_range(node) {
-            output.push(StructuralSymbol {
-                kind,
-                name: node_name(node, source),
-                signature: signature_text(node, language, source),
-                return_type: None,
-                documentation: None,
-                range,
-            });
-        }
+    if let Some(kind) = symbol_kind(language, node.kind())
+        && let Ok(range) = node_range(node)
+    {
+        output.push(StructuralSymbol {
+            kind,
+            name: node_name(node, source),
+            signature: signature_text(node, language, source),
+            return_type: None,
+            documentation: None,
+            range,
+        });
     }
     let mut cursor = node.walk();
     for child in node.children(&mut cursor) {
