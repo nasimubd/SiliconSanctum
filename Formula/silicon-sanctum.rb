@@ -4,12 +4,10 @@ class SiliconSanctum < Formula
   version "1.14.0"
   license "MIT"
 
-  on_arm do
+  if Hardware::CPU.arm?
     url "https://github.com/nasimubd/SiliconSanctum/releases/download/v#{version}/silicon-sanctum-#{version}-aarch64-apple-darwin.tar.gz"
     sha256 "REPLACE_WITH_RELEASE_SHA256"
-  end
-
-  on_intel do
+  else
     url "https://github.com/nasimubd/SiliconSanctum/releases/download/v#{version}/silicon-sanctum-#{version}-x86_64-apple-darwin.tar.gz"
     sha256 "REPLACE_WITH_RELEASE_SHA256"
   end

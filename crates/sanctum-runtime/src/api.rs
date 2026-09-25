@@ -103,6 +103,7 @@ async fn models(State(state): State<Arc<ApiState>>) -> impl IntoResponse {
 
 async fn openai_chat(
     State(state): State<Arc<ApiState>>,
+    uri: axum::http::Uri,
     Json(request): Json<Value>,
 ) -> impl IntoResponse {
     let model = request
@@ -129,16 +130,26 @@ async fn openai_chat(
                     .pointer("/message/content")
                     .and_then(Value::as_str)
                     .unwrap_or_default();
-                (
-                    StatusCode::OK,
-                    Json(json!({
+                let response = if uri.path().ends_with("/responses") {
+                    json!({
+                        "id":"resp_sanctum_local",
+                        "object":"response",
+                        "status":"completed",
+                        "model":model,
+                        "output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":content}]}],
+                        "output_text":content,
+                        "usage":{"input_tokens":value.get("prompt_eval_count").and_then(Value::as_u64).unwrap_or(0),"output_tokens":value.get("eval_count").and_then(Value::as_u64).unwrap_or(0)}
+                    })
+                } else {
+                    json!({
                         "id":"sanctum-local",
                         "object":"chat.completion",
                         "model":model,
                         "choices":[{"index":0,"message":{"role":"assistant","content":content},"finish_reason":"stop"}],
                         "usage":{"prompt_tokens":value.get("prompt_eval_count").and_then(Value::as_u64).unwrap_or(0),"completion_tokens":value.get("eval_count").and_then(Value::as_u64).unwrap_or(0)}
-                    })),
-                )
+                    })
+                };
+                (StatusCode::OK, Json(response))
             }
             Err(error) => upstream_error(error.to_string()),
         },
@@ -207,6 +218,9 @@ async fn anthropic_messages(
 }
 
 fn openai_prompt(request: &Value) -> String {
+    if let Some(input) = request.get("input").and_then(Value::as_str) {
+        return input.to_owned();
+    }
     request
         .get("messages")
         .and_then(Value::as_array)
