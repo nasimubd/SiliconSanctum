@@ -1,6 +1,8 @@
 //! Domain-agnostic local model runtime services.
 
+pub mod api;
 pub mod arbiter;
+pub mod benchmark;
 pub mod context;
 pub mod decision;
 pub mod gateway;

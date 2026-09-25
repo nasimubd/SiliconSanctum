@@ -7,3 +7,7 @@ unsafe_op_in_unsafe_fn = "deny"
 
 [workspace.lints.clippy]
 pedantic = "warn"
+
+[workspace.dependencies]
+axum = "0.8"
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }

@@ -11,7 +11,9 @@ path = "src/lib.rs"
 workspace = true
 
 [dependencies]
+axum = { workspace = true }
 tokio = { version = "1.47", features = ["fs", "macros", "process", "rt-multi-thread", "signal", "sync", "time"] }
+reqwest = { workspace = true }
 thiserror = "2.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
