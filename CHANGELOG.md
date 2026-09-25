@@ -1,3 +1,12 @@
+## [1.15.2](https://github.com/nasimubd/SiliconSanctum/compare/v1.15.1...v1.15.2) (2026-09-25)
+
+
+### Bug Fixes
+
+* **cli:** launch canonical server executable ([0b5ca01](https://github.com/nasimubd/SiliconSanctum/commit/0b5ca014b5d7c939f1d44d57f86407dc56c89109))
+* **release:** match published arm formula checksum ([a487fda](https://github.com/nasimubd/SiliconSanctum/commit/a487fdac05dc58cd72ae8270ac3bdfcf2229b7d2))
+* **release:** point formula to fixed arm asset ([adce95e](https://github.com/nasimubd/SiliconSanctum/commit/adce95e6f00eb37ebcc5f43d65f1633ea09802d8))
+
 ## [1.15.1](https://github.com/nasimubd/SiliconSanctum/compare/v1.15.0...v1.15.1) (2026-09-25)
 
 
