@@ -16,15 +16,15 @@ must still be built.
 | Speculative decoding | Harness exists | draft/target contract and tests; connect to real backends |
 | Prefix/radix cache | Foundation exists | radix module and tests; add cache metrics and eviction validation |
 | Decision-model executor | Contract only | [`decision.rs`](../crates/sanctum-runtime/src/decision.rs) currently has a fixture executor |
-| OpenAI API | Not implemented in Rust binary | implement normalized request/response and SSE layer |
-| Anthropic API | Not implemented in Rust binary | implement `/v1/messages` and content-block streaming |
-| Hardware benchmark installer | Shell benchmarks exist | make a native, persisted benchmark manifest and recommender |
-| Agent commands | Existing Claude/Aider shell path | add versioned adapters for Claude, Codex, OpenCode, and Aether |
+| OpenAI API | Shipped compatibility gateway | deepen contract/error/tool-call coverage |
+| Anthropic API | Shipped `/v1/messages` gateway | deepen content-block/tool-call coverage |
+| Hardware benchmark installer | Shipped native probe and smoke benchmark | persist deep manifests and thermal/quality runs |
+| Agent commands | Shipped Claude/Codex/OpenCode/Aider launch adapters | add versioned capability matrices and Aether contract |
 | Kimi backend | Not implemented | documentation-only plan; see [`KIMI_BACKEND.md`](KIMI_BACKEND.md) |
 
 ## Phase 1 — one Homebrew-installed binary and one local server
 
-Deliver a native Rust binary distributed through Homebrew with the canonical
+The current release delivers a native Rust binary distributed through Homebrew with the canonical
 entry points `sanctum-serve`, `sanctum-doctor`, and `sanctum-benchmark`:
 
 ```text
@@ -37,7 +37,7 @@ sanctum serve
   └─ print endpoint, model, fit class, and health
 ```
 
-Acceptance criteria:
+Completed criteria and remaining hardening:
 
 - `brew install silicon-sanctum` installs the binary and all required runtime
   assets without a repository checkout.
@@ -56,9 +56,10 @@ memory pressure, thermal repeatability, and rollback behavior.
 
 ## Phase 2 — hardware-aware installation
 
-Implement the benchmark and recommender in [`BENCHMARKING.md`](BENCHMARKING.md).
-The installer should run a short native test first, then offer an optional deep
-test. It must report why a model is comfortable, delayed, or unsupported.
+The shipped benchmark and recommender in [`BENCHMARKING.md`](BENCHMARKING.md)
+run a short native test first. The deep repeatability, memory, thermal, and
+quality suite remains the next extension and must report why a model is
+comfortable, delayed, or unsupported.
 
 Acceptance criteria:
 
@@ -70,12 +71,12 @@ Acceptance criteria:
 
 ## Phase 3 — agent adapters
 
-Implement `sanctum claude`, `sanctum codex`, `sanctum opencode`, and
-`sanctum aether` as narrow adapters. Each adapter gets a versioned capability
-matrix and smoke test. The adapter must reuse a running server, configure only
-its own scoped environment, avoid credential mutation, and restore state on
-exit. If a client is absent, the command should still start the API and print
-the exact endpoint configuration.
+The shipped binary implements `sanctum-claude`, `sanctum-codex`,
+`sanctum-opencode`, and `sanctum-aider` as narrow adapters. Each adapter reuses
+a running server or starts one on a free local port, configures only its
+process-scoped environment, avoids credential mutation, and stops servers it
+started. Add versioned capability matrices and the Aether contract as clients
+stabilize.
 
 The target is transparent workflow behavior, not an unsupported promise that a
 local model has frontier-model quality. Quality, tool-call reliability,

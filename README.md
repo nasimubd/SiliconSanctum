@@ -26,11 +26,10 @@ Rust control plane
   └─ model backends: MLX, llama.cpp, Ollama, and future native backends
 ```
 
-The current repository is the control-plane and runtime foundation. The
-single-binary API server and zero-configuration agent commands are the target
-Phase 1 product surface described in
-[`docs/CONTROL_PLANE.md`](docs/CONTROL_PLANE.md); they are not all implemented
-by the current release.
+The current release ships the single-binary API server, hardware probe,
+benchmark command, Ollama supervision, and agent launch adapters described in
+[`docs/CONTROL_PLANE.md`](docs/CONTROL_PLANE.md). Native MLX/llama.cpp workers,
+deep quality benchmarking, and the Kimi backend remain future work.
 
 ## What it solves today
 
@@ -59,39 +58,32 @@ experiment, not a verified native-million-token deployment; it is guarded at
 
 The Rust runtime already contains backend-neutral registry, supervisor, routing,
 gateway, speculative, context, and decision contracts. Several contracts are
-tested as foundations while the unified server and installer experience remain
-the next product phase.
+tested as foundations; the shipped binary currently uses Ollama as its
+managed inference worker and exposes the compatibility gateway around it.
 
 ## Installation and intended user experience
 
-The distribution target is Homebrew. Once the formula is published, the
-installation command will be:
-
-```bash
-brew install silicon-sanctum
-```
-
-During development, the same formula can be tested from the project tap with:
+The distribution target is Homebrew. After tapping the published Silicon
+Sanctum repository, install the released binary with:
 
 ```bash
 brew tap nasimubd/silicon-sanctum
-brew install nasimubd/silicon-sanctum/silicon-sanctum
+brew install silicon-sanctum
 ```
 
-The intended end state is one installed binary and one command:
+The installed binary exposes one generic server command:
 
 ```bash
 sanctum serve
 ```
 
-On first run, the binary will benchmark the host, inspect available storage,
-select or recommend model profiles, start one resident backend, and print:
+The server starts or reuses Ollama, then prints its endpoint and selected
+upstream model:
 
 ```text
 OpenAI API:    http://127.0.0.1:8080/v1
 Anthropic API: http://127.0.0.1:8080/v1/messages
 Model:         <selected profile>
-Hardware fit:  comfortable | usable with latency | unsupported
 ```
 
 The dedicated commands are:
@@ -108,16 +100,15 @@ sanctum-benchmark   # rerun the reproducible hardware/model benchmark
 
 The canonical executable names are lowercase. `sanctum-aider` is the Aider
 adapter; an Aether adapter will use the same command shape once Aether's public
-integration contract is verified. The agent commands will detect an already-open supported client where its
-public integration permits it, preserve existing user configuration, write
-only a scoped local profile, and restore the prior environment on exit. No
-provider credentials should be overwritten. Until this surface is implemented,
-the commands are planned and are not yet installed by the current release.
+integration contract is verified. The agent commands reuse a healthy local
+server or start one on an available local port, export only process-scoped
+provider variables, launch the installed client, and stop a server they start.
+They do not overwrite global credentials.
 
-The first installation on the target laptop is an explicit empirical gate. It
-must record the Homebrew formula revision, binary version, hardware benchmark,
-selected profile, API health, cold load, TTFT, decode rate, memory pressure,
-and repeated-run stability before a model is recommended.
+The installation benchmark is intentionally conservative: it reports host
+capacity, backend reachability, model availability, and a generation probe.
+`docs/BENCHMARKING.md` defines the deeper repeatability, memory, thermal, and
+quality gates that will extend this fast installation check.
 
 ## Current commands
 

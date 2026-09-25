@@ -93,8 +93,9 @@ CLI
  └─ model worker (MLX / llama.cpp / Ollama / future native backend)
 ```
 
-The first implementation milestone should add a real binary entry point,
-HTTP/SSE handling, normalized request types, backend capability negotiation,
-and end-to-end tests. Do not claim frontier equivalence from API compatibility:
-quality, latency, tool reliability, and refusal behavior must be measured per
-profile.
+The current release provides the binary entry point, HTTP/SSE handling,
+OpenAI/Anthropic request translation, Ollama supervision, hardware reports,
+and smoke-level end-to-end coverage. The next runtime milestone is backend
+capability negotiation and deeper quality/latency evaluation. API compatibility
+does not imply frontier equivalence: quality, latency, tool reliability, and
+refusal behavior must be measured per profile.
