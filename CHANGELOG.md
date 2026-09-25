@@ -1,3 +1,11 @@
+## [1.15.1](https://github.com/nasimubd/SiliconSanctum/compare/v1.15.0...v1.15.1) (2026-09-25)
+
+
+### Bug Fixes
+
+* **cli:** avoid occupied default agent port ([99a69ea](https://github.com/nasimubd/SiliconSanctum/commit/99a69ea06c06da7167b2b4a54b9d0fc1c13b8355))
+* **release:** synchronize both homebrew checksums ([9f6b33c](https://github.com/nasimubd/SiliconSanctum/commit/9f6b33c090335b670045c024d072dbde181c9cbf))
+
 # [1.15.0](https://github.com/nasimubd/SiliconSanctum/compare/v1.14.0...v1.15.0) (2026-09-25)
 
 
