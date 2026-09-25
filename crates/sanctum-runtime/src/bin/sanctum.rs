@@ -37,7 +37,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn run_agent(command: &str) -> Result<(), Box<dyn std::error::Error>> {
     let host = std::env::var("SANCTUM_HOST").unwrap_or_else(|_| "127.0.0.1".to_owned());
-    let port = std::env::var("SANCTUM_PORT").unwrap_or_else(|_| "8080".to_owned());
+    let configured_port = std::env::var("SANCTUM_PORT").unwrap_or_else(|_| "8080".to_owned());
+    let port = if configured_port == "8080"
+        && std::net::TcpListener::bind(format!("{host}:{configured_port}")).is_err()
+    {
+        std::net::TcpListener::bind(format!("{host}:0"))?
+            .local_addr()?
+            .port()
+            .to_string()
+    } else {
+        configured_port
+    };
     let endpoint = format!("http://{host}:{port}");
     let client = reqwest::Client::new();
     let server = if client
@@ -50,6 +60,7 @@ async fn run_agent(command: &str) -> Result<(), Box<dyn std::error::Error>> {
     } else {
         let child = std::process::Command::new(std::env::current_exe()?)
             .arg("serve")
+            .env("SANCTUM_PORT", &port)
             .spawn()?;
         let mut ready = false;
         for _ in 0..50 {
