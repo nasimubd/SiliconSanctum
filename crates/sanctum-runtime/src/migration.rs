@@ -98,10 +98,8 @@ impl BusInspection {
         for line in report.lines() {
             let line = line.trim();
             if line == "Port:" {
-                if connected {
-                    if let (Some(width), Some(speed)) = (width, speed) {
-                        return Ok(Self { width, speed });
-                    }
+                if connected && let (Some(width), Some(speed)) = (width, speed) {
+                    return Ok(Self { width, speed });
                 }
                 port = true;
                 connected = false;
@@ -122,10 +120,8 @@ impl BusInspection {
                 speed = LinkSpeed::parse(value).ok();
             }
         }
-        if connected {
-            if let (Some(width), Some(speed)) = (width, speed) {
-                return Ok(Self { width, speed });
-            }
+        if connected && let (Some(width), Some(speed)) = (width, speed) {
+            return Ok(Self { width, speed });
         }
         Err(MigrationError::InvalidInput(
             "connected Thunderbolt link with PCIe width and speed",
