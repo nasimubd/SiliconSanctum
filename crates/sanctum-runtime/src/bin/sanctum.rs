@@ -23,10 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "benchmark" | "sanctum-benchmark" => benchmark()?,
         "claude" | "codex" | "opencode" | "aider" | "sanctum-claude" | "sanctum-codex"
         | "sanctum-opencode" | "sanctum-aider" => {
-            eprintln!(
-                "agent adapter '{command}' is not yet available; use sanctum-serve and the printed API endpoint"
-            );
-            serve().await?;
+            run_agent(&command).await?;
         }
         "--help" | "help" => help(),
         other => {
@@ -34,6 +31,79 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             help();
             std::process::exit(2);
         }
+    }
+    Ok(())
+}
+
+async fn run_agent(command: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let host = std::env::var("SANCTUM_HOST").unwrap_or_else(|_| "127.0.0.1".to_owned());
+    let port = std::env::var("SANCTUM_PORT").unwrap_or_else(|_| "8080".to_owned());
+    let endpoint = format!("http://{host}:{port}");
+    let client = reqwest::Client::new();
+    let server = if client
+        .get(format!("{endpoint}/health"))
+        .send()
+        .await
+        .is_ok()
+    {
+        None
+    } else {
+        let child = std::process::Command::new(std::env::current_exe()?)
+            .arg("serve")
+            .spawn()?;
+        let mut ready = false;
+        for _ in 0..50 {
+            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+            if client
+                .get(format!("{endpoint}/health"))
+                .send()
+                .await
+                .is_ok()
+            {
+                ready = true;
+                break;
+            }
+        }
+        if !ready {
+            return Err("sanctum server did not become ready".into());
+        }
+        Some(child)
+    };
+    let (program, variables): (String, Vec<(String, String)>) = match command {
+        "claude" | "sanctum-claude" => (
+            "claude".into(),
+            vec![
+                ("ANTHROPIC_BASE_URL".into(), endpoint.clone()),
+                ("ANTHROPIC_API_KEY".into(), "local".into()),
+                ("ANTHROPIC_AUTH_TOKEN".into(), "local".into()),
+            ],
+        ),
+        "codex" | "sanctum-codex" | "opencode" | "sanctum-opencode" => (
+            command.trim_start_matches("sanctum-").to_owned(),
+            vec![
+                ("OPENAI_BASE_URL".into(), format!("{endpoint}/v1")),
+                ("OPENAI_API_KEY".into(), "local".into()),
+            ],
+        ),
+        "aider" | "sanctum-aider" => (
+            "aider".into(),
+            vec![
+                ("OPENAI_API_BASE".into(), format!("{endpoint}/v1")),
+                ("OPENAI_API_KEY".into(), "local".into()),
+            ],
+        ),
+        _ => return Err(format!("unknown agent adapter: {command}").into()),
+    };
+    let status = std::process::Command::new(&program)
+        .envs(variables)
+        .args(std::env::args().skip(1))
+        .status()?;
+    if let Some(mut child) = server {
+        let _ = child.kill();
+        let _ = child.wait();
+    }
+    if !status.success() {
+        return Err(format!("{program} exited with {status}").into());
     }
     Ok(())
 }
