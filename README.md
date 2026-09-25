@@ -1,195 +1,315 @@
+<div align="center">
+
+<img src="assets/silicon-sanctum.svg" alt="Silicon Sanctum" width="128">
+
 # Silicon Sanctum
 
-Silicon Sanctum is a Rust control plane for reproducible local AI inference and
-quantitative-development workflows on Apple Silicon. It keeps model assets on
-external NVMe, selects a model according to measured hardware capacity, and
-exposes one local service that applications and coding agents can use through
-standard APIs.
+### A local inference control plane for fast, private AI workflows
 
-## About
+Run one Rust binary. Keep model traffic on your machine. Give Claude Code,
+Codex, OpenCode, Aider, and ordinary applications standard OpenAI or Anthropic
+endpoints.
 
-Silicon Sanctum is aimed at high-frequency AI inference in the practical sense:
-many small, latency-sensitive decisions around an agent or research workflow,
-with predictable local execution and minimal network dependence. It is not a
-claim of financial high-frequency trading performance and it does not place
-orders.
+[![Release](https://img.shields.io/github/v/release/nasimubd/SiliconSanctum?display_name=tag&sort=semver&color=7c3aed)](https://github.com/nasimubd/SiliconSanctum/releases)
+[![Rust CI](https://img.shields.io/github/actions/workflow/status/nasimubd/SiliconSanctum/rust-core.yml?label=Rust%20CI)](https://github.com/nasimubd/SiliconSanctum/actions/workflows/rust-core.yml)
+[![Security](https://img.shields.io/github/actions/workflow/status/nasimubd/SiliconSanctum/security.yml?label=Security)](https://github.com/nasimubd/SiliconSanctum/actions/workflows/security.yml)
+[![License](https://img.shields.io/github/license/nasimubd/SiliconSanctum)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/nasimubd/SiliconSanctum?style=social)](https://github.com/nasimubd/SiliconSanctum/stargazers)
 
-The architecture separates three jobs:
+[Install](#install) · [Quick start](#quick-start) · [API](#api) · [Commands](#dedicated-commands) · [Docs](#documentation)
+
+</div>
+
+---
+
+## Why Silicon Sanctum?
+
+Most local model tools make you choose between a model runner, an API gateway,
+an agent configuration, and a hardware guess. Silicon Sanctum provides the
+small control plane between those pieces:
 
 ```text
-Rust control plane
-  ├─ hardware benchmark and model-fit recommendation
-  ├─ OpenAI-compatible /v1 API
-  ├─ Anthropic-compatible /v1/messages API
-  ├─ agent adapters and automatic local environment setup
-  ├─ decision plane: typed routing, confidence, policy, and verification
-  └─ model backends: MLX, llama.cpp, Ollama, and future native backends
+your app / coding agent
+          │ OpenAI or Anthropic protocol
+          ▼
+   sanctum (Rust binary)
+   ├─ hardware probe + model-fit report
+   ├─ local API gateway + streaming SSE
+   ├─ scoped Claude/Codex/OpenCode/Aider launchers
+   ├─ Ollama lifecycle and health supervision
+   └─ decision, routing, memory, and performance foundations
+          │
+          ▼
+   local model backend (Ollama today; native backends later)
 ```
 
-The current release ships the single-binary API server, hardware probe,
-benchmark command, Ollama supervision, and agent launch adapters described in
-[`docs/CONTROL_PLANE.md`](docs/CONTROL_PLANE.md). Native MLX/llama.cpp workers,
-deep quality benchmarking, and the Kimi backend remain future work.
+The result is a private local endpoint that existing AI clients already know
+how to use—without making an open-weight model magically equivalent to a
+frontier model. Quality and latency are measured per model and per machine.
 
-## What it solves today
+## Highlights
 
-- Reproducible local model profiles and manifests.
-- External-NVMe storage for model weights, caches, and benchmark artifacts.
-- Ollama, llama.cpp, and MLX process supervision on Apple Silicon.
-- Context and memory guardrails for small local coding models.
-- Repository-aware agent workflows through Aider and Claude Code.
-- Deterministic quantitative research and backtest orchestration with safety
-  checks, manifests, seeds, and no-live-order defaults.
-- A Rust foundation for routing, speculative execution, prefix caching,
-  chunked prefill, pressure handling, and typed decision policies.
+- **One binary:** `sanctum` plus canonical command aliases.
+- **Two compatible protocols:** OpenAI-compatible `/v1` routes and Anthropic
+  Messages at `/v1/messages`.
+- **Agent-ready:** launch Claude Code, Codex, OpenCode, or Aider with scoped
+  environment variables and no global credential mutation.
+- **Hardware-aware:** report comfortable models separately from models that can
+  run with noticeable delay.
+- **Private by default:** local traffic goes to a local backend; no provider
+  credentials are required for the gateway.
+- **Apple Silicon first:** released binaries target macOS ARM64 and Intel, with
+  Docker and source builds available for other environments.
+- **Honest boundaries:** Kimi K3 is documented as a future backend and is not
+  exposed as supported today.
 
-It does not currently make arbitrary trillion-parameter models fit in RAM. The
-Kimi K3 backend is documented as a future native backend and is explicitly
-**coming soon**, not included in this release. See
-[`docs/KIMI_BACKEND.md`](docs/KIMI_BACKEND.md).
+## Install
 
-## Current status
+Choose the path that fits your workflow. The current release is `v1.15.2`.
 
-The tested workstation is an M1 Pro Mac with 16 GiB unified memory. Existing
-profiles include Qwen3.5 4B, Qwen3.5 9B, an experimental Qwen3.5 long-context
-profile, and a guarded Qwen3.8 27B profile. The 1M profile is an extrapolation
-experiment, not a verified native-million-token deployment; it is guarded at
-64 GiB RAM. See [`docs/LONG_CONTEXT.md`](docs/LONG_CONTEXT.md).
-
-The Rust runtime already contains backend-neutral registry, supervisor, routing,
-gateway, speculative, context, and decision contracts. Several contracts are
-tested as foundations; the shipped binary currently uses Ollama as its
-managed inference worker and exposes the compatibility gateway around it.
-
-## Installation and intended user experience
-
-The distribution target is Homebrew. After tapping the published Silicon
-Sanctum repository, install the released binary with:
+### Homebrew (recommended)
 
 ```bash
 brew tap nasimubd/silicon-sanctum
 brew install silicon-sanctum
 ```
 
-The installed binary exposes one generic server command:
+Upgrade later with:
 
 ```bash
-sanctum serve
+brew update
+brew upgrade silicon-sanctum
 ```
 
-The server starts or reuses Ollama, then prints its endpoint and selected
-upstream model:
+### Prebuilt release installer
+
+The installer detects Apple Silicon or Intel macOS, downloads the matching
+released archive, verifies its SHA-256 checksum, and installs into
+`~/.local/bin` without requiring `sudo`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nasimubd/SiliconSanctum/main/install.sh | sh
+```
+
+Pin an explicit release or installation directory when desired:
+
+```bash
+SANCTUM_VERSION=v1.15.2 \
+SANCTUM_INSTALL_DIR="$HOME/.local/bin" \
+  sh -c 'curl -fsSL https://raw.githubusercontent.com/nasimubd/SiliconSanctum/main/install.sh | sh'
+```
+
+### Docker
+
+The image runs the gateway in a container and connects to an Ollama service on
+the host. Build it locally so the image is always tied to the source you
+reviewed:
+
+```bash
+docker build -t silicon-sanctum:local .
+docker run --rm --add-host=host.docker.internal:host-gateway \
+  -p 8080:8080 \
+  silicon-sanctum:local
+```
+
+Set `SANCTUM_UPSTREAM` when the model backend is elsewhere. The container does
+not bundle model weights or silently download them.
+
+### Build from source
+
+Requires Rust 1.90 or newer:
+
+```bash
+git clone https://github.com/nasimubd/SiliconSanctum.git
+cd SiliconSanctum
+cargo install --path crates/sanctum-runtime --bin sanctum
+```
+
+For development without installing:
+
+```bash
+cargo run --release -p sanctum-runtime --bin sanctum -- serve
+```
+
+The prebuilt release installer currently supports macOS. Docker and source
+builds are the supported paths for Linux and other environments; hardware
+acceleration and backend availability remain platform-dependent.
+
+## Quick start
+
+Make sure Ollama is installed and has at least one compatible model, then run:
+
+```bash
+sanctum-doctor       # inspect hardware, backend, storage, and model fit
+sanctum-benchmark    # run the reproducible smoke benchmark
+sanctum-serve        # start the local gateway
+```
+
+The server prints both endpoint families:
 
 ```text
 OpenAI API:    http://127.0.0.1:8080/v1
 Anthropic API: http://127.0.0.1:8080/v1/messages
-Model:         <selected profile>
 ```
 
-The dedicated commands are:
+Useful environment variables:
 
 ```bash
-sanctum-serve       # generic local server
-sanctum-claude      # prepare and launch Claude Code against the local API
-sanctum-codex       # prepare and launch Codex against the local API
-sanctum-opencode    # prepare and launch OpenCode against the local API
-sanctum-aider       # prepare and launch Aider/Aether against the local API
-sanctum-doctor      # inspect installation, backend, storage, and API health
-sanctum-benchmark   # rerun the reproducible hardware/model benchmark
+SANCTUM_HOST=127.0.0.1
+SANCTUM_PORT=8080
+SANCTUM_UPSTREAM=http://127.0.0.1:11434
+SANCTUM_MODEL=qwen3.5:4b-q4_K_M
 ```
 
-The canonical executable names are lowercase. `sanctum-aider` is the Aider
-adapter; an Aether adapter will use the same command shape once Aether's public
-integration contract is verified. The agent commands reuse a healthy local
-server or start one on an available local port, export only process-scoped
-provider variables, launch the installed client, and stop a server they start.
-They do not overwrite global credentials.
+If port 8080 is already occupied, the dedicated agent launchers select a free
+local port automatically. `sanctum-serve` itself reports a bind error so an
+explicit server configuration is never silently ignored.
 
-The installation benchmark is intentionally conservative: it reports host
-capacity, backend reachability, model availability, and a generation probe.
-`docs/BENCHMARKING.md` defines the deeper repeatability, memory, thermal, and
-quality gates that will extend this fast installation check.
+## API
 
-## Current commands
+### OpenAI-compatible
+
+Point any OpenAI-compatible client at `http://127.0.0.1:8080/v1` and use any
+local model returned by `/v1/models`:
 
 ```bash
-cp .env.example .env       # set the exact external NVMe volume name
-./scripts/bootstrap.sh
-local-ai doctor
-local-ai serve daily
-local-ai status
-local-ai agent claude qwen35-4b-coding
-local-ai benchmark qwen35-4b-coding 32768
-local-ai stop
+curl http://127.0.0.1:8080/v1/chat/completions \
+  -H 'content-type: application/json' \
+  -d '{
+    "model": "qwen3.5:4b-q4_K_M",
+    "messages": [{"role": "user", "content": "Reply with OK."}],
+    "stream": false
+  }'
 ```
 
-The current implementation uses Ollama as the managed server. `scripts/serve.sh`
-can alternatively launch llama.cpp with a pinned GGUF. Model files and runtime
-state live below `AI_ROOT`, normally on the external volume.
+Available OpenAI-shaped routes:
 
-## Hardware recommendations
+| Route | Purpose |
+| --- | --- |
+| `GET /v1/models` | Discover backend models |
+| `POST /v1/chat/completions` | Chat generation and SSE streaming |
+| `POST /v1/completions` | Completion-shaped compatibility route |
+| `POST /v1/responses` | Responses-shaped compatibility route |
 
-Installation must distinguish model *fit* from model *quality*. The benchmark
-plan defines two recommendations:
+### Anthropic-compatible
 
-1. **Comfortable**: fits physical memory without swap and meets the selected
-   interactive latency target under a representative prompt.
-2. **Robust but delayed**: fits and completes correctly, but cold load, prompt
-   processing, or token latency is visibly slower.
+Use the same server with clients that speak the Anthropic Messages API:
 
-Recommendations must be based on measured memory headroom, storage bandwidth,
-prompt processing, decode rate, first-token latency, context growth, and thermal
-repeatability—not parameter count alone. See
-[`docs/BENCHMARKING.md`](docs/BENCHMARKING.md).
+```bash
+curl http://127.0.0.1:8080/v1/messages \
+  -H 'content-type: application/json' \
+  -H 'x-api-key: local' \
+  -d '{
+    "model": "qwen3.5:4b-q4_K_M",
+    "max_tokens": 128,
+    "messages": [{"role": "user", "content": "Reply with OK."}]
+  }'
+```
 
-## Decision models and Jev
+The gateway translates system prompts, messages, non-streaming responses, and
+streaming SSE events to and from the local backend.
 
-The decision plane is where Silicon Sanctum can become faster and more reliable
-without pretending a small generative model is a frontier model. A decision
-model can classify intent, select a backend, decide whether a tool call is
-safe, score confidence, detect ambiguity, and gate escalation. The final policy
-and side effects remain in Rust.
+## Dedicated commands
 
-TypeSafe's Jev is a relevant hosted System One decision model. Based on the
-official TypeSafe documentation checked on 2026-09-25, Jev is accessed through
-TypeSafe's API; its weights are not published as an open-weight local model.
-TypeSafe's SDKs and `system-one-adapter` are open source, but they do not make
-Jev locally runnable. See [`docs/DECISION_MODELS.md`](docs/DECISION_MODELS.md).
+```text
+sanctum-serve       Start the generic local server
+sanctum-claude      Start/reuse the server and launch Claude Code
+sanctum-codex       Start/reuse the server and launch Codex
+sanctum-opencode    Start/reuse the server and launch OpenCode
+sanctum-aider       Start/reuse the server and launch Aider
+sanctum-doctor      Inspect installation, backend, storage, and API health
+sanctum-benchmark   Rerun the reproducible hardware/model benchmark
+```
 
-## Safety boundary
+The Aider-shaped command is also the reserved compatibility shape for Aether;
+an Aether-specific adapter will land once its public integration contract is
+stable. Missing client executables fail with an actionable error after the
+server readiness check.
 
-This is research infrastructure, not trading advice. Do not connect it to live
-order execution without independent controls and explicit human authorization.
-Local model output is not an authority: tests, deterministic tools, manifests,
-and independent verification remain authoritative.
+## Hardware fit and model recommendations
 
-## Further documentation
+`sanctum-doctor` is the fast installation check. `sanctum-benchmark` adds a
+generation probe and reports backend reachability, model availability,
+generation time, output tokens, and tokens per second when the probe completes.
 
-- [`docs/CONTROL_PLANE.md`](docs/CONTROL_PLANE.md) — unified binary, APIs, and
-  agent commands.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — ordered implementation plan, current
-  state, and acceptance criteria.
-- [`docs/BENCHMARKING.md`](docs/BENCHMARKING.md) — reproducible hardware and
-  model-fit benchmark plan.
-- [`docs/DECISION_MODELS.md`](docs/DECISION_MODELS.md) — Jev status and the
-  local decision-plane strategy.
-- [`docs/KIMI_BACKEND.md`](docs/KIMI_BACKEND.md) — Kimi K3 backend plan,
-  explicitly coming soon.
-- [`docs/LONG_CONTEXT.md`](docs/LONG_CONTEXT.md) — current 1M-context limits.
-- [`docs/PHASE1_DARWIN_CORE.md`](docs/PHASE1_DARWIN_CORE.md) — Darwin storage
-  and scheduling foundations.
+Recommendations are deliberately split:
+
+- **Comfortable:** the model fits the detected memory class and is the primary
+  local recommendation.
+- **Robust but delayed:** the model is expected to run, but cold load, prompt
+  processing, or decode latency may be noticeable.
+
+The current laptop result is Qwen3.5 4B as comfortable, with Qwen3.5 9B and
+Qwen3.8 27B in the delayed tier. These are machine-specific recommendations,
+not universal performance claims. See [`docs/BENCHMARKING.md`](docs/BENCHMARKING.md)
+for the deeper benchmark design based on llama.cpp, MLX-LM, vLLM, SGLang, and
+lm-evaluation-harness.
+
+## What is supported today?
+
+| Capability | Status |
+| --- | --- |
+| Rust single-binary CLI/server | Supported |
+| Ollama supervision | Supported |
+| OpenAI-compatible gateway | Supported |
+| Anthropic-compatible gateway | Supported |
+| Claude/Codex/OpenCode/Aider launchers | Supported |
+| Hardware probe and smoke benchmark | Supported |
+| Native MLX or llama.cpp worker inside Sanctum | Planned |
+| Local FOSS decision-model backend | Contract and research plan; implementation pending |
+| Kimi K3 backend | **Coming soon; not included** |
+
+## Architecture and roadmap
+
+The Rust decision plane is designed to route, verify, abstain, gate tools, and
+escalate without granting a model authority over side effects. TypeSafe Jev is
+hosted and has no verified open-weight checkpoint; Silicon Sanctum therefore
+does not claim to run Jev locally. Candidate local FOSS runtimes are ONNX
+Runtime, Candle, and Apple-native model paths, selected by calibration and
+latency benchmarks rather than branding.
+
+The separate Kimi K3 plan is documented in
+[`docs/KIMI_BACKEND.md`](docs/KIMI_BACKEND.md). It remains explicitly
+documentation-only until storage, memory, latency, parity, and recovery gates
+pass.
+
+## Documentation
+
+- [`docs/CONTROL_PLANE.md`](docs/CONTROL_PLANE.md) — API and agent contract.
+- [`docs/BENCHMARKING.md`](docs/BENCHMARKING.md) — hardware and model-fit methodology.
+- [`docs/DECISION_MODELS.md`](docs/DECISION_MODELS.md) — Jev findings and local decision plane.
+- [`docs/KIMI_BACKEND.md`](docs/KIMI_BACKEND.md) — future Kimi integration.
+- [`docs/LONG_CONTEXT.md`](docs/LONG_CONTEXT.md) — current million-token limits.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — implementation status and next milestones.
+
+## Contributing
+
+Issues and pull requests are welcome. Run the local gates before submitting:
+
+```bash
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace --all-targets
+make validate
+./scripts/security-scan.sh
+```
+
+Use Conventional Commits. Please include reproducible hardware, model, backend,
+and latency details for performance changes.
+
+## Safety and limitations
+
+Silicon Sanctum is local inference infrastructure, not trading advice and not a
+frontier-model replacement. Do not connect generated output to live financial
+execution without independent controls and explicit human authorization.
 
 ## License
 
 MIT. Model weights, provider services, and third-party tools retain their own
 licenses and terms.
 
-## Citation
+<div align="center">
 
-```bibtex
-@software{silicon_sanctum,
-  title = {Silicon Sanctum: Reproducible local inference and quantitative-development workstation},
-  author = {MD NASIM},
-  url = {https://github.com/nasimubd/SiliconSanctum}
-}
-```
+Built for private, measurable, local inference.
+
+</div>
