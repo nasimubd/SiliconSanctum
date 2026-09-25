@@ -1,15 +1,15 @@
 class SiliconSanctum < Formula
   desc "Local AI inference control plane for Apple Silicon"
   homepage "https://github.com/nasimubd/SiliconSanctum"
-  version "1.15.0"
+  version "1.15.1"
   license "MIT"
 
   if Hardware::CPU.arm?
     url "https://github.com/nasimubd/SiliconSanctum/releases/download/v#{version}/silicon-sanctum-#{version}-aarch64-apple-darwin.tar.gz"
-    sha256 "b3036189af8bbe74ad4ed53e84bf85eadba215f617a1429c8a00d008d169c92f"
+    sha256 "53dc583e7fd285d73812badff65b1d568574aa49a45f19ee56cd1f9d2e40022a"
   else
     url "https://github.com/nasimubd/SiliconSanctum/releases/download/v#{version}/silicon-sanctum-#{version}-x86_64-apple-darwin.tar.gz"
-    sha256 "7177f3db04f424872470bcd407193a66dc282da0ecdc6d3e388c27bd48aef6d9"
+    sha256 "a2bae2d45abf524f39cea9b96ffdf36a4db80d09163d98b90b6e71f6b1dc6541"
   end
 
   def install
